@@ -42,6 +42,7 @@ Texture *Texture::create(int width, int height, bool clear)
 	tex->_h = height;
 	tex->_data = (uint32_t*)malloc(width*height*4);
 	tex->_dirty = true;
+	tex->_clip = Rect(0, 0, width, height);
 
 	// Clear ?
 	if(clear)
@@ -131,6 +132,13 @@ void Texture::set_wrap(TextureWrap::Type horiz, TextureWrap::Type vert)
 
 	// Drop the OpenGL texture if it exists
 	delete_gl();
+}
+	
+void Texture::set_clip(const Rect& r)
+{
+	// Clip the clipping rectangle
+	if(!Rect::clip(r, Rect(0, 0, _w, _h), _clip))
+		_clip = Rect(0, 0, 0, 0);
 }
 
 inline static GLint gl_filter(TextureFilter::Type filter)
@@ -266,7 +274,270 @@ void Texture::clear(const Color& col)
 
 	_dirty = true;
 }
+	
+void Texture::set_pixel(int x, int y, const Color& col)
+{
+	if(_clip.contains(x, y))
+	{
+		set_pixel_fast(x, y, col);
+		_dirty = true;
+	}
+}
 
+Color Texture::get_pixel(int x, int y)
+{
+	if(_clip.contains(x, y))
+		return get_pixel_fast(x, y);
 
+	return 0;
+}
+
+void Texture::hline(int x1, int x2, int y, const Color& col)
+{
+	if(x1>x2)
+		Math::swap(x1, x2);
+
+	// Clip
+	if(y<_clip.y || y>=(_clip.y+_clip.h))
+		return;
+	if(x1>=(_clip.x+_clip.w))
+		return;
+	if(x2<_clip.x)
+		return;
+
+	if(x1<_clip.x)
+		x1 = _clip.x;
+	if(x2>=(_clip.x+_clip.w))
+		x2 = _clip.x+_clip.w-1;
+
+	uint32_t *ptr = _data + y*_w + x1;
+	for(int w = x2-x1+1; w>0; w--)
+		*(ptr++) = col;
+
+	_dirty = true;
+}
+
+void Texture::vline(int y1, int y2, int x, const Color& col)
+{
+	if(y1>y2)
+		Math::swap(y1, y2);
+
+	// Clip
+	if(x<_clip.x || x>=(_clip.x+_clip.w))
+		return;
+	if(y1>=(_clip.y+_clip.h))
+		return;
+	if(y2<_clip.y)
+		return;
+
+	if(y1<_clip.y)
+		y1 = _clip.y;
+	if(y2>=(_clip.y+_clip.h))
+		y2 = _clip.y+_clip.h-1;
+
+	uint32_t *ptr = _data + y1*_w + x;
+	for(int h = y2-y1+1; h>0; h--)
+	{
+		*ptr = col;
+		ptr += _w;
+	}
+
+	_dirty = true;
+}
+
+void Texture::line(int x1, int y1, int x2, int y2, const Color& col)
+{
+	// Check for full clips right away
+	if(_clip.w==0 || _clip.h==0)
+		return;
+
+	if(x1==x2 && y1==y2)
+	{
+		set_pixel(x1, y1, col);
+		return;
+	}
+
+	if(x1==x2)
+	{
+		vline(y1, y2, x1, col);
+		return;
+	}
+
+	if(y1==y2)
+	{
+		hline(x1, x2, y1, col);
+		return;
+	}
+
+	// Use Bresenham to draw a regular line
+	// Taken from http://members.chello.at/easyfilter/bresenham.html
+
+	int sx = x1<x2 ? 1 : -1;
+	int sy = y1<y2 ? 1 : -1;
+	int dx = abs(x2-x1);
+	int dy = -abs(y2-y1);
+	int err = dx+dy;
+
+	for(;;)
+	{
+		if(_clip.contains(x1, y1))
+			set_pixel_fast(x1, y1, col);
+
+		if(x1==x2 && y1==y2)
+			break;
+
+		int e2 = err*2;
+
+		if(e2>=dy)
+		{
+			err += dy;
+			x1 += sx;
+		}
+		if(e2<=dx)
+		{
+			err += dx;
+			y1 += sy;
+		}
+	}
+
+	_dirty = true;
+}
+
+void Texture::rect(int x1, int y1, int x2, int y2, const Color& col)
+{
+	// Check for full clips right away
+	if(_clip.w==0 || _clip.h==0)
+		return;
+
+	// Single v line?
+	if(x1==x2)
+	{
+		vline(y1, y1, x1, col);
+		return;
+	}
+
+	// Single h line?
+	if(y1==y2)
+	{
+		hline(x1, x2, y1, col);
+		return;
+	}
+
+	// Draw 4 lines
+	hline(x1, x2, y1, col);
+	hline(x1, x2, y2, col);
+	vline(y1, y2, x1, col);
+	vline(y1, y2, x2, col);
+}
+
+void Texture::rect_fill(int x1, int y1, int x2, int y2, const Color& col)
+{
+	// Check for full clips right away
+	if(_clip.w==0 || _clip.h==0)
+		return;
+
+	if(x1>x2)
+		Math::swap(x1, x2);
+	if(y1>y2)
+		Math::swap(y1, y2);
+	
+	// Clip
+	Rect r;
+	if(!Rect::clip(Rect(x1, y1, x2-x1+1, y2-y1+1), _clip, r))
+		return;
+
+	// Draw using hlines
+	for(int y = 0; y<r.h; y++)
+		hline(r.x, r.x+r.w-1, r.y+y, col);
+}
+
+void Texture::circle(int x, int y, int r, const Color& col)
+{
+	// Check for full clips right away
+	if(_clip.w==0 || _clip.h==0)
+		return;
+
+	Rect dummy;
+	if(!Rect::clip(Rect(x-r, y-r, r*2, r*2), _clip, dummy))
+		return;
+
+	int hr = (int)((float)r*0.70710678);
+	if(Rect(x-hr, y-hr, hr*2, hr*2).contains(_clip))
+		return;
+	
+	// Use Bresenham to draw a circle outline
+	// Taken from http://members.chello.at/easyfilter/bresenham.html
+
+	int xm = x;
+	int ym = y;
+
+	x = -r;
+	y = 0;
+	int err = 2-2*r;
+
+	for(;;)
+	{
+		if(_clip.contains(xm-x, ym+y))	set_pixel_fast(xm-x, ym+y, col);
+		if(_clip.contains(xm-y, ym-x))	set_pixel_fast(xm-y, ym-x, col);
+		if(_clip.contains(xm+x, ym-y))	set_pixel_fast(xm+x, ym-y, col);
+		if(_clip.contains(xm+y, ym+x))	set_pixel_fast(xm+y, ym+x, col);
+
+		r = err;
+		if(r<=y)
+			err += ++y*2+1;
+		if(r>x || err>y)
+			err += ++x*2+1;
+
+		if(x>=0)
+			break;
+	}
+
+	_dirty = true;
+}
+
+void Texture::circle_fill(int x, int y, int r, const Color& col)
+{
+	// Check for full clips right away
+	if(_clip.w==0 || _clip.h==0)
+		return;
+
+	Rect dummy;
+	if(!Rect::clip(Rect(x-r, y-r, r*2, r*2), _clip, dummy))
+		return;
+
+	int hr = (int)((float)r*0.70710678);
+	if(Rect(x-hr, y-hr, hr*2, hr*2).contains(_clip))
+	{
+		// The circle full encompasses the clipping rectangle, fill it all
+		rect_fill(_clip, col);
+		return;
+	}
+	
+	// Use Bresenham to draw a filled circle
+	// Taken from http://members.chello.at/easyfilter/bresenham.html
+
+	int xm = x;
+	int ym = y;
+
+	x = -r;
+	y = 0;
+	int err = 2-2*r;
+
+	for(;;)
+	{
+		// Draw 2 horizontal lines
+		hline(xm+x, xm-x, ym-y, col);
+		hline(xm-y, xm+y, ym-x, col);
+
+		r = err;
+		if(r<=y)
+			err += ++y*2+1;
+		if(r>x || err>y)
+			err += ++x*2+1;
+
+		if(x>=0)
+			break;
+	}
+}
 
 }

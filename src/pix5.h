@@ -71,6 +71,7 @@ int load_file(const Str& fname, char **buf);
 
 #include "Log.h"
 #include "List.h"
+#include "Math.h"
 
 #include "Mouse.h"
 #include "keys.h"
@@ -82,6 +83,7 @@ int load_file(const Str& fname, char **buf);
 #include "VideoMode.h"
 
 #include "Color.h"
+#include "Rect.h"
 #include "Glyph.h"
 #include "Font.h"
 #include "Texture.h"

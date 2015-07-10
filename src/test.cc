@@ -1,4 +1,5 @@
 #include "pix5.h"
+#include <math.h>
 
 
 Texture *tex = NULL;
@@ -110,9 +111,12 @@ int main(int argc, char **argv)
 
 
 		Display::set_mode(VideoMode::resizable());
+		//Display::set_mode(VideoMode::resizable(1366, 768, false));
 
 		tex = Texture::load("konata.png");
-		tex->bind(0);
+		tex->rect(tex->get_clip(), Color(0,0,0));
+		tex->rect(10, 20, tex->width()-10, tex->height()-20, Color(1, 0, 1));
+		tex->set_clip(Rect(11, 21, tex->width()-21, tex->height()-41));
 
 		Shader *shad = Shader::load("Shader2D", "shader2d.vs", "shader2d.fs");
 
@@ -122,11 +126,18 @@ int main(int argc, char **argv)
 		Font *fnt = new Font("data/LiberationSans-Regular.ttf", 12);
 		fnt->get_glyph('A');
 
-		fnt->print(tex, 10, 50, Color(1, 1, 0), "Proutentakendok");
-		tex->bind(0);
+		tex->print(fnt, -10, 510, Color(1, 1, 0), "Proutentakendok");
+
+		float r = 1;
 
 		for(;;)
 		{
+			tex->circle_fill(tex->width()/2, tex->height()/2, (int)r, 0xFF000000 | (rand()*rand()));
+			tex->print(fnt, tex->width()/2, tex->height()/2, Color(1, 1, 0), "Proutentakendok");
+			tex->bind(0);
+
+			r += 1.0f;
+
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 		

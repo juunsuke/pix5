@@ -9,8 +9,8 @@ CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer V
 CLSS += Input
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
-HDRS += pix5.h Str.h List.h Error.h errors.h
-HDRS += VideoModeType.h VideoMode.h Color.h
+HDRS += pix5.h Str.h List.h Error.h errors.h Math.h
+HDRS += VideoModeType.h VideoMode.h Color.h Rect.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h 
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))

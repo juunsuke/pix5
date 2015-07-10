@@ -57,6 +57,9 @@ class Texture
 	TextureWrap::Type _wrap_h, _wrap_v;
 	// Horizontal/vertical wrapping
 
+	Rect _clip;
+	// Clipping rectangle, for drawing operations
+
 
 	
 	Texture();
@@ -68,6 +71,9 @@ class Texture
 
 	void create_gl();
 	// Create/bind/configure/upload the OpenGL texture
+
+	void hline(int x1, int x2, int y, const Color& col);
+	void vline(int y1, int y2, int x, const Color& col);
 
 public:
 
@@ -123,6 +129,13 @@ public:
 	// Set the horizontal/vertical wrap
 	// This may cause the OpenGL texture to be destroyed and later re-created
 
+	inline Rect get_clip() const { return _clip; }
+	// Get the clipping rectangle
+
+	void set_clip(const Rect& r);
+	// Set the clipping rectangle
+	// It is adjusted to make sure it fits inside the texture
+
 	void bind(int index);
 	// Bind the texture in OpenGL using GL_TEXTURE_2D
 	// 'index' represents the sampler unit to use
@@ -164,6 +177,40 @@ public:
 		return _data[y*_w+x];
 	}
 
+
+	//
+	// Drawing functions
+	// All these functions modify the raw texture data, and marks it as dirty
+	// The modified texture will be re-uploaded to OpenGL on the next bind()
+	// All these functions take account of the clipping rectangle
+	//
+
+	void set_pixel(int x, int y, const Color& col);
+	// Set a single pixel
+
+	Color get_pixel(int x, int y);
+	// Get a single pixel
+	// If out of bounds, returns 0
+
+	void line(int x1, int y1, int x2, int y2, const Color& col);
+	// Draw a regular line between (x1,y1) and (x2,y2)
+
+	void rect(int x1, int y1, int x2, int y2, const Color& col);
+	inline void rect(const Rect& r, const Color& col) { rect(r.x, r.y, r.x+r.w-1, r.y+r.h-1, col); }
+	// Draw a rectangle outline
+
+	void rect_fill(int x1, int y1, int x2, int y2, const Color& col);
+	inline void rect_fill(const Rect& r, const Color& col) { rect_fill(r.x, r.y, r.x+r.w-1, r.y+r.h-1, col); }
+	// Draw a filled rectangle
+
+	void circle(int x, int y, int r, const Color& col);
+	// Draw a circle outline, with (x,y) as a center and 'r' as a radius
+
+	void circle_fill(int x, int y, int r, const Color& col);
+	// Draw a filled circle, with (x,y) as a center and 'r' as a radius
+
+	inline void print(Font *fnt, int x, int y, const Color& col, const Str& text) { fnt->print(this, x, y, col, text); }
+	// Print a string using the given font
 };
 
 

@@ -102,12 +102,23 @@ public:
 	{
 		// Mix col1 and col2 together, using 'ratio'
 		// A ratio of 0 returns col1
-		// A ratio of 255 returns col2
+		// A ratio of 255 returns col2 (with proper alpha processing according to alpha1)
 		// A ratio of 127 retuns half of each color
 		// If 'alpha1' is true, the alpha channel of 'col1' is used as-is in the returned color
 		// If it is false, the alpha channel is also mixed
-		uint32_t rr = ratio;
-		uint32_t ri = 255-rr;
+		if(ratio==0)
+			return col1;
+
+		if(ratio==255)
+		{
+			if(alpha1)
+				return Color((((uint32_t)col2)&0xFFFFFF)|(col1.ia()<<24));
+			else
+				return col2;
+		}
+
+		uint32_t rr = 255-ratio;
+		uint32_t ri = ratio;
 
 		uint32_t r = ((col1.ir()*rr) + (col2.ir()*ri)) / 255;
 		uint32_t g = ((col1.ig()*rr) + (col2.ig()*ri)) / 255;

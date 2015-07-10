@@ -137,11 +137,25 @@ Glyph *Font::get_glyph(int ch)
 	
 void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g)
 {
-	uint8_t *ptr = g->data;
+	// Clip
+	Rect r;
+	int ox, oy;
+	if(!Rect::clip(Rect(dx, dy, g->width, g->height), tex->get_clip(), r, &ox, &oy))
+		return;
 
-	for(int y = 0; y<g->height; y++)
-		for(int x = 0; x<g->width; x++)
-			tex->set_pixel_fast(dx+x, dy+y, Color::mix(tex->get_pixel_fast(dx+x, dy+y), col, 255-*(ptr++)));
+	uint8_t *ptr = g->data + oy*g->width + ox;
+	dx += ox;
+	dy += oy;
+
+	for(int y = 0; y<r.h; y++)
+	{
+		for(int x = 0; x<r.w; x++)
+			tex->set_pixel_fast(dx+x, dy, Color::mix(tex->get_pixel_fast(dx+x, dy), col, ptr[x]));
+
+	
+		ptr += g->width;
+		dy++;
+	}
 }
 
 void Font::print(Texture *tex, int x, int y, const Color& col, const Str& text)
