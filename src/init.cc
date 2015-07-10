@@ -18,6 +18,8 @@ static bool _has_parachute = false;
 namespace Display		{ void init(); void done(); }
 namespace Input			{ void init(); void done(); }
 
+void font_init(); void font_done();
+
 
 
 static void parachute()
@@ -55,6 +57,7 @@ void pix_init(const Str& app_name)
 	}
 
 	Input::init();
+	font_init();
 	Display::init();
 
 	Log::log("PIX successfully initialized");
@@ -70,6 +73,7 @@ void pix_shutdown()
 
 	// Shutdown
 	Display::done();
+	font_done();
 	Input::done();
 
 	SDL_Quit();

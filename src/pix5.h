@@ -10,6 +10,7 @@
 
 
 struct SDL_Window;
+struct FT_FaceRec_;
 
 #ifdef DBG
 	#include <typeinfo>
@@ -79,15 +80,22 @@ int load_file(const Str& fname, char **buf);
 
 #include "VideoModeType.h"
 #include "VideoMode.h"
+
 #include "Color.h"
+#include "Glyph.h"
+#include "Font.h"
 #include "Texture.h"
+
 #include "Matrix.h"
 #include "Camera.h"
+
 #include "Shader.h"
+
 #include "VertexComp.h"
 #include "VertexDef.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
+
 #include "Display.h"
 
 #include "EventHandler.h"

@@ -144,6 +144,25 @@ public:
 	void clear(const Color& col);
 	// Clear the texture using the given color
 
+	void set_dirty() { _dirty = true; }
+	// Set the dirty flag
+
+	inline void set_pixel_fast(int x, int y, uint32_t col)
+	{
+		// This sets a single pixel as fast as possible
+		// No clipping is performed
+		// The dirty flag is not updated
+		// Use with care
+		_data[y*_w+x] = col;
+	}
+
+	inline uint32_t get_pixel_fast(int x, int y)
+	{
+		// This gets the color of a single pixel as fast as possible
+		// No clipping is performed
+		// Used with care
+		return _data[y*_w+x];
+	}
 
 };
 

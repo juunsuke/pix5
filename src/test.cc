@@ -118,12 +118,19 @@ int main(int argc, char **argv)
 
 		MyEventHandler eh;
 
+
+		Font *fnt = new Font("data/LiberationSans-Regular.ttf", 12);
+		fnt->get_glyph('A');
+
+		fnt->print(tex, 10, 50, Color(1, 1, 0), "Proutentakendok");
+		tex->bind(0);
+
 		for(;;)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 		
-			Display::test_draw(0, 0, tex);
+			Display::test_draw(600, 100, tex);
 
 			shad->bind();
 			shad->set_uniform("tex", 0);

@@ -96,6 +96,26 @@ public:
 	inline float fb() const { return (float)ib()/255.0f; }
 	inline float fa() const { return (float)ia()/255.0f; }
 	// Get float components
+
+
+	static Color mix(const Color& col1, const Color& col2, uint8_t ratio, bool alpha1 = true)
+	{
+		// Mix col1 and col2 together, using 'ratio'
+		// A ratio of 0 returns col1
+		// A ratio of 255 returns col2
+		// A ratio of 127 retuns half of each color
+		// If 'alpha1' is true, the alpha channel of 'col1' is used as-is in the returned color
+		// If it is false, the alpha channel is also mixed
+		uint32_t rr = ratio;
+		uint32_t ri = 255-rr;
+
+		uint32_t r = ((col1.ir()*rr) + (col2.ir()*ri)) / 255;
+		uint32_t g = ((col1.ig()*rr) + (col2.ig()*ri)) / 255;
+		uint32_t b = ((col1.ib()*rr) + (col2.ib()*ri)) / 255;
+		uint32_t a = alpha1 ? col1.ia() : ((col1.ia()*rr) + (col2.ia()*ri)) / 255;
+
+		return Color(((a&0xFF)<<24) | ((b&0xFF)<<16) | ((g&0xFF)<<8) | (r&0xFF));
+	}
 };
 
 

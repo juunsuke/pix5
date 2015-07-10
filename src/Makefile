@@ -5,7 +5,7 @@ DBG = 1
 ########################################################################################################################
 
 CLSS  = Error EventHandler Log
-CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer VertexArray
+CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer VertexArray Glyph Font
 CLSS += Input
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
@@ -16,7 +16,7 @@ HDRS += Mouse.h keys.h Key.h Keyboard.h
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc load_file.cc
 
-PKGS = sdl2 SDL2_image gl glew
+PKGS = sdl2 SDL2_image gl glew freetype2
 
 ########################################################################################################################
 
