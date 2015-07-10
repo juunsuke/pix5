@@ -402,6 +402,71 @@ void Texture::line(int x1, int y1, int x2, int y2, const Color& col)
 
 	_dirty = true;
 }
+	
+void Texture::line(int x1, int y1, int x2, int y2, float width, const Color& col)
+{
+	// Check for full clips right away
+	if(_clip.w==0 || _clip.h==0)
+		return;
+
+	// Use Bresenham to draw a regular line
+	// Taken from http://members.chello.at/easyfilter/bresenham.html
+
+	int sx = x1<x2 ? 1 : -1;
+	int sy = y1<y2 ? 1 : -1;
+	int dx = abs(x2-x1);
+	int dy = abs(y2-y1);
+	int err = dx-dy;
+	float ed = (dx+dy)==0 ? 1 : sqrt((float)dx*dx+(float)dy*dy);
+	width = (width+1)/2;
+
+	for(;;)
+	{
+		if(_clip.contains(x1, y1))
+			set_pixel_fast(x1, y1, Color::mix(get_pixel_fast(x1, y1), col, 255-Math::max(0, 255*(abs(err-dx+dy)/ed-width+1))));
+
+		int e2 = err;
+		int x3 = x1;
+
+		if(e2*2 >= -dx)
+		{
+			e2 += dy;
+			for(int y3 = y1; e2<ed*width && (y2!=y3 || dx>dy); e2 += dx)
+			{
+				y3 += sy;
+
+				if(_clip.contains(x1, y3))
+					set_pixel_fast(x1, y3, Color::mix(get_pixel_fast(x1, y3), col, 255-Math::max(0, 255*(abs(e2)/ed-width+1))));
+			}
+
+			if(x1==x2)
+				break;
+
+			e2 = err;
+			err -= dy;
+			x1 += sx;
+		}
+
+		if(e2*2 <= dy)
+		{
+			for(e2 = dx-e2; e2<ed*width && (x2!=x3 || dx<dy); e2 += dy)
+			{
+				x3 += sx;
+
+				if(_clip.contains(x3, y1))
+					set_pixel_fast(x3, y1, Color::mix(get_pixel_fast(x3, y1), col, 255-Math::max(0, 255*(abs(e2)/ed-width+1))));
+			}
+
+			if(y1==y2)
+				break;
+
+			err += dx;
+			y1 += sy;
+		}
+	}
+
+	_dirty = true;
+}
 
 void Texture::rect(int x1, int y1, int x2, int y2, const Color& col)
 {
@@ -539,5 +604,71 @@ void Texture::circle_fill(int x, int y, int r, const Color& col)
 			break;
 	}
 }
+
+void Texture::blit_raw(uint32_t *dptr, uint32_t *sptr, int w, int h, int spitch)
+{
+	// Perform a raw blit
+	for(int y = 0; y<h; y++)
+	{
+		memcpy(dptr, sptr, w*4);
+		dptr += _w;
+		sptr += spitch;
+	}
+}
+
+void Texture::blit_alpha(uint32_t *dptr, uint32_t *sptr, int w, int h, int spitch)
+{
+	// Perform an alpha blit
+	for(int y = 0; y<h; y++)
+	{
+		for(int x = 0; x<w; x++)
+			dptr[x] = Color::mix(dptr[x], sptr[x], ((sptr[x]&0xFF000000)>>24));
+
+		dptr += _w;
+		sptr += spitch;
+	}
+}
+
+void Texture::blit(int dx, int dy, Texture *src, int sx, int sy, int w, int h, bool alpha)
+{
+	// Clip
+	Rect r;
+	int ox, oy;
+
+	if(!Rect::clip(Rect(dx, dy, w, h), _clip, r, &ox, &oy))
+		return;
+
+	dx = r.x;
+	dy = r.y;
+	w = r.w;
+	h = r.h;
+
+	sx += ox;
+	sy += oy;
+
+	if(!Rect::clip(Rect(sx, sy, w, h), src->_clip, r, &ox, &oy))
+		return;
+
+	sx = r.x;
+	sy = r.y;
+
+	w = r.w;
+	h = r.h;
+
+	dx += ox;
+	dy += oy;
+
+
+	// Perform the proper blit
+	if(alpha)
+		blit_alpha(_data+dy*_w+dx, src->_data+sy*src->_w+sx, w, h, src->_w);
+	else
+		blit_raw(_data+dy*_w+dx, src->_data+sy*src->_w+sx, w, h, src->_w);
+
+	_dirty = true;
+}
+
+
+
 
 }

@@ -1,0 +1,53 @@
+#pragma once
+
+
+class SpriteSet
+{
+	VertexArray _va;
+	// The set's vertex array
+
+	SortedList<Sprite*> _vis_sprites;
+	// List of all visible sprites, sorted by their Z value
+
+	Sprite *_hid_first, *_hid_last;
+	// First/last hidden sprite, for the doubly-linked list
+
+	bool _va_dirty;
+	// Wether the vertex array should be rebuild
+
+	
+	void show_sprite(Sprite *s);
+	// Show a hidden sprite
+
+	void hide_sprite(Sprite *s);
+	// Hide a visible sprite
+
+	void reorder_sprite(Sprite *s, int new_z);
+	// Change a sprite's Z value, changing its ordering if visible
+
+	void add_hidden(Sprite *s);
+	void del_hidden(Sprite *s);
+	// Add/remove a sprite to the hidden doubly-linked-list
+
+	void add_visible(Sprite *s);
+	void del_visible(Sprite *s);
+	// Add/remove a sprite from the visible list
+
+	void set_sprite_vertex(struct SpriteVertex *v, Sprite *s);
+	// Set a sprite's vertex data
+
+	friend class Sprite;
+
+public:
+
+	SpriteSet();
+	~SpriteSet();
+
+
+	void draw();
+	// Render all the sprites in the set
+
+	Sprite *new_sprite(Texture *tex, int z=0, int x=0, int y=0, int ox=0, int oy=0, bool vis=true, float u1=0, float v1=0, float u2=1, float v2=1);
+	// Create a new sprite in the set
+};
+

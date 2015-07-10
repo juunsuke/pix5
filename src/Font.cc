@@ -89,6 +89,10 @@ void Font::setup(int ptsize)
 
 	// Allocate the glyphs buffers
 	_glyphs = (Glyph**)calloc(_face->num_glyphs, sizeof(Glyph*));
+
+	// Get the height and spacing
+	_height = (_face->size->metrics.ascender + _face->size->metrics.descender)/64 + 1;
+	_spacing = _face->size->metrics.height/64;
 }
 
 Glyph *Font::get_glyph(int ch)
@@ -158,15 +162,18 @@ void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g)
 	}
 }
 
-void Font::print(Texture *tex, int x, int y, const Color& col, const Str& text)
+int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text)
 {
 	Glyph *last = NULL;
+	int ox = x;
 
 	for(int c = 0; c<text.len(); c++)
 	{
 		Glyph *g = get_glyph(text[c]);
 
-		draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g);
+		if(tex)
+			draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g);
+
 		x += g->metrics.advance;
 
 		// Apply kerning
@@ -181,8 +188,10 @@ void Font::print(Texture *tex, int x, int y, const Color& col, const Str& text)
 		last = g;
 	}
 
-	tex->set_dirty();
-}
+	if(tex)
+		tex->set_dirty();
 
+	return x-ox;
+}
 
 }

@@ -18,7 +18,8 @@ static bool _has_parachute = false;
 namespace Display		{ void init(); void done(); }
 namespace Input			{ void init(); void done(); }
 
-void font_init(); void font_done();
+void font_init();		void font_done();
+void sprite_init();		void sprite_done();
 
 
 
@@ -59,6 +60,7 @@ void pix_init(const Str& app_name)
 	Input::init();
 	font_init();
 	Display::init();
+	sprite_init();
 
 	Log::log("PIX successfully initialized");
 }
@@ -72,6 +74,7 @@ void pix_shutdown()
 	Log::log("Shutting down PIX...");
 
 	// Shutdown
+	sprite_done();
 	Display::done();
 	font_done();
 	Input::done();

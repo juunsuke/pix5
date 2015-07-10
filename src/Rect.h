@@ -97,7 +97,7 @@ public:
 		if(res.x<bounds.x)
 		{
 			int d = bounds.x - res.x;
-			res.x = 0;
+			res.x = bounds.x;
 			res.w -= d;
 
 			if(dx)
@@ -110,7 +110,7 @@ public:
 		if(res.y<bounds.y)
 		{
 			int d = bounds.y - res.y;
-			res.y = 0;
+			res.y = bounds.y;
 			res.h -= d;
 
 			if(dy)

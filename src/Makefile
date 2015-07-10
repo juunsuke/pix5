@@ -6,10 +6,11 @@ DBG = 1
 
 CLSS  = Error EventHandler Log
 CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer VertexArray Glyph Font
+CLSS += SpriteSet Sprite
 CLSS += Input
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
-HDRS += pix5.h Str.h List.h Error.h errors.h Math.h
+HDRS += pix5.h Str.h List.h SortedList.h Error.h errors.h Math.h
 HDRS += VideoModeType.h VideoMode.h Color.h Rect.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h 
 

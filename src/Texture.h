@@ -75,6 +75,9 @@ class Texture
 	void hline(int x1, int x2, int y, const Color& col);
 	void vline(int y1, int y2, int x, const Color& col);
 
+	void blit_raw(uint32_t *dptr, uint32_t *sptr, int w, int h, int spitch);
+	void blit_alpha(uint32_t *dptr, uint32_t *sptr, int w, int h, int spitch);
+
 public:
 
 	static Texture *create(int width, int height, bool clear = true);
@@ -193,7 +196,10 @@ public:
 	// If out of bounds, returns 0
 
 	void line(int x1, int y1, int x2, int y2, const Color& col);
-	// Draw a regular line between (x1,y1) and (x2,y2)
+	// Draw a regular line
+
+	void line(int x1, int y1, int x2, int y2, float width, const Color& col);
+	// Draw an anti-aliased line of arbitrary thickness
 
 	void rect(int x1, int y1, int x2, int y2, const Color& col);
 	inline void rect(const Rect& r, const Color& col) { rect(r.x, r.y, r.x+r.w-1, r.y+r.h-1, col); }
@@ -211,6 +217,9 @@ public:
 
 	inline void print(Font *fnt, int x, int y, const Color& col, const Str& text) { fnt->print(this, x, y, col, text); }
 	// Print a string using the given font
+
+	void blit(int dx, int dy, Texture *src, int sx, int sy, int w, int h, bool alpha = true);
+	inline void blit(int dx, int dy, Texture *src, bool alpha = true) { blit(dx, dy, src, 0, 0, src->_w, src->_h, alpha); }
 };
 
 

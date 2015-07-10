@@ -9,6 +9,9 @@ class Font
 	Glyph **_glyphs;
 	// All the glyphs
 
+	int _height, _spacing;
+	// Font height and vertical spacing
+
 	void setup(int ptsize);
 	// Setup the font once the face was loaded
 
@@ -34,8 +37,18 @@ public:
 	// Per freetype convention, if the font doesn't have a glyph for the given
 	// character, the first glyph (index 0) is returned, which is usually a square mark
 
-	void print(class Texture *tex, int x, int y, const Color& col, const Str& text);
+	int print(class Texture *tex, int x, int y, const Color& col, const Str& text);
 	// Print a string on the given texture
+	// Returns the width, in pixels, used by the string
+
+	inline int len(const Str& text) { return print(NULL, 0, 0, 0, text); }
+	// Return the width, in pixels, required to draw the given string
+
+	inline int height() { return _height; }
+	// Return the height of the tallest character in the font
+
+	inline int spacing() { return _spacing; }
+	// Return the reccomended vertical spacing between lines of text
 };
 
 

@@ -71,6 +71,7 @@ int load_file(const Str& fname, char **buf);
 
 #include "Log.h"
 #include "List.h"
+#include "SortedList.h"
 #include "Math.h"
 
 #include "Mouse.h"
@@ -97,6 +98,9 @@ int load_file(const Str& fname, char **buf);
 #include "VertexDef.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
+
+#include "Sprite.h"
+#include "SpriteSet.h"
 
 #include "Display.h"
 
