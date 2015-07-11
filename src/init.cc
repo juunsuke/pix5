@@ -17,6 +17,8 @@ static bool _has_parachute = false;
 
 namespace Display		{ void init(); void done(); }
 namespace Input			{ void init(); void done(); }
+namespace Audio			{ void init(); void done(); }
+
 
 void font_init();		void font_done();
 void sprite_init();		void sprite_done();
@@ -47,7 +49,7 @@ void pix_init(const Str& app_name)
 	_app_name = app_name;
 
 	// Init SDL
-	if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_EVENTS))
+	if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK|SDL_INIT_EVENTS))
 		E::SDL("%s", SDL_GetError());
 
 	// Install the parachute if needed
@@ -61,6 +63,7 @@ void pix_init(const Str& app_name)
 	font_init();
 	Display::init();
 	sprite_init();
+	Audio::init();
 
 	Log::log("PIX successfully initialized");
 }
@@ -74,6 +77,7 @@ void pix_shutdown()
 	Log::log("Shutting down PIX...");
 
 	// Shutdown
+	Audio::done();
 	sprite_done();
 	Display::done();
 	font_done();

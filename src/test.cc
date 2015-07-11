@@ -3,7 +3,7 @@
 
 
 Sprite *s;
-
+SoundClip *sc2;
 
 class MyEventHandler: public EventHandler
 {
@@ -32,17 +32,16 @@ public:
 
 	void on_key_down(Key& key)
 	{
-		s->hide();
+		if(key.code==KEY_SPACE)
+			Audio::play(sc2);
 	}
 
 	void on_key_up(Key& key)
 	{
-		s->show();
 	}
 
 	void on_text(const Str& text)
 	{
-		printf("TEXT: %s\n", text.ptr());
 	}
 
 	void on_window_resize(int width, int height)
@@ -58,6 +57,11 @@ int main(int argc, char **argv)
 	try
 	{
 		pix_init("Test");
+
+		SoundClip *sc = SoundClip::load("data/FindYou.ogg");
+		sc2 = SoundClip::load("data/Heal8-Bit.ogg");
+
+		Audio::play(sc, true);
 
 		Display::set_mode(VideoMode::resizable());
 		//Display::set_mode(VideoMode::resizable(1366, 768, false));

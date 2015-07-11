@@ -267,11 +267,12 @@ void swap()
 	{
 		_frames++;
 
-		// Display the FPS every second
+		// Display the FPS every second on the title bar
 		if((now-_last_time)>=1000)
 		{
 			#ifdef DBG
-			Log::debug("%f frames/second", (double)_frames/((double)(now-_last_time)/1000.0f));
+			float fps = (float)((double)_frames/((double)(now-_last_time)/1000.0f));
+			SDL_SetWindowTitle(_window, Str::build("%s - %f frames/second", get_app_name().ptr(), fps));
 			#endif
 	
 			_last_time = now;

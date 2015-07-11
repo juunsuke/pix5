@@ -41,6 +41,11 @@ PIXERR( 0x1000000D, BadStreamIndex,		"Invalid stream index" )
 PIXERR( 0x1000000E, FreeType,			"FreeType error" )
 
 
+// Audio error
+PIXERR( 0x20000001, AudioStarted,		"Audio sub-system already started" )
+PIXERR( 0x20000002, AudioStart,			"Error starting audio" )
+PIXERR( 0x20000003, LoadVorbis,			"Error loading Ogg Vorbis file" )
+PIXERR( 0x20000004, BadTrack,			"Invalid track index" )
 
 
 

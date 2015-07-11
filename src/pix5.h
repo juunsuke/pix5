@@ -104,6 +104,9 @@ int load_file(const Str& fname, char **buf);
 
 #include "Display.h"
 
+#include "SoundClip.h"
+#include "Audio.h"
+
 #include "EventHandler.h"
 
 
