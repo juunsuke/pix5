@@ -12,6 +12,9 @@ class Sprite
 	int _z;
 	// Z-order
 
+	int _w, _h;
+	// Sprite size
+
 	int _ox, _oy;
 	// Origin position
 
@@ -73,6 +76,8 @@ public:
 	inline int x() const			{ return _x; }
 	inline int y() const			{ return _y; }
 	inline int z() const			{ return _z; }
+	inline int w() const			{ return _w; }
+	inline int h() const			{ return _h; }
 	inline int ox() const			{ return _ox; }
 	inline int oy() const			{ return _oy; }
 	inline float angle() const		{ return _angle; }
@@ -103,6 +108,13 @@ public:
 
 	void set_z(int z);
 	// Change the Z order
+
+	inline void set_size(int w, int h)
+	{
+		_w = w;
+		_h = h;
+		_mat_dirty = true;
+	}
 
 	inline void set_origin(int ox, int oy)
 	{
@@ -141,12 +153,13 @@ public:
 	inline void show() { set_visible(true); }
 	inline void hide() { set_visible(false); }
 
-	void set_tex(Texture *tex, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1)
+	void set_tex(Texture *tex, bool resize = true, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1)
 	{
-		// Change the texture
-		if(_tex->width()!=tex->width() || _tex->height()!=tex->height())
-			_vtx_dirty = true;
+		// Auto-resize ?
+		if(resize && (tex->width()!=_w || tex->height()!=_h))
+			set_size(tex->width(), tex->height());
 
+		// Change the texture
 		_tex = tex;
 
 		if(_u1!=u1 || _v1!=v1 || _u2!=u2 || _v2!=v2)
@@ -162,9 +175,14 @@ public:
 
 	inline void set_color(const Color& col)
 	{
-		_col = col;
-		_vtx_dirty = true;
+		if(_col!=col)
+		{
+			_col = col;
+			_vtx_dirty = true;
+		}
 	}
 
+	void calc_matrix();
+	// Recalculate the sprite's matrix
 };
 

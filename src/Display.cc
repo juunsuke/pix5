@@ -20,9 +20,16 @@ static VideoMode _cur_mode;
 static Camera _2d_cam;
 // A 2D camera for the current mode
 
+static int _frames = 0;
+static uint32_t _last_time = 0;
+// Used by the FPS counter
+
 
 void init()
 {
+	_window = NULL;
+	_gl = NULL;
+	_cur_mode.type = VideoModeType::None;
 }
 
 void done()
@@ -190,6 +197,9 @@ void set_mode(const VideoMode& vm)
 		Log::log("The GPU *DOES NOT* support non-power-of-two (NPOT) textures");
 
 	Log::log("Number of texture units supported by the GPU: %i", get_texture_units());		
+
+	_frames = 0;
+	_last_time = 0;
 }
 
 SDL_Window *get_window()
@@ -244,6 +254,30 @@ void swap()
 	ASSERT(_window, "Display::swap(): No mode currently set")
 
 	SDL_GL_SwapWindow(_window);
+
+	// Do FPS calculations
+	uint32_t now = SDL_GetTicks();
+
+	if(_last_time==0)
+	{
+		// Init
+		_last_time = now;
+	}
+	else
+	{
+		_frames++;
+
+		// Display the FPS every second
+		if((now-_last_time)>=1000)
+		{
+			#ifdef DBG
+			Log::debug("%f frames/second", (double)_frames/((double)(now-_last_time)/1000.0f));
+			#endif
+	
+			_last_time = now;
+			_frames = 0;
+		}
+	}
 }
 
 void show_cursor(bool show)

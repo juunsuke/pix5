@@ -15,6 +15,9 @@ class SpriteSet
 	bool _va_dirty;
 	// Wether the vertex array should be rebuild
 
+	int _max_size;
+	// Max number of visible sprites, used to handle the vertex buffers properly
+
 	
 	void show_sprite(Sprite *s);
 	// Show a hidden sprite
@@ -35,6 +38,12 @@ class SpriteSet
 
 	void set_sprite_vertex(struct SpriteVertex *v, Sprite *s);
 	// Set a sprite's vertex data
+
+	void check_max();
+	// Check/handle the max size
+
+	void set_pos_data(int first, int num);
+	// Fill in part of the position vertex buffer
 
 	friend class Sprite;
 

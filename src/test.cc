@@ -11,12 +11,18 @@ public:
 
 	void on_mouse_wheel_down(Mouse& mouse)
 	{
-		s->set_scale(s->hscale()*0.9f);
+		//s->set_scale(s->hscale()*0.9f);
+		int nz = s->z()-1;
+		s->set_z(nz);
+		Log::debug("Z: %i", nz);
 	}
 
 	void on_mouse_wheel_up(Mouse& mouse)
 	{
-		s->set_scale(s->hscale()*1.1f);
+		//s->set_scale(s->hscale()*1.1f);
+		int nz = s->z()+1;
+		s->set_z(nz);
+		Log::debug("Z: %i", nz);
 	}
 
 	void on_mouse_move(Mouse& mouse)
@@ -26,12 +32,12 @@ public:
 
 	void on_key_down(Key& key)
 	{
-		printf("DOWN: %s\n", key.key_name.ptr());
+		s->hide();
 	}
 
 	void on_key_up(Key& key)
 	{
-		printf("  UP: %s\n", key.key_name.ptr());
+		s->show();
 	}
 
 	void on_text(const Str& text)
@@ -60,11 +66,30 @@ int main(int argc, char **argv)
 
 		SpriteSet *ss = new SpriteSet();
 
-		Texture *tex = Texture::load("data/konata.png");
+		Font *fnt = new Font("data/LiberationSans-Regular.ttf", 12);
+
+		Texture *tex;
+
+		for(int c = 0; c<1000; c++)
+		{
+			int n = rand()%1000;
+
+			tex = Texture::create(100, 20, false);
+			tex->clear(0xFF000000 | (rand()*rand()));
+
+			tex->print(fnt, 5, 3, Color(0,0,0), Str::build("%i", n));
+
+			s = ss->new_sprite(tex, n, rand()%1200, rand()%1000);
+		}
+		
+		tex = Texture::load("data/konata.png");
 		tex->set_filter(TextureFilter::Linear, TextureFilter::Linear);
 
 		s = ss->new_sprite(tex);
 		s->set_origin(tex->width()/2, tex->height()/2);
+		s->set_z(500);
+		s->set_scale(2);
+
 
 		float a = 0;
 

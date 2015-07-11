@@ -1,4 +1,5 @@
 #include "pix5.h"
+#include <GL/glew.h>
 
 namespace PIX {
 
@@ -60,6 +61,39 @@ void Sprite::set_visible(bool vis)
 		_ss->show_sprite(this);
 	else
 		_ss->hide_sprite(this);
+}
+	
+void Sprite::calc_matrix()
+{
+	// Recalculate the sprite's matrix
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+			
+	glLoadIdentity();
+
+	// Position
+	glTranslatef(_x, _y, 0);
+	
+	// Rotation
+	if(_angle)
+		glRotatef(_angle, 0, 0, 1.0f);
+
+	// Scaling
+	if(_hscale!=1.0f || _vscale!=1.0f)
+		glScalef(_hscale, _vscale, 1.0f);
+
+	// Origin
+	if(_ox || _oy)
+		glTranslatef(-_ox, -_oy, 0);
+
+	// Size
+	glScalef(_w, _h, 1.0f);
+
+	// Save the matrix
+	_mat = Matrix::get_modelview();
+	_mat_dirty = false;
+	
+	glPopMatrix();
 }
 
 
