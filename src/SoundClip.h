@@ -33,7 +33,7 @@ public:
 
 	~SoundClip();
 
-	static SoundClip *load(const Str& fname, const Str& cat);
+	static SoundClip *load(const Str& fname, const Str& cat = "default");
 	// Load an Ogg Vorbis (.ogg) file
 	// 'cat' is the sound category the clip should be part of
 
@@ -43,8 +43,8 @@ public:
 	inline int samples() const { return _samples; }
 	// Get info about the clip
 
-	inline Str category() const { return _cat; }
-	inline void set_category(const Str& cat) { _cat = cat; }
+	Str category() const { return _cat; }
+	void set_category(const Str& cat) { _cat = cat; }
 	// Get/set the sound category
 	// Changing the category of a sound that is currently playing will
 	// not have any effect until it is played again

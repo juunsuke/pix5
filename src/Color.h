@@ -98,6 +98,11 @@ public:
 	// Get float components
 
 
+	inline static Color ubyte(uint32_t r, uint32_t g, uint32_t b, uint32_t a=255)
+	{
+		return ((a&0xFF)<<24) | ((b&0xFF)<<16) | ((g&0xFF)<<8) | (r&0xFF);
+	}
+
 	static Color mix(const Color& col1, const Color& col2, uint8_t ratio, bool alpha1 = true)
 	{
 		// Mix col1 and col2 together, using 'ratio'
