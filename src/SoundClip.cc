@@ -86,7 +86,7 @@ SoundClip *SoundClip::load(const Str& fname)
 		}
 	
 		// Done reading the data
-		sc->_data = (uint16_t*)buf;
+		sc->_data = (int16_t*)buf;
 		
 		ov_clear(&vf);
 

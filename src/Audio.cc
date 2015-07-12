@@ -18,6 +18,9 @@ typedef struct Track
 
 	bool playing;
 	// Wether thr track is playing
+
+	float adv_rate;
+	// Position advance rate
 } Track;
 
 
@@ -54,23 +57,23 @@ void audio_cb(void *ud, uint8_t *ptr, int len)
 	// Number of samples to produce
 	int num = len/(2*_spec.channels);
 
-	// Check all the tracks
-	for(int c = 0; c<_num_track; c++)
+	int16_t *out = (int16_t*)ptr;
+
+	// Do each sample
+	for(int c = 0; c<num; c++)
 	{
-		Track *t = _tracks+c;
-		SoundClip *sc = t->clip;
+		float tot[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-		// Skip tracks that aren't playing
-		if(!sc || !t->playing)
-			continue;
-
-		uint16_t *out = (uint16_t*)ptr;
-
-		float adv_rate = (float)sc->_freq/(float)_spec.freq;
-
-		// Add up as many samples/channels as possible
-		for(int d = 0; d<num; d++)
+		// Check all the tracks
+		for(int d = 0; d<_num_track; d++)
 		{
+			Track *t = _tracks+d;
+			SoundClip *sc = t->clip;
+
+			// Skip tracks that aren't playing
+			if(!sc || !t->playing)
+				continue;
+
 			// Calc the current pos
 			int pos = (int)t->pos;
 			if(pos>=sc->_samples)
@@ -91,18 +94,22 @@ void audio_cb(void *ud, uint8_t *ptr, int len)
 				}
 			}
 
-			uint16_t *src = sc->_data + pos*sc->_num_chan;
+			// Add all the channel values to the totals
+			int16_t *src = sc->_data + pos*sc->_num_chan;
 
-			// Fill in as many channels as possible
-			for(int e = 0; e<_spec.channels && e<sc->_num_chan; e++)
-				out[e] += src[e];
-
-			// Advance the output pointer
-			out += _spec.channels;
+			for(int e = 0; e<sc->_num_chan && e<_spec.channels; e++)
+			{
+				float v = (float)src[e];
+				tot[e] += v*0.5f;
+			}
 
 			// Advance the source sample
-			t->pos += adv_rate;
+			t->pos += t->adv_rate;
 		}
+
+		// Write the output data
+		for(int e = 0; e<_spec.channels; e++)
+			*(out++) = (int16_t)tot[e];
 	}
 }
 
@@ -128,7 +135,7 @@ void start(int freq, int chan, int buf_size)
 	if(!_id)
 		E::AudioStart("Error opening audio device: %s", SDL_GetError());
 
-	Log::log("Success: %i Hz, %i channels", _spec.freq, _spec.channels);
+	Log::log("Success: %i Hz, %i channels.  Format: %04X", _spec.freq, _spec.channels, _spec.format);
 
 	// Start playback
 	SDL_PauseAudioDevice(_id, 0);
@@ -197,6 +204,7 @@ int play(SoundClip *sc, bool loop, bool start, int track)
 	t->pos = 0;
 	t->loop = loop;
 	t->playing = start;
+	t->adv_rate = (float)sc->freq()/(float)_spec.freq;
 
 	t->clip = sc;
 

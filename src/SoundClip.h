@@ -15,7 +15,7 @@ class SoundClip
 	int _samples;
 	// Number of samples
 
-	uint16_t *_data;
+	int16_t *_data;
 	// Raw sound data
 
 
@@ -31,5 +31,10 @@ public:
 
 	static SoundClip *load(const Str& fname);
 	// Load an Ogg Vorbis (.ogg) file
+
+
+	inline int freq() { return _freq; }
+	inline int num_chan() { return _num_chan; }
+	inline int samples() { return _samples; }
 };
 
