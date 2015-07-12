@@ -5,6 +5,7 @@
 Sprite *s;
 SoundClip *sc2;
 
+
 class MyEventHandler: public EventHandler
 {
 public:
@@ -58,8 +59,8 @@ int main(int argc, char **argv)
 	{
 		pix_init("Test");
 
-		SoundClip *sc = SoundClip::load("data/FindYou.ogg");
-		sc2 = SoundClip::load("data/Heal8-Bit.ogg");
+		SoundClip *sc = SoundClip::load("data/FindYou.ogg", "music");
+		sc2 = SoundClip::load("data/Heal8-Bit.ogg", "fx");
 
 		Audio::play(sc, true);
 

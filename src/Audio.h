@@ -57,7 +57,31 @@ void pause(int track);
 void resume(int track);
 // Pause/resume playback on the given track index
 
+float get_pos(int track);
+// Return the current playback position of the given track
+// The position ranges from 0 (start) to 1 (end)
+// If the track is not playing, 1 will be returned
 
+void set_pos(int track, float pos);
+// Change the current playback position of the given track
+// The position ranges from 0 (start) to 1 (end)
 
+float get_volume(const Str& cat);
+void set_volume(const Str& cat, float vol);
+// Get/set the volume of a category
+// If sounds of the specified category are currently playing on active
+// tracks, their volume will be changed immediatly
+// Volume values cannot be below zero, and shouldn't exceed 1.0
+
+float get_volume();
+void set_volume(float vol);
+// Get/set the master volume
+// This does not change the sound card's mixer data, but rather applies
+// a multiplier to every output sample
+// Volume values cannot be below zero, and shouldn't exceed 1.0
+
+float get_volume(int track);
+void set_volume(int track, float vol);
+// Get/set the volume of a track
 
 }

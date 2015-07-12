@@ -16,7 +16,7 @@ SoundClip::~SoundClip()
 		free(_data);
 }
 
-SoundClip *SoundClip::load(const Str& fname)
+SoundClip *SoundClip::load(const Str& fname, const Str& cat)
 {
 	// Try to open the file
 	OggVorbis_File vf;
@@ -54,6 +54,7 @@ SoundClip *SoundClip::load(const Str& fname)
 		sc->_freq = vi->rate;
 		sc->_num_chan = vi->channels;
 		sc->_samples = samples;
+		sc->_cat = cat;
 		sc->_data = (float*)malloc(samples*sc->_num_chan*4);
 		
 		// Load the file data

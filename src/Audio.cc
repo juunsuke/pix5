@@ -5,6 +5,24 @@ namespace PIX {
 namespace Audio {
 
 
+class SoundCategory
+{
+public:
+
+	Str _name;
+	// Category name
+
+	float _vol;
+	// Category volume
+
+	SoundCategory(const Str& name, float vol = 1.0f)
+	{
+		_name = name;
+		_vol = vol;
+	}
+};
+
+
 typedef struct Track
 {
 	SoundClip *clip;
@@ -21,6 +39,12 @@ typedef struct Track
 
 	float adv_rate;
 	// Position advance rate
+
+	float vol;
+	// Track volume
+
+	SoundCategory *cat;
+	// Category the playing clip is part of
 } Track;
 
 
@@ -34,6 +58,12 @@ static Track _tracks[MAX_TRACKS];
 static int _num_track = 16;
 // Sound tracks
 
+static List<SoundCategory*> _cats;
+// Sound categories
+
+static float _master_vol = 1.0f;
+// Master volume
+
 
 void init()
 {
@@ -41,12 +71,20 @@ void init()
 	_id = 0;
 	_num_track = 16;
 	memset(_tracks, 0, sizeof(_tracks));
+	_master_vol = 1.0f;
 	start();
 }
 
 void done()
 {
+	// Stop the audio device
 	stop();
+
+	// Reset the tracks
+	memset(_tracks, 0, sizeof(_tracks));
+
+	// Free the categories
+	_cats.clear_del();
 }
 
 void audio_cb(void *ud, uint8_t *ptr, int len)
@@ -98,7 +136,7 @@ void audio_cb(void *ud, uint8_t *ptr, int len)
 			float *src = sc->_data + pos*sc->_num_chan;
 
 			for(int e = 0; e<sc->_num_chan && e<_spec.channels; e++)
-				tot[e] += src[e]*0.5f;
+				tot[e] += src[e] * t->cat->_vol * _master_vol * t->vol;
 
 			// Advance the source sample
 			t->pos += t->adv_rate;
@@ -170,6 +208,20 @@ int get_free_track()
 	return -1;
 }
 
+static SoundCategory *get_category(const Str& name)
+{
+	// Check if the category object exists
+	for(int c = 0; c<_cats.size(); c++)
+		if(_cats[c]->_name==name)
+			return _cats[c];
+
+	// Create it
+	SoundCategory *cat = new SoundCategory(name);
+	_cats.add(cat);
+
+	return cat;
+}
+
 int play(SoundClip *sc, bool loop, bool start, int track)
 {
 	// Play a sound clip
@@ -193,8 +245,6 @@ int play(SoundClip *sc, bool loop, bool start, int track)
 		stop(track);
 	}
 
-	Log::debug("Using track %i", track);
-		
 	// Setup the track
 	Track *t = _tracks+track;
 
@@ -202,6 +252,8 @@ int play(SoundClip *sc, bool loop, bool start, int track)
 	t->loop = loop;
 	t->playing = start;
 	t->adv_rate = (float)sc->freq()/(float)_spec.freq;
+	t->cat = get_category(sc->category());
+	t->vol = 1.0f;
 
 	t->clip = sc;
 
@@ -213,6 +265,11 @@ void stop(int track)
 	// Validate
 	if(track<0 || track>=_num_track)
 		E::BadTrack("Audio::stop(): Invalid track index");
+
+	// Stop a track from playing
+	SDL_LockAudioDevice(_id);
+	_tracks[track].clip = NULL;
+	SDL_UnlockAudioDevice(_id);
 }
 
 void pause(int track)
@@ -220,6 +277,9 @@ void pause(int track)
 	// Validate
 	if(track<0 || track>=_num_track)
 		E::BadTrack("Audio::pause(): Invalid track index");
+
+	// Pause playback
+	_tracks[track].playing = false;
 }
 
 void resume(int track)
@@ -227,7 +287,82 @@ void resume(int track)
 	// Validate
 	if(track<0 || track>=_num_track)
 		E::BadTrack("Audio::resume(): Invalid track index");
+
+	// Resume playback
+	_tracks[track].playing = true;
 }
+
+float get_pos(int track)
+{
+	// Validate
+	if(track<0 || track>=_num_track)
+		E::BadTrack("Audio::get_pos(): Invalid track index");
+
+	SoundClip *sc = _tracks[track].clip;
+	if(!sc)
+		return 1;
+
+	return _tracks[track].pos/(float)sc->samples();
+}
+
+void set_pos(int track, float pos)
+{
+	// Validate
+	if(track<0 || track>=_num_track)
+		E::BadTrack("Audio::set_pos(): Invalid track index");
+	
+	SoundClip *sc = _tracks[track].clip;
+	if(!sc)
+		return;
+
+	SDL_LockAudioDevice(_id);
+
+	// Change the position
+	pos = Math::fclamp(pos);
+	_tracks[track].pos = (float)sc->samples() * pos;
+	
+	SDL_UnlockAudioDevice(_id);
+}
+
+
+float get_volume(const Str& cat)
+{
+	return get_category(cat)->_vol;
+}
+
+void set_volume(const Str& cat, float vol)
+{
+	get_category(cat)->_vol = fmax(0, vol);
+}
+
+float get_volume()
+{
+	return _master_vol;
+}
+
+void set_volume(float vol)
+{
+	_master_vol = fmax(0, vol);
+}
+
+float get_volume(int track)
+{
+	// Validate
+	if(track<0 || track>=_num_track)
+		E::BadTrack("Audio::get_volume(): Invalid track index");
+
+	return _tracks[track].vol;
+}
+
+void set_volume(int track, float vol)
+{
+	// Validate
+	if(track<0 || track>=_num_track)
+		E::BadTrack("Audio::set_volume(): Invalid track index");
+
+	_tracks[track].vol = fmax(0, vol);
+}
+
 
 
 }}

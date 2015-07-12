@@ -19,6 +19,9 @@ class SoundClip
 	// Raw sound data
 	// Kept as float for easier math until final output
 
+	Str _cat;
+	// Sound category
+
 
 	SoundClip();
 	// Used internally, use the static functions to load a clip
@@ -30,12 +33,20 @@ public:
 
 	~SoundClip();
 
-	static SoundClip *load(const Str& fname);
+	static SoundClip *load(const Str& fname, const Str& cat);
 	// Load an Ogg Vorbis (.ogg) file
+	// 'cat' is the sound category the clip should be part of
 
 
-	inline int freq() { return _freq; }
-	inline int num_chan() { return _num_chan; }
-	inline int samples() { return _samples; }
+	inline int freq() const { return _freq; }
+	inline int num_chan() const { return _num_chan; }
+	inline int samples() const { return _samples; }
+	// Get info about the clip
+
+	inline Str category() const { return _cat; }
+	inline void set_category(const Str& cat) { _cat = cat; }
+	// Get/set the sound category
+	// Changing the category of a sound that is currently playing will
+	// not have any effect until it is played again
 };
 
