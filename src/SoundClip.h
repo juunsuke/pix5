@@ -15,8 +15,9 @@ class SoundClip
 	int _samples;
 	// Number of samples
 
-	int16_t *_data;
+	float *_data;
 	// Raw sound data
+	// Kept as float for easier math until final output
 
 
 	SoundClip();

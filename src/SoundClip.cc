@@ -54,10 +54,9 @@ SoundClip *SoundClip::load(const Str& fname)
 		sc->_freq = vi->rate;
 		sc->_num_chan = vi->channels;
 		sc->_samples = samples;
-
+		sc->_data = (float*)malloc(samples*sc->_num_chan*4);
+		
 		// Load the file data
-		int sz = samples*sc->_num_chan*2;
-		uint8_t *buf = (uint8_t*)malloc(sz);
 		int pos = 0;
 		int bs = 0;
 
@@ -66,7 +65,8 @@ SoundClip *SoundClip::load(const Str& fname)
 			// Try to read
 			for(;;)
 			{
-				int ret = ov_read(&vf, (char*)buf+pos, sz-pos, 0, 2, 1, &bs);
+				int16_t buf[4096];
+				int ret = ov_read(&vf, (char*)buf, 4096, 0, 2, 1, &bs);
 
 				// Done ?
 				if(!ret)
@@ -75,24 +75,19 @@ SoundClip *SoundClip::load(const Str& fname)
 				if(ret<0)
 					E::LoadVorbis("Error while loading sound samples");
 
-				pos += ret;
+				ret /= 2;
+				for(int c = 0; c<ret; c++)
+					sc->_data[pos++] = buf[c];
 			}
 		}
 		catch(Error)
 		{
-			free(buf);
 			delete sc;
 			throw;
 		}
 	
 		// Done reading the data
-		sc->_data = (int16_t*)buf;
-		
 		ov_clear(&vf);
-
-		#ifdef DBG
-		Log::debug("Successfully decoded %i bytes of sound sample data", pos);
-		#endif
 
 		return sc;
 	}

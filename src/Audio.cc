@@ -95,13 +95,10 @@ void audio_cb(void *ud, uint8_t *ptr, int len)
 			}
 
 			// Add all the channel values to the totals
-			int16_t *src = sc->_data + pos*sc->_num_chan;
+			float *src = sc->_data + pos*sc->_num_chan;
 
 			for(int e = 0; e<sc->_num_chan && e<_spec.channels; e++)
-			{
-				float v = (float)src[e];
-				tot[e] += v*0.5f;
-			}
+				tot[e] += src[e]*0.5f;
 
 			// Advance the source sample
 			t->pos += t->adv_rate;
