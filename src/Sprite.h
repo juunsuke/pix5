@@ -49,13 +49,13 @@ class Sprite
 
 
 	Sprite(class SpriteSet *ss);
-	~Sprite();
 	// Private constructor, create sprites using SpriteSet::new_sprite()
 
 	friend class SpriteSet;
 
 public:
 
+	~Sprite();
 
 	int comp(Sprite *o) const
 	{
@@ -68,6 +68,8 @@ public:
 
 		return 1;
 	}
+
+
 
 	//
 	// Functions to retrieve the sprite's data

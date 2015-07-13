@@ -100,6 +100,9 @@ public:
 	// to images loaded by this function
 
 	~Texture();
+
+	Texture *sub(int x, int y, int w, int h);
+	// Create a sub-texture
 	
 	void delete_gl();
 	// Delete the OpenGL texture, if it exists

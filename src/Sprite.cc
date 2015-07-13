@@ -36,8 +36,9 @@ Sprite::Sprite(SpriteSet *ss)
 
 Sprite::~Sprite()
 {
+	_ss->del_sprite(this);
 }
-
+	
 void Sprite::set_z(int z)
 {
 	// Skip if no change

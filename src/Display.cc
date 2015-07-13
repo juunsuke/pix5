@@ -64,7 +64,9 @@ void handle_resize(int width, int height)
 void handle_move(int x, int y)
 {
 	// The window was moved
-	Log::log("The window was moved to: %i,%i", x, y);
+	#ifdef DBG
+	Log::debug("The window was moved to: %i,%i", x, y);
+	#endif
 	_cur_mode.x = x;
 	_cur_mode.y = y;
 }

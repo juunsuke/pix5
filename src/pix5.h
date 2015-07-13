@@ -104,10 +104,14 @@ int load_file(const Str& fname, char **buf);
 
 #include "Display.h"
 
+#include "TexRenderer.h"
+
 #include "SoundClip.h"
 #include "Audio.h"
 
 #include "Cache.h"
+
+#include "GUI.h"
 
 #include "EventHandler.h"
 

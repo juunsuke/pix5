@@ -305,6 +305,16 @@ Sprite *SpriteSet::new_sprite(Texture *tex, int z, int x, int y, int ox, int oy,
 
 	return s;
 }
+	
+void SpriteSet::del_sprite(Sprite *s)
+{
+	// Remove the sprite from whichever list it is
+	if(s->_visible)
+		del_visible(s);
+	else
+		del_hidden(s);
+}
+
 
 }
 

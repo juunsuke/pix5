@@ -44,6 +44,9 @@ class SpriteSet
 
 	void set_pos_data(int first, int num);
 	// Fill in part of the position vertex buffer
+	
+	void del_sprite(Sprite *s);
+	// Delete a sprite that is part of this SpriteSet
 
 	friend class Sprite;
 
