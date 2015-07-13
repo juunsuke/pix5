@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 			s = ss->new_sprite(tex, n, rand()%1200, rand()%1000);
 		}
 		
-		tex = Texture::load("data/konata.png");
+		tex = Cache::texture("data/konata.png");
 		tex->set_filter(TextureFilter::Linear, TextureFilter::Linear);
 
 		s = ss->new_sprite(tex);

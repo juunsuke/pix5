@@ -4,7 +4,7 @@ DBG = 1
 
 ########################################################################################################################
 
-CLSS  = Error EventHandler Log
+CLSS  = Error EventHandler Log Cache
 CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer VertexArray Glyph Font
 CLSS += SpriteSet Sprite
 CLSS += Audio SoundClip

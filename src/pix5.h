@@ -107,6 +107,8 @@ int load_file(const Str& fname, char **buf);
 #include "SoundClip.h"
 #include "Audio.h"
 
+#include "Cache.h"
+
 #include "EventHandler.h"
 
 
