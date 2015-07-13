@@ -27,5 +27,6 @@ public:
 	// ox,oy are the global offset to add to each texture's destination coordinates
 	// When this is done, there will be no VertexArray, Shader or Texture bound
 	// The 2D camera will be set before drawing
+	// After rendering, the queue will be cleared
 };
 
