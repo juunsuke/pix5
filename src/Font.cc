@@ -27,31 +27,40 @@ void font_done()
 }
 
 	
+Font::Font()
+{
+	_face = NULL;
+	_glyphs = NULL;
+}
 	
-Font::Font(const Str& fname, int ptsize)
+Font *Font::load(const Str& fname, int ptsize)
 {
 	// Try to load the face
 	Log::log("Loading font: %s", fname.ptr());
 
-	reset();
-
-	if(FT_New_Face(_ft, fname, 0, &_face))
+	FT_Face face;
+	if(FT_New_Face(_ft, fname, 0, &face))
 		E::FreeType("Error loading font: %s", fname.ptr());
 
-	setup(ptsize);
+	Font *fnt = new Font();
+	fnt->setup(face, ptsize);
+
+	return fnt;
 }
 	
-Font::Font(const void *buf, int size, int ptsize)
+Font *Font::load(const void *buf, int size, int ptsize)
 {
 	// Try to load the face
 	Log::log("Loading memory font");
 
-	reset();
-
-	if(FT_New_Memory_Face(_ft, (const FT_Byte*)buf, size, 0, &_face))
+	FT_Face face;
+	if(FT_New_Memory_Face(_ft, (const FT_Byte*)buf, size, 0, &face))
 		E::FreeType("Error loading a memory font");
 
-	setup(ptsize);
+	Font *fnt = new Font();
+	fnt->setup(face, ptsize);
+
+	return fnt;
 }
 
 Font::~Font()
@@ -67,18 +76,15 @@ Font::~Font()
 	}
 
 	// Free the face
-	if(_face)
-		FT_Done_Face(_face);
+	//if(_face)
+	//	FT_Done_Face(_face);
 }
 	
-void Font::reset()
+void Font::setup(struct FT_FaceRec_* face, int ptsize)
 {
-	_face = NULL;
-	_glyphs = NULL;
-}
-	
-void Font::setup(int ptsize)
-{
+	// Set the face
+	_face = face;
+
 	// Set the size
 	if(FT_Set_Char_Size(_face, 0, ptsize*64, 96, 96))
 		E::FreeType("Error setting the font size to %i points", ptsize);
@@ -139,7 +145,7 @@ Glyph *Font::get_glyph(int ch)
 	return g;
 }
 	
-void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g)
+void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g, BlendMode::Type blend)
 {
 	// Clip
 	Rect r;
@@ -153,8 +159,25 @@ void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g)
 
 	for(int y = 0; y<r.h; y++)
 	{
-		for(int x = 0; x<r.w; x++)
-			tex->set_pixel_fast(dx+x, dy, Color::mix(tex->get_pixel_fast(dx+x, dy), col, ptr[x]));
+		switch(blend)
+		{
+			case BlendMode::Copy:
+				// Raw copy
+				for(int x = 0; x<r.w; x++)
+				{
+					Color col2(col);
+					col2.ia(ptr[x]);
+					tex->set_pixel_fast(dx+x, dy, col2);
+				}
+				break;
+
+			default:
+				// Dest blend
+				for(int x = 0; x<r.w; x++)
+					tex->set_pixel_fast(dx+x, dy, Color::mix(tex->get_pixel_fast(dx+x, dy), col, ptr[x]));
+
+				break;
+		}
 
 	
 		ptr += g->width;
@@ -162,7 +185,7 @@ void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g)
 	}
 }
 
-int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text)
+int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, BlendMode::Type blend)
 {
 	Glyph *last = NULL;
 	int ox = x;
@@ -172,7 +195,7 @@ int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text)
 		Glyph *g = get_glyph(text[c]);
 
 		if(tex)
-			draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g);
+			draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g, blend);
 
 		x += g->metrics.advance;
 

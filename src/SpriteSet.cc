@@ -1,4 +1,5 @@
 #include "pix5.h"
+#include "data.h"
 #include <GL/glew.h>
 
 namespace PIX {
@@ -23,7 +24,7 @@ static Shader *_shad = NULL;
 void sprite_init()
 {
 	// Load the sprite shader
-	_shad = Shader::load("SpriteShader", "data/sprite.vs", "data/sprite.fs");
+	_shad = Shader::create_from_source("SpriteShader", (char*)data_sprite_vs, data_sprite_vs_len, (char*)data_sprite_fs, data_sprite_fs_len);
 }
 
 void sprite_done()

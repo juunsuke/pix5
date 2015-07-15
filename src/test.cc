@@ -63,14 +63,15 @@ int main(int argc, char **argv)
 
 		Audio::play(sc, true);
 
-		Display::set_mode(VideoMode::resizable());
-		//Display::set_mode(VideoMode::resizable(1366, 768, false));
+		Display::set_mode(VideoMode::resizable(
+			//1366, 768, false
+		));
 
 		MyEventHandler eh;
 
 		SpriteSet *ss = new SpriteSet();
 
-		Font *fnt = new Font("data/LiberationSans-Regular.ttf", 12);
+		Font *fnt = GUI::font_default;
 
 		Texture *tex;
 
@@ -102,6 +103,11 @@ int main(int argc, char **argv)
 
 		int x = 0;
 
+
+		Label *lab = new Label("Test", 200, 80, "Proutendish");
+		//lab->set_align(TextAlign::BottomRight);
+		GUI::add_child(lab, 100, 10);
+
 		for(;;)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
@@ -126,6 +132,7 @@ int main(int argc, char **argv)
 
 			x++;
 
+			GUI::draw();
 
 			Display::swap();
 

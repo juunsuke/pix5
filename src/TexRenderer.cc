@@ -1,4 +1,5 @@
 #include "pix5.h"
+#include "data.h"
 
 namespace PIX {
 
@@ -36,7 +37,7 @@ static Shader *_shad = NULL;
 void tr_init()
 {
 	// Load the shader
-	_shad = Shader::load("TexRenderer", "data/sprite.vs", "data/sprite.fs");
+	_shad = Shader::create_from_source("TexRenderer", (char*)data_sprite_vs, data_sprite_vs_len, (char*)data_sprite_fs, data_sprite_fs_len);
 }
 
 void tr_done()

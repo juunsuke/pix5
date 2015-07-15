@@ -83,6 +83,8 @@ int load_file(const Str& fname, char **buf);
 #include "VideoModeType.h"
 #include "VideoMode.h"
 
+#include "BlendMode.h"
+#include "TextAlign.h"
 #include "Color.h"
 #include "Rect.h"
 #include "Glyph.h"
@@ -111,6 +113,11 @@ int load_file(const Str& fname, char **buf);
 
 #include "Cache.h"
 
+#include "GuiElement.h"
+#include "Label.h"
+#include "Button.h"
+
+#include "GuiTheme.h"
 #include "GUI.h"
 
 #include "EventHandler.h"

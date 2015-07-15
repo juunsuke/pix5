@@ -23,11 +23,8 @@ class Shader
 	Str _name;
 	// Shader name, for logging purposes
 
-	const char *_vs_src, *_fs_src;
+	char *_vs_src, *_fs_src;
 	// Vertex and Fragment Shader sources
-
-	bool _own_src;
-	// Wether we own our copy of the sources
 
 	uint32_t _prg;
 	// OpenGL program object
@@ -51,10 +48,9 @@ public:
 
 	~Shader();
 	
-	static Shader *create_from_source(const Str& name, const char *vs_src, const char *fs_src, bool copy);
+	static Shader *create_from_source(const Str& name, const char *vs_src, int vs_len, const char *fs_src, int fs_len);
 	// Create a shader from raw data
-	// 'vs_src' and 'fs_src' are zero-terminated strings containing the whole source
-	// code for each shader
+	// 'vs_src' and 'fs_src' are strings containing the whole source code for each shader
 	// The shader instance must always have access to the original source, in case
 	// it needs to me recompiled (like after a mode switch or context loss of some sort)
 	// If 'copy' is true, the shader instance will make its own copy of both sources

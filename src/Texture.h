@@ -218,7 +218,7 @@ public:
 	void circle_fill(int x, int y, int r, const Color& col);
 	// Draw a filled circle, with (x,y) as a center and 'r' as a radius
 
-	inline void print(Font *fnt, int x, int y, const Color& col, const Str& text) { fnt->print(this, x, y, col, text); }
+	inline void print(Font *fnt, int x, int y, const Color& col, const Str& text, BlendMode::Type blend = BlendMode::DestAlpha) { fnt->print(this, x, y, col, text, blend); }
 	// Print a string using the given font
 
 	void blit(int dx, int dy, Texture *src, int sx, int sy, int w, int h, bool alpha = true);

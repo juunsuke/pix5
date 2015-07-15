@@ -12,21 +12,22 @@ class Font
 	int _height, _spacing;
 	// Font height and vertical spacing
 
-	void setup(int ptsize);
+
+	Font();
+
+	void setup(struct FT_FaceRec_* face, int ptsize);
 	// Setup the font once the face was loaded
 
-	void reset();
-
-	void draw_glyph(class Texture *tex, int dx, int dy, const Color& col, Glyph *g);
+	void draw_glyph(class Texture *tex, int dx, int dy, const Color& col, Glyph *g, BlendMode::Type blend);
 	// Draw a glyphr
 
 public:
 
-	Font(const Str& fname, int ptsize);
+	static Font *load(const Str& fname, int ptsize);
 	// Load a new font file
 	// 'fname' is the name of a .TTF file, 'ptsize' is the requested font size, in points
 
-	Font(const void *buf, int size, int ptsize);
+	static Font *load(const void *buf, int size, int ptsize);
 	// Load a new font from memory
 	// 'buf' points to a memory buffer of 'size' bytes containing the equivalent of a TTF font file
 
@@ -37,7 +38,7 @@ public:
 	// Per freetype convention, if the font doesn't have a glyph for the given
 	// character, the first glyph (index 0) is returned, which is usually a square mark
 
-	int print(class Texture *tex, int x, int y, const Color& col, const Str& text);
+	int print(class Texture *tex, int x, int y, const Color& col, const Str& text, BlendMode::Type blend = BlendMode::DestAlpha);
 	// Print a string on the given texture
 	// Returns the width, in pixels, used by the string
 

@@ -9,20 +9,16 @@ Shader::Shader(const Str& name)
 	_name = name;
 	_vs_src = NULL;
 	_fs_src = NULL;
-	_own_src = false;
 	_prg = 0;
 }
 
 Shader::~Shader()
 {
-	// Free the source if we own it and have it
-	if(_own_src)
-	{
-		if(_vs_src)
-			free((void*)_vs_src);
-		if(_fs_src)
-			free((void*)_fs_src);
-	}
+	// Free the sources
+	if(_vs_src)
+		free(_vs_src);
+	if(_fs_src)
+		free(_fs_src);
 
 	if(_prg)
 		glDeleteProgram(_prg);
@@ -31,28 +27,21 @@ Shader::~Shader()
 	_attribs.clear_del();
 }
 
-Shader *Shader::create_from_source(const Str& name, const char *vs_src, const char *fs_src, bool copy)
+Shader *Shader::create_from_source(const Str& name, const char *vs_src, int vs_len, const char *fs_src, int fs_len)
 {
 	// Create a shader
 	Shader *shad = new Shader(name);
 
 	try
 	{
-		// Make copies or copy the pointers
-		if(copy)
-		{
-			// Make our own copy
-			shad->_vs_src = strdup(vs_src);
-			shad->_fs_src = strdup(fs_src);
-			shad->_own_src = true;
-		}
-		else
-		{
-			// Simply copy the pointers
-			shad->_vs_src = vs_src;
-			shad->_fs_src = fs_src;
-			shad->_own_src = false;
-		}
+		// Copy the sources
+		shad->_vs_src = (char*)malloc(vs_len+1);
+		memcpy(shad->_vs_src, vs_src, vs_len);
+		shad->_vs_src[vs_len] = 0;
+
+		shad->_fs_src = (char*)malloc(fs_len+1);
+		memcpy(shad->_fs_src, fs_src, fs_len);
+		shad->_fs_src[fs_len] = 0;
 	}
 	catch(Error)
 	{
@@ -80,7 +69,7 @@ Shader *Shader::load(const Str& name, const Str& vs_file, const Str& fs_file)
 	try
 	{
 		// Create the shader
-		Shader *shad = Shader::create_from_source(name, vs, fs, true);
+		Shader *shad = Shader::create_from_source(name, vs, strlen(vs), fs, strlen(fs));
 		free(vs);
 		free(fs);
 		return shad;

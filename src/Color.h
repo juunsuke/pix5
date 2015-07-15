@@ -97,6 +97,12 @@ public:
 	inline float fa() const { return (float)ia()/255.0f; }
 	// Get float components
 
+	inline void ir(uint32_t r) { _val = (_val&0xFFFFFF00) | (r&0xFF); }
+	inline void ig(uint32_t g) { _val = (_val&0xFFFF00FF) | ((g&0xFF)<<8); }
+	inline void ib(uint32_t b) { _val = (_val&0xFF00FFFF) | ((b&0xFF)<<16); }
+	inline void ia(uint32_t a) { _val = (_val&0x00FFFFFF) | ((a&0xFF)<<24); }
+	// Change a single component of the color
+
 
 	inline static Color ubyte(uint32_t r, uint32_t g, uint32_t b, uint32_t a=255)
 	{

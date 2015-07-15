@@ -23,10 +23,32 @@ public:
 	}
 };
 
+class CachedFont
+{
+public:
+
+	Str name;
+	Font *fnt;
+	int ptsize;
+
+	CachedFont(const Str& name, Font *fnt, int ptsize)
+	{
+		this->name = name;
+		this->fnt = fnt;
+		this->ptsize = ptsize;
+	}
+
+	~CachedFont()
+	{
+		delete fnt;
+	}
+};
+
 
 
 static List<CachedTexture*> _tex;
-// All the cached textures
+static List<CachedFont*> _fnt;
+// All the cached items
 
 
 
@@ -44,6 +66,7 @@ void flush()
 {
 	// Flush everything
 	_tex.clear_del();
+	_fnt.clear_del();
 }
 
 
@@ -62,6 +85,42 @@ Texture *texture(const Str& fname)
 
 	return tex;
 }
+
+Font *font(const Str& fname, int ptsize)
+{
+	// Check if its already loaded
+	for(int c = 0; c<_fnt.size(); c++)
+		if(_fnt[c]->name==fname && _fnt[c]->ptsize==ptsize)
+			return _fnt[c]->fnt;
+
+	// Load it
+	Font *fnt = Font::load(fname, ptsize);
+
+	// Add it to the cache
+	_fnt.add(new CachedFont(fname, fnt, ptsize));
+
+	return fnt;
+}
+
+Font *font(const uint8_t *data, uint32_t len, int ptsize)
+{
+	// Load a memory font
+	// Build the name from the pointer
+	Str name = Str::build("mem_%lli", (long long)(intptr_t)data);
+
+	for(int c = 0; c<_fnt.size(); c++)
+		if(_fnt[c]->name==name && _fnt[c]->ptsize==ptsize)
+			return _fnt[c]->fnt;
+
+	// Load it
+	Font *fnt = Font::load(data, len, ptsize);
+
+	// Add it to the cache
+	_fnt.add(new CachedFont(name, fnt, ptsize));
+
+	return fnt;
+}
+
 
 
 
