@@ -82,9 +82,10 @@ int main(int argc, char **argv)
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 
-			tm->draw(Rect(100, 50, 800, 500), bx, by);
+			//tm->draw(Rect(100, 50, 800, 500), bx, by);
+			//Display::test_draw(99, 49, tex);
 
-			Display::test_draw(99, 49, tex);
+			tm->draw(Rect(0, 0, Display::get_mode().width, Display::get_mode().height), bx, by);
 
 			if(Input::get_keyboard()[KEY_LEFT])
 				bx-=2;
