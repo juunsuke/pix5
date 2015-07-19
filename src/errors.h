@@ -57,6 +57,7 @@ PIXERR( 0x30000003, NoChild,			"The child element was not found" )
 // Map errors
 PIXERR( 0x40000001, BadTileCoord,		"Invalid tile coordinates" )
 PIXERR( 0x40000002, BadLayerType,		"Invalid layer type" )
+PIXERR( 0x40000003, BadTileIndex,		"Invalid tile index" )
 
 
 

@@ -77,6 +77,15 @@ int main(int argc, char **argv)
 		int bx = 0;
 		int by = 0;
 
+
+		uint32_t vt = tm->add_virt_tile(0, 18, 300);
+		tm->add_virt_tile(vt, 19, 300);
+		tm->add_virt_tile(vt, 20, 300);
+
+
+		tm->get_tile(0, 4, 3, true)->tile = vt;
+
+
 		for(;;)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));

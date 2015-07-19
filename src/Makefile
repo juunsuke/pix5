@@ -19,7 +19,7 @@ HDRS += TileMap.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h 
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
-SRCS += init.cc load_file.cc
+SRCS += init.cc load_file.cc get_ms.cc
 SRCS += GuiTheme_Label.cc
 
 DATA = sprite.vs sprite.fs LiberationSans-Regular.ttf

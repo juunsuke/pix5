@@ -18,11 +18,17 @@ class TMBase
 	Shader *_shad;
 	// The tilemap shader
 
+	List<class VirtualTile*> _vtiles;
+	// Virtual tiles
+
 
 	TMLayer *add_layer(LayerType::Type type);
 	// Create and insert a new layer
 
 	void draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by);
+
+	int get_vt_cur(uint32_t vti);
+	// Get the current VT sub-tile index for the given VT index based on time
 
 protected:
 
@@ -68,6 +74,41 @@ public:
 	// (x,y) represents the map coordinate, in pixels, that should be at (dest.x,dest.y)
 	// This will leave any shader, VB/VA, and texture undbound
 	// The camera will be set to the 2D camera
+
+	int32_t get_int32(int layer, int x, int y);
+	int64_t get_int64(int layer, int x, int y);
+	Str get_str(int layer, int x, int y);
+	void set_int32(int layer, int x, int y, int32_t val);
+	void set_int64(int layer, int x, int y, int64_t val);
+	void set_str(int layer, int x, int y, const Str& val);
+	// Get/set the value of an Int32/Int64/Str layer for the given tile
+	// Throws an error if the layer is not an Int32/Int64/Str layer, or if
+	// the coordinates are out of range
+
+	uint32_t add_virt_tile(uint32_t vt, uint32_t t, uint32_t ms);
+	// Add a sub-tile to a virtual tile, or create a new virtual tile
+	// If 'vt' is 0, create a new virtual tile and return its index
+	// If 'vt' is not 0, it must be an already created virtual tile
+	// 't' is a regular, non-virtual, tile index to add
+	// 'ms' is the number of milliseconds the tile 't' should be visible
+	// before switching to the next sub-tile
+	
+	
+
+	//
+	// Fast inline getters/setters for value layers
+	// Absolutely no layer validation nor bounds checking is performed, as to access the
+	// data as fast as possible
+	// These can be used if you are 100% certain the provided values are valid and within bounds
+	// In most cases, the regular access functions should be used
+	//
+	
+	inline int32_t get_int32_fast(int layer, int x, int y)				{ return _layers[layer]->_i32[y*_mw+x];		}
+	inline int32_t get_int64_fast(int layer, int x, int y)				{ return _layers[layer]->_i64[y*_mw+x];		}
+	inline Str get_str_fast(int layer, int x, int y)					{ return *_layers[layer]->_str[y*_mw+x];	}
+	inline void set_int32_fast(int layer, int x, int y, int32_t val)	{ _layers[layer]->_i32[y*_mw+x] = val;		}
+	inline void set_int64_fast(int layer, int x, int y, int64_t val)	{ _layers[layer]->_i64[y*_mw+x] = val;		}
+	inline void set_str_fast(int layer, int x, int y, const Str& val)	{ *_layers[layer]->_str[y*_mw+x] = val;		}
 };
 
 

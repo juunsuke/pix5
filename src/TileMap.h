@@ -29,7 +29,7 @@ public:
 	{
 	}
 
-	inline T *get_tile(int layer, int x, int y, bool set_dirty)
+	inline T *get_tile(int layer, int x, int y, bool set_dirty = false)
 	{
 		// Get the given tile
 		return (T*)get_tile_base(layer, x, y, set_dirty);
