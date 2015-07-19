@@ -2,8 +2,13 @@
 #include <math.h>
 
 
-Sprite *s;
-SoundClip *sc2;
+struct MyTile
+{
+	TILE_BASE
+};
+
+TileMap<MyTile> *tm;
+
 
 
 class MyEventHandler: public EventHandler
@@ -12,29 +17,18 @@ public:
 
 	void on_mouse_wheel_down(Mouse& mouse)
 	{
-		//s->set_scale(s->hscale()*0.9f);
-		int nz = s->z()-1;
-		s->set_z(nz);
-		Log::debug("Z: %i", nz);
 	}
 
 	void on_mouse_wheel_up(Mouse& mouse)
 	{
-		//s->set_scale(s->hscale()*1.1f);
-		int nz = s->z()+1;
-		s->set_z(nz);
-		Log::debug("Z: %i", nz);
 	}
 
 	void on_mouse_move(Mouse& mouse)
 	{
-		//printf("%i, %i\n", mouse.x, mouse.y);
 	}
 
 	void on_key_down(Key& key)
 	{
-		if(key.code==KEY_SPACE)
-			Audio::play(sc2);
 	}
 
 	void on_key_up(Key& key)
@@ -58,88 +52,56 @@ int main(int argc, char **argv)
 	{
 		pix_init("Test");
 
-		SoundClip *sc = SoundClip::load("data/FindYou.ogg", "music");
-		sc2 = SoundClip::load("data/Heal8-Bit.ogg", "fx");
-
-		Audio::play(sc, true);
-
 		Display::set_mode(VideoMode::resizable(
 			//1366, 768, false
 		));
 
+
+		tm = new TileMap<MyTile>(256, 256, 32, 32);
+		tm->add_layer_tiles(Cache::texture("data/ts0.png"));
+
+
+		for(int y = 0; y<256; y++)
+			for(int x = 0; x<256; x++)
+			{
+				MyTile *t = tm->get_tile(0, x, y, true);
+				t->tile = rand()%171;
+			}
+
+
+		Texture *tex = Texture::create(802, 502);
+		tex->rect(0, 0, 801, 501, Color(1,1,1));
+
 		MyEventHandler eh;
 
-		SpriteSet *ss = new SpriteSet();
-
-		Font *fnt = GUI::font_default;
-
-		Texture *tex;
-
-		for(int c = 0; c<1000; c++)
-		{
-			int n = rand()%1000;
-
-			tex = Texture::create(100, 20, false);
-			tex->clear(0xFF000000 | (rand()*rand()));
-
-			tex->print(fnt, 5, 3, Color(0,0,0), Str::build("%i", n));
-
-			s = ss->new_sprite(tex, n, rand()%1200, rand()%1000);
-		}
-		
-		tex = Cache::texture("data/konata.png");
-		tex->set_filter(TextureFilter::Linear, TextureFilter::Linear);
-
-		s = ss->new_sprite(tex);
-		s->set_origin(tex->width()/2, tex->height()/2);
-		s->set_z(500);
-		s->set_scale(2);
-
-
-		float a = 0;
-
-
-		TexRenderer tr;
-
-		int x = 0;
-
-
-		Label *lab = new Label("Test", 200, 80, "Proutendish");
-		//lab->set_align(TextAlign::BottomRight);
-		GUI::add_child(lab, 100, 10);
+		int bx = 0;
+		int by = 0;
 
 		for(;;)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 
-			int mx = Input::get_mouse().x;
-			int my = Input::get_mouse().y;
+			tm->draw(Rect(100, 50, 800, 500), bx, by);
 
-			if(mx!=s->x() || my!=s->y())
-				s->set_pos(mx, my);
+			Display::test_draw(99, 49, tex);
 
-			a += 1.0f;
-			s->set_angle(a);
+			if(Input::get_keyboard()[KEY_LEFT])
+				bx-=2;
 
-			//ss->draw();
+			if(Input::get_keyboard()[KEY_RIGHT])
+				bx+=2;
 
-			
-			tr.add(tex, x, 100);
-			tr.add(tex, 1000-x, 500, Color(1,0,0), tex->width()/2, tex->height()/4);
-			tr.draw();
+			if(Input::get_keyboard()[KEY_UP])
+				by-=2;
 
-
-			x++;
-
-			GUI::draw();
+			if(Input::get_keyboard()[KEY_DOWN])
+				by+=2;
 
 			Display::swap();
 
 			eh.process_events();
 		}
-
-		delete ss;
 
 		pix_shutdown();
 	}

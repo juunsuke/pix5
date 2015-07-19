@@ -80,8 +80,12 @@ public:
 	void set_theme(GuiTheme *theme)
 	{
 		// Change the theme
-		_theme = theme;
-		set_dirty();
+		if(_theme!=theme)
+		{
+			_theme = theme;
+			on_apply_theme(theme);
+			set_dirty();
+		}
 	}
 
 
@@ -100,6 +104,9 @@ public:
 	//
 	// Virtual events
 	//
+
+	virtual void on_apply_theme(GuiTheme *theme) {}
+	// Called when the theme has been changed
 
 	virtual void on_draw(Texture *tex) {}
 	// Redraw the element

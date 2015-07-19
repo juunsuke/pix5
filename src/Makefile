@@ -7,6 +7,7 @@ DBG = 1
 CLSS  = Error EventHandler Log Cache
 CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer VertexArray Glyph Font
 CLSS += SpriteSet Sprite TexRenderer
+CLSS += TMLayer TMBase
 CLSS += Audio SoundClip
 CLSS += GUI GuiTheme GuiElement Label Button
 CLSS += Input
@@ -14,6 +15,7 @@ CLSS += Input
 HDRS  = $(patsubst %,%.h,$(CLSS))
 HDRS += pix5.h Str.h List.h SortedList.h Error.h errors.h Math.h
 HDRS += VideoModeType.h VideoMode.h Color.h Rect.h BlendMode.h TextAlign.h
+HDRS += TileMap.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h 
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
@@ -78,10 +80,10 @@ LFLAGS_TEST = $(LFLAGS) -L. $(LIB_LINK) -Wl,-rpath=.
 
 ########################################################################################################################
 
-$(LIB_OUT): data.cc $(OBJS) $(DEPS)
-	$(LD) $(LIB_OUT) data.cc $(OBJS) $(LFLAGS_LIB)
+$(LIB_OUT): data.o $(OBJS) $(DEPS)
+	$(LD) $(LIB_OUT) data.o $(OBJS) $(LFLAGS_LIB)
 
-$(OBJS): %.o: %.cc $(DEPS)
+$(OBJS) data.o: %.o: %.cc $(DEPS)
 	$(CC) $@ $(CFLAGS_LIB) $<
 
 ########################################################################################################################

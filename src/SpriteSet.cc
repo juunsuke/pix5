@@ -43,7 +43,7 @@ SpriteSet::SpriteSet()
 	// Define the vertex format streams
 	VertexDef vd;
 	vd.add(VertexComp::float2("pos", 0));
-	_va.add_stream(vd, sizeof(PosVertex), VertexBufferUsage::Stream);
+	_va.add_stream(vd, sizeof(PosVertex), VertexBufferUsage::Static);
 
 	vd.clear();
 	vd.add(VertexComp::ubyte4("col", true, 0));

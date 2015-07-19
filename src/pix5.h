@@ -120,6 +120,10 @@ int load_file(const Str& fname, char **buf);
 #include "GuiTheme.h"
 #include "GUI.h"
 
+#include "TMLayer.h"
+#include "TMBase.h"
+#include "TileMap.h"
+
 #include "EventHandler.h"
 
 
