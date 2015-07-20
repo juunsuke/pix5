@@ -538,8 +538,8 @@ void TMBase::draw()
 	int sx1 = Math::max(x1-8, 0);
 	int sy1 = Math::max(y1-8, 0);
 
-	int sw = w+16;
-	int sh = h+16;
+	int sw = (x2-sx1)+8;
+	int sh = (y2-sy1)+8;
 
 	if(sx1+sw>_mw)
 		sw = _mw-sx1;

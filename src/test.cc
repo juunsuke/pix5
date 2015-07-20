@@ -77,8 +77,8 @@ int main(int argc, char **argv)
 			}
 
 
-		Texture *tex = Texture::create(802, 502);
-		tex->rect(0, 0, 801, 501, Color(1,1,1));
+		Texture *tex = Texture::create(502, 302);
+		tex->rect(0, 0, 501, 301, Color(1,1,1));
 
 		MyEventHandler eh;
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 		tm->get_tile(0, 4, 3)->tile = vt;
 
 
-		tm->set_rect(Rect(100, 50, 800, 500));
+		tm->set_rect(Rect(300, 250, 500, 300));
 		//tm->set_rect(Rect(0, 0, 1246, 1059));
 
 		Texture *at = Cache::texture("data/sprites.png");
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 
-			//Display::test_draw(99, 49, tex);
+			//Display::test_draw(299, 249, tex);
 
 			tm->set_pos(bx, by);
 			tm->draw();
