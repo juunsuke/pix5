@@ -32,9 +32,20 @@ class TMBase
 	// Create and insert a new layer
 
 	void draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by);
+	void draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int dx, int dy);
 
 	int get_vt_cur(uint32_t vti);
 	// Get the current VT sub-tile index for the given VT index based on time
+
+	void add_sprite_to_tile(MapSprite *ms);
+	void remove_sprite_from_tile(MapSprite *ms);
+	// Add/remove the sprite to/from its tile
+
+	void get_ipos(MapSprite *ms, int *ix, int *iy);
+	// Calc the map position for the sprite
+
+	friend class MapSprite;
+
 
 protected:
 
@@ -61,6 +72,10 @@ public:
 	// by the tile dimensions in both sides
 	// The tile map doesn't take possession of the texture nor copy it, thus
 	// the provided texture must be kept and freed when done with the map
+	// Returns the layer index
+
+	int add_layer_sprites();
+	// Add a sprites layer
 	// Returns the layer index
 
 	int add_layer_int32(int32_t def);
@@ -112,6 +127,12 @@ public:
 	// 't' is a regular, non-virtual, tile index to add
 	// 'ms' is the number of milliseconds the tile 't' should be visible
 	// before switching to the next sub-tile
+
+	MapSprite *new_sprite(int layer, Texture *tex, float x, float y, int w = -1, int h = -1);
+	MapSprite *new_sprite(int layer, Anim *anim, float x, float y);
+	// Create a new sprite and add it to the map
+	// The positions are given in fractional tile coordinates, with the integer
+	// value corresponding to the center of the tile
 	
 	
 

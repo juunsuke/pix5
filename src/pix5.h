@@ -125,6 +125,7 @@ int64_t get_ms();
 #include "GuiTheme.h"
 #include "GUI.h"
 
+#include "MapSprite.h"
 #include "TMLayer.h"
 #include "TMBase.h"
 #include "TileMap.h"

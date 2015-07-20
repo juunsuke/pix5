@@ -25,6 +25,8 @@ Sprite::Sprite(SpriteSet *ss)
 	_u2 = 1;
 	_v2 = 1;
 
+	_anim = NULL;
+
 	_col = Color(1,1,1,1);
 
 	_mat_dirty = true;
@@ -63,6 +65,52 @@ void Sprite::set_visible(bool vis)
 	else
 		_ss->hide_sprite(this);
 }
+	
+void Sprite::set_tex(Texture *tex, bool resize, float u1, float v1, float u2, float v2)
+{
+	if(_anim)
+	{
+		_anim = NULL;
+		_mat_dirty = true;
+		_vtx_dirty = true;
+	}
+
+	// Auto-resize ?
+	if(resize && (tex->width()!=_w || tex->height()!=_h))
+		set_size(tex->width(), tex->height());
+
+	// Change the texture
+	_tex = tex;
+
+	if(_u1!=u1 || _v1!=v1 || _u2!=u2 || _v2!=v2)
+	{
+		_u1 = u1;
+		_v1 = v1;
+		_u2 = u2;
+		_v2 = v2;
+		_vtx_dirty = true;
+	}
+
+}
+
+void Sprite::set_anim(Anim *anim)
+{
+	if(_tex)
+	{
+		_tex = NULL;
+		_mat_dirty = true;
+		_vtx_dirty = true;
+	}
+
+	// Set the anim
+	_anim = anim;
+
+	// Fix the size
+	AnimFrame *frm = anim->get_frame(false);
+	_w = frm->w;
+	_h = frm->h;
+}
+
 	
 void Sprite::calc_matrix()
 {

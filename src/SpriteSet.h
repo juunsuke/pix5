@@ -58,8 +58,10 @@ public:
 
 	void draw();
 	// Render all the sprites in the set
+	// Any sprites bound to an animation will advance the animations of all visible sprites
 
 	Sprite *new_sprite(Texture *tex, int z=0, int x=0, int y=0, int ox=0, int oy=0, bool vis=true, float u1=0, float v1=0, float u2=1, float v2=1);
+	Sprite *new_sprite(Anim *anim, int z=0, int x=0, int y=0, int ox=0, int oy=0, bool vis=true);
 	// Create a new sprite in the set
 };
 

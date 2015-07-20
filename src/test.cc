@@ -10,6 +10,8 @@ struct MyTile
 TileMap<MyTile> *tm;
 
 
+bool run = true;
+
 
 class MyEventHandler: public EventHandler
 {
@@ -43,6 +45,11 @@ public:
 	{
 		tm->set_rect(Rect(0, 0, width, height));
 	}
+
+	void on_quit()
+	{
+		run = false;
+	}
 };
 
 
@@ -54,7 +61,7 @@ int main(int argc, char **argv)
 		pix_init("Test");
 
 		Display::set_mode(VideoMode::resizable(
-			//1366, 768, false
+			1366, 768, false
 		));
 
 
@@ -98,52 +105,71 @@ int main(int argc, char **argv)
 		a->add_frame("walk_right", at, 10, 0, 110, 32*3, 55, 3, 1);
 		a->add_frame("walk_up", at, 10, 0, 165, 32*3, 55, 3, 1);
 
+		Anim *a2 = new Anim();
+		a2->add_frame("walk_down", at, 10, 96, 0, 32*3, 55, 3, 1);
+		a2->add_frame("walk_left", at, 10, 96, 55, 32*3, 55, 3, 1);
+		a2->add_frame("walk_right", at, 10, 96, 110, 32*3, 55, 3, 1);
+		a2->add_frame("walk_up", at, 10, 96, 165, 32*3, 55, 3, 1);
+
+
+		tm->add_layer_sprites();
+
+		for(int c = 0; c<10000; c++)
+		{
+			MapSprite *ms = tm->new_sprite(1, a2, rand()%256, rand()%256);
+			ms->ox = 16;
+			ms->oy = 55-16;
+		}
+
 		int sx = 700;
 		int sy = 400;
 
-		TexRenderer tr;
+		SpriteSet ss;
+		Sprite *s = ss.new_sprite(a, 0, sx, sy);
 
-		for(;;)
+		while(run)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 
-			tm->set_pos(bx, by);
-			tm->draw();
 			//Display::test_draw(99, 49, tex);
 
-			tr.add(a, sx, sy);
-			tr.draw();
+			tm->set_pos(bx, by);
+			tm->draw();
+
+			ss.draw();
 
 
 			if(Input::get_keyboard()[KEY_LEFT])
 			{
 				bx-=2;
-				a->change_set("walk_left");
+				s->change_set("walk_left");
 			}
 
 			else if(Input::get_keyboard()[KEY_RIGHT])
 			{
 				bx+=2;
-				a->change_set("walk_right");
+				s->change_set("walk_right");
 			}
 
 			else if(Input::get_keyboard()[KEY_UP])
 			{
 				by-=2;
-				a->change_set("walk_up");
+				s->change_set("walk_up");
 			}
 
 			else if(Input::get_keyboard()[KEY_DOWN])
 			{
 				by+=2;
-				a->change_set("walk_down");
+				s->change_set("walk_down");
 			}
 
 			Display::swap();
 
 			eh.process_events();
 		}
+
+		delete tm;
 
 		pix_shutdown();
 	}

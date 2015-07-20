@@ -47,6 +47,15 @@ public:
 			// U and V factors for the tileset
 		};
 
+		struct
+		{
+			MapSprite **_sprites;
+			// Map sprites array, for sprite layers
+
+			int _num_sprite;
+			// Total number of current sprites
+		};
+
 		int32_t *_i32;
 		int64_t *_i64;
 		// Integer arrays, for Int32/Int64 layers

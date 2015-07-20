@@ -39,6 +39,9 @@ class Sprite
 	Matrix _mat;
 	// The current matrix
 
+	Anim *_anim;
+	// The sprite anim, if any
+
 
 	bool _mat_dirty, _vtx_dirty;
 	// Various dirty flags, used by SpriteSet
@@ -94,6 +97,8 @@ public:
 	inline float u2() const			{ return _u2; }
 	inline float v2() const			{ return _v2; }
 
+	inline Anim *anim() const		{ return _anim; }
+
 	inline Color col() const		{ return _col; }
 
 
@@ -103,9 +108,12 @@ public:
 
 	inline void set_pos(int x, int y)
 	{
-		_x = x;
-		_y = y;
-		_mat_dirty = true;
+		if(x!=_x || y!=_y)
+		{
+			_x = x;
+			_y = y;
+			_mat_dirty = true;
+		}
 	}
 
 	void set_z(int z);
@@ -113,41 +121,57 @@ public:
 
 	inline void set_size(int w, int h)
 	{
-		_w = w;
-		_h = h;
-		_mat_dirty = true;
+		ASSERT(!_anim, "Sprite::set_size() should not be called for Anim-base sprites")
+
+		if(w!=_w || h!=_h)
+		{
+			_w = w;
+			_h = h;
+			_mat_dirty = true;
+		}
 	}
 
 	inline void set_origin(int ox, int oy)
 	{
-		_ox = ox;
-		_oy = oy;
-		_mat_dirty = true;
+		if(ox!=_ox || oy!=_oy)
+		{
+			_ox = ox;
+			_oy = oy;
+			_mat_dirty = true;
+		}
 	}
 
 	inline void set_angle(float a)
 	{
-		_angle = a;
-		_mat_dirty = true;
+		if(a!=_angle)
+		{
+			_angle = a;
+			_mat_dirty = true;
+		}
 	}
 
 	inline void set_hscale(float hscale)
 	{
-		_hscale = hscale;
-		_mat_dirty = true;
+		if(hscale!=_hscale)
+		{
+			_hscale = hscale;
+			_mat_dirty = true;
+		}
 	}
 
 	inline void set_vscale(float vscale)
 	{
-		_vscale = vscale;
-		_mat_dirty = true;
+		if(vscale!=_vscale)
+		{
+			_vscale = vscale;
+			_mat_dirty = true;
+		}
 	}
 
 	inline void set_scale(float scale)
 	{
-		_hscale = scale;
-		_vscale = scale;
-		_mat_dirty = true;
+		set_hscale(scale);
+		set_vscale(scale);
 	}
 
 	void set_visible(bool vis);
@@ -155,25 +179,13 @@ public:
 	inline void show() { set_visible(true); }
 	inline void hide() { set_visible(false); }
 
-	void set_tex(Texture *tex, bool resize = true, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1)
-	{
-		// Auto-resize ?
-		if(resize && (tex->width()!=_w || tex->height()!=_h))
-			set_size(tex->width(), tex->height());
+	void set_tex(Texture *tex, bool resize = true, float u1 = 0, float v1 = 0, float u2 = 1, float v2 = 1);
+	// Change the sprite's texture
+	// If the sprite was anim-based, the anim will be dropped
 
-		// Change the texture
-		_tex = tex;
-
-		if(_u1!=u1 || _v1!=v1 || _u2!=u2 || _v2!=v2)
-		{
-			_u1 = u1;
-			_v1 = v1;
-			_u2 = u2;
-			_v2 = v2;
-			_vtx_dirty = true;
-		}
-
-	}
+	void set_anim(Anim *anim);
+	// Change the sprite's anim
+	// If the sprite was texture-based, the texture will be dropped
 
 	inline void set_color(const Color& col)
 	{
@@ -182,6 +194,20 @@ public:
 			_col = col;
 			_vtx_dirty = true;
 		}
+	}
+
+	inline void set_set(const Str& name, int frame = 0)
+	{
+		// Change the bound anim's set
+		ASSERT(_anim, "Sprite::set_set(): The sprite is not Anim-based")
+		_anim->set_set(name, frame);
+	}
+
+	inline void change_set(const Str& name, int frame = 0)
+	{
+		// Change the bound anim's set
+		ASSERT(_anim, "Sprite::change_set(): The sprite is not Anim-based")
+		_anim->change_set(name, frame);
 	}
 
 	void calc_matrix();

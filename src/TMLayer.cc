@@ -35,6 +35,15 @@ TMLayer::~TMLayer()
 
 		case LayerType::Sprites:
 			// Sprites layer
+			// Free all the sprites
+			if(_sprites)
+			{
+				for(int c = 0; c<(_w*_h); c++)
+					while(_sprites[c])
+						delete _sprites[c];
+
+				free(_sprites);
+			}
 			
 			break;
 
@@ -52,7 +61,7 @@ TMLayer::~TMLayer()
 			if(_str)
 			{
 				//free each one individually
-				for(int c = 0; c<((_w*_h)); c++)
+				for(int c = 0; c<(_w*_h); c++)
 					if(_str[c])
 						delete _str[c];
 

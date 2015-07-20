@@ -1,5 +1,6 @@
 #include "pix5.h"
 #include "data.h"
+#include <GL/glew.h>
 
 namespace PIX {
 
@@ -135,11 +136,29 @@ int TMBase::add_layer_tiles(Texture *ts)
 	vd.add(VertexComp::float2("texcoord", 12));
 
 	lay->_vb = new VertexBuffer(vd, sizeof(TileVertex), VertexBufferUsage::Stream);
-	lay->_vb->resize((_rect.w/_tw+2)*(_rect.h/_th+2)*4);
 
 	#ifdef DBG
 	Log::debug("Added tiles layer, tileset is %ix%i and holds %i tiles of %ix%i pixels", lay->_tx, lay->_ty, lay->_tx*lay->_ty, _tw, _th);
 	#endif
+
+	return lay->_index;
+}
+	
+int TMBase::add_layer_sprites()
+{
+	// Add a sprites layer
+	TMLayer *lay = add_layer(LayerType::Sprites);
+
+	lay->_sprites = (MapSprite**)calloc(_mw*_mh, sizeof(MapSprite*));
+	lay->_num_sprite = 0;
+
+	// Create the vertex array
+	VertexDef vd;
+	vd.add(VertexComp::float2("pos", 0));
+	vd.add(VertexComp::ubyte4("col", true, 8));
+	vd.add(VertexComp::float2("texcoord", 12));
+
+	lay->_vb = new VertexBuffer(vd, sizeof(TileVertex), VertexBufferUsage::Stream);
 
 	return lay->_index;
 }
@@ -236,15 +255,6 @@ int TMBase::get_vt_cur(uint32_t vti)
 void TMBase::set_rect(const Rect& r)
 {
 	_rect = r;
-
-	// Resize the VB to be large enough to hold all the draw area
-	for(int c = 0; c<_layers.size(); c++)
-	{
-		TMLayer *lay = _layers[c];
-
-		if(lay->_vb)
-			lay->_vb->resize((r.w/_tw+2)*(r.h/_th+2)*4);
-	}
 }
 
 void TMBase::set_pos(int x, int y)
@@ -255,9 +265,8 @@ void TMBase::set_pos(int x, int y)
 
 void TMBase::draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by)
 {
-	// Bind the shader and tileset texture
+	// Bind the tileset texture
 	lay->_ts->bind(0);
-	_shad->bind();
 
 	// Prepare the matrix
 	Matrix mat = Matrix::identity();
@@ -351,6 +360,145 @@ void TMBase::draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx,
 	Display::draw(0, w*h*4);
 }
 
+void TMBase::draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int dx, int dy)
+{
+	// Build the vertices
+	TileVertex *v = (TileVertex*)lay->_vb->lock(0, lay->_num_sprite*4);
+
+	int count = 0;
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+			
+	for(int y = 0; y<h; y++)
+	{
+		for(int x = 0; x<w; x++)
+		{
+			// Do all the visible sprites for this tile
+			for(MapSprite *ms = lay->_sprites[(y1+y)*_mw+x1+x]; ms; ms = ms->_next)
+				if(ms->visible)
+				{
+					// Build the matrix for this sprite
+					glLoadIdentity();
+
+					float fx = (float)dx + (ms->_x * (float)_tw) - (float)_x + (float)_tw/2.0f;
+					float fy = (float)dy + (ms->_y * (float)_th) - (float)_y + (float)_th/2.0f;
+
+					// Position
+					glTranslatef(fx, fy, 0);
+					
+					// Rotation
+					if(ms->angle)
+						glRotatef(ms->angle, 0, 0, 1.0f);
+
+					// Scaling
+					if(ms->hscale!=1.0f || ms->vscale!=1.0f)
+						glScalef(ms->hscale, ms->vscale, 1.0f);
+
+					// Origin
+					if(ms->ox || ms->oy)
+						glTranslatef(-ms->ox, -ms->oy, 0);
+
+					// Save the matrix
+					ms->_mat = Matrix::get_modelview();
+
+					float u1, v1, u2, v2;
+					int ww, hh;
+
+					// Get dimensions and texture coordinates
+					if(ms->_tex)
+					{
+						ww = ms->_w;
+						hh = ms->_h;
+						u1 = ms->_u1;
+						v1 = ms->_v1;
+						u2 = ms->_u2;
+						v2 = ms->_v2;
+					}
+					else
+					{
+						AnimFrame *frm = ms->_anim->get_frame(false);
+						ww = frm->w;
+						hh = frm->h;
+						u1 = frm->u1;
+						v1 = frm->v1;
+						u2 = frm->u2;
+						v2 = frm->v2;
+					}
+
+					// Setup the vertices
+					v->x = 0;
+					v->y = 0;
+					v->col = ms->col;
+					v->u = u1;
+					v->v = v1;
+					v++;
+
+					v->x = ww;
+					v->y = 0;
+					v->col = ms->col;
+					v->u = u2;
+					v->v = v1;
+					v++;
+
+					v->x = ww;
+					v->y = hh;
+					v->col = ms->col;
+					v->u = u2;
+					v->v = v2;
+					v++;
+
+					v->x = 0;
+					v->y = hh;
+					v->col = ms->col;
+					v->u = u1;
+					v->v = v2;
+					v++;
+
+					count++;
+				}
+		}
+	}
+	
+	glPopMatrix();
+		
+	// Draw the sprites
+	if(count)
+	{
+		lay->_vb->bind();
+		lay->_vb->set_attribs(_shad);
+
+		int c = 0;
+		Texture *last_tex = NULL;
+	
+		for(int y = 0; y<h; y++)
+		{
+			for(int x = 0; x<w; x++)
+			{
+				// Do all the visible sprites for this tile
+				for(MapSprite *ms = lay->_sprites[(y1+y)*_mw+x1+x]; ms; ms = ms->_next)
+					if(ms->visible)
+					{
+						// Set the matrix
+						_shad->set_uniform("mat", ms->_mat);
+
+						// Set the texture
+						Texture * tex = ms->_tex ? ms->_tex : ms->_anim->get_frame()->tex;
+						if(tex!=last_tex)
+						{
+							tex->bind(0);
+							last_tex = tex;
+						}
+
+						// Draw it
+						Display::draw(c, 4);
+						c += 4;
+					}
+			}
+		}
+	}
+}
+
 void TMBase::draw()
 {
 	// Calc the draw range
@@ -386,11 +534,26 @@ void TMBase::draw()
 	if(x1>x2 || y1>y2 || w<=0 || h<=0)
 		return;
 
+	// For sprites, always check a few tiles around the region
+	int sx1 = Math::max(x1-8, 0);
+	int sy1 = Math::max(y1-8, 0);
+
+	int sw = w+16;
+	int sh = h+16;
+
+	if(sx1+sw>_mw)
+		sw = _mw-sx1;
+	if(sy1+sh>_mh)
+		sh = _mh-sy1;
+
 	// Prepare to draw
 	Display::get_2d_camera().set();
 
 	// Make sure no VA is bound
 	VertexArray::unbind();
+	
+	// Bind the shader
+	_shad->bind();
 
 	// Draw each layer
 	for(int c = 0; c<_layers.size(); c++)
@@ -402,6 +565,11 @@ void TMBase::draw()
 			case LayerType::Tiles:
 				// Tiles layer
 				draw_tile_layer(lay, x1, y1, x2-x1+1, y2-y1+1, dx-(_x%_tw), dy-(_y%_th));
+				break;
+
+			case LayerType::Sprites:
+				// Sprites layer
+				draw_sprite_layer(lay, sx1, sy1, sw, sh, _rect.x, _rect.y);
 				break;
 
 			default:
@@ -532,5 +700,107 @@ uint32_t TMBase::add_virt_tile(uint32_t vt, uint32_t t, uint32_t ms)
 
 	return vt;
 }
+
+MapSprite *TMBase::new_sprite(int layer, Texture *tex, float x, float y, int w, int h)
+{
+	// Create the sprite
+	MapSprite *ms = new MapSprite(this, layer);
+
+	ms->_tex = tex;
+	ms->_x = x;
+	ms->_y = y;
+	ms->_w = (w==-1) ? tex->width() : w;
+	ms->_h = (h==-1) ? tex->height() : h;
+
+	// Add it
+	add_sprite_to_tile(ms);
+
+	return ms;
+}
+
+MapSprite *TMBase::new_sprite(int layer, Anim *anim, float x, float y)
+{
+	// Create the sprite
+	MapSprite *ms = new MapSprite(this, layer);
+
+	ms->_anim = anim;
+	ms->_x = x;
+	ms->_y = y;
+
+	AnimFrame *frm = anim->get_frame(false);
+	ms->_w = frm->w;
+	ms->_h = frm->h;
+
+	// Add it
+	add_sprite_to_tile(ms);
+
+	return ms;
+}
+
+void TMBase::get_ipos(MapSprite *ms, int *ix, int *iy)
+{
+	*ix = (int)ms->_x;
+	*iy = (int)ms->_y;
+
+	// Clip
+	if(*ix<0)
+		*ix = 0;
+	if(*ix>=_mw)
+		*ix = _mw-1;
+
+	if(*iy<0)
+		*iy = 0;
+	if(*iy>=_mh)
+		*iy = _mh-1;
+}
+
+void TMBase::add_sprite_to_tile(MapSprite *ms)
+{
+	// Add the sprite to the tile's linked list
+	TMLayer *lay = _layers[ms->_layer];
+
+	int ix, iy;
+	get_ipos(ms, &ix, &iy);
+
+	// Add it
+	int i = iy*_mw+ix;
+
+	ms->_next = lay->_sprites[i];
+	lay->_sprites[i] = ms;
+
+	lay->_num_sprite++;
+}
+
+void TMBase::remove_sprite_from_tile(MapSprite *ms)
+{
+	// Remove the sprite from the tile's linked list
+	TMLayer *lay = _layers[ms->_layer];
+
+	int ix, iy;
+	get_ipos(ms, &ix, &iy);
+
+	// Remove it
+	int i = iy*_mw+ix;
+
+	if(lay->_sprites[i]==ms)
+		lay->_sprites[i] = ms->_next;
+	else
+	{
+		for(MapSprite *run = lay->_sprites[i]; run->_next; run = run->_next)
+			if(run->_next==ms)
+			{
+				run->_next = ms->_next;
+				break;
+			}
+	}
+
+	lay->_num_sprite--;
+}
+
+
+
+
+
+
 
 }

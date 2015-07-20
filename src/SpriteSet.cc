@@ -57,6 +57,9 @@ SpriteSet::SpriteSet()
 	_hid_first->_next = _hid_last;
 	_hid_last->_prev = _hid_first;
 
+	_hid_first->_visible = false;
+	_hid_last->_visible = false;
+
 	_va_dirty = true;
 
 	_max_size = 0;
@@ -66,8 +69,8 @@ SpriteSet::~SpriteSet()
 {
 	// Clear everything
 	// Since Sprite has a private destructor, we must delete them manually here
-	for(int c = 0; c<_vis_sprites.size(); c++)
-		delete _vis_sprites[c];
+	while(_vis_sprites.size())
+		delete _vis_sprites[0];
 
 	_vis_sprites.clear_nodel();
 
@@ -118,6 +121,10 @@ void SpriteSet::add_hidden(Sprite *s)
 void SpriteSet::del_hidden(Sprite *s)
 {
 	// Remove a sprite from the hidden linked list
+	if(!s->_prev || !s->_next)
+		// First and last
+		return;
+
 	s->_prev->_next = s->_next;
 	s->_next->_prev = s->_prev;
 
@@ -215,6 +222,36 @@ void SpriteSet::draw()
 	// Bind the sprite shader
 	_shad->bind();
 
+	// Advance the animations and adjust the sprite data as required
+	for(int c = 0; c<_vis_sprites.size(); c++)
+	{
+		Sprite *s = _vis_sprites[c];
+
+		if(!s->_anim)
+			continue;
+
+		AnimFrame *frm = s->_anim->get_frame();
+
+		// Adjust data
+		s->_tex = frm->tex;
+
+		if(s->_w!=frm->w || s->_h!=frm->h)
+		{
+			s->_w = frm->w;
+			s->_h = frm->h;
+			s->_mat_dirty = true;
+		}
+
+		if(s->_u1!=frm->u1 || s->_u2!=frm->u2 || s->_v1!=frm->v1 || s->_v2!=frm->v2)
+		{
+			s->_u1 = frm->u1;
+			s->_v1 = frm->v1;
+			s->_u2 = frm->u2;
+			s->_v2 = frm->v2;
+			s->_vtx_dirty = true;
+		}
+	}
+
 	// Rebuild the vertex buffer if needed
 	if(_va_dirty)
 	{
@@ -303,6 +340,19 @@ Sprite *SpriteSet::new_sprite(Texture *tex, int z, int x, int y, int ox, int oy,
 		add_visible(s);
 	else
 		add_hidden(s);
+
+	return s;
+}
+	
+Sprite *SpriteSet::new_sprite(Anim *anim, int z, int x, int y, int ox, int oy, bool vis)
+{
+	// Create a new sprite
+	AnimFrame *frm = anim->get_frame(false);
+
+	Sprite *s = new_sprite(frm->tex, z, x, y, ox, oy, vis, frm->u1, frm->v1, frm->u2, frm->v2);
+	s->_w = frm->w;
+	s->_h = frm->h;
+	s->_anim = anim;
 
 	return s;
 }
