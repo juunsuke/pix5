@@ -27,6 +27,9 @@ public:
 	int _w, _h;
 	// Layer size, which is always the same as the map size
 
+	VertexBuffer *_vb;
+	// The array's VB, if any
+
 	union
 	{
 		struct
@@ -42,12 +45,6 @@ public:
 
 			float _uf, _vf;
 			// U and V factors for the tileset
-
-			VertexArray **_va;
-			// Vertex arrays, one per row
-
-			bool *_dirty;
-			// Dirty flags, one per row
 		};
 
 		int32_t *_i32;

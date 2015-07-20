@@ -11,16 +11,18 @@ TMLayer::TMLayer(LayerType::Type type, int w, int h)
 	_type = type;
 	_w = w;
 	_h = h;
+	_vb = NULL;
 
 	// Clear the union
 	_tiles = NULL;
 	_ts = NULL;
-	_va = NULL;
-	_dirty = NULL;
 }
 
 TMLayer::~TMLayer()
 {
+	if(_vb)
+		delete _vb;
+
 	// Free the appropriate data
 	switch(_type)
 	{
@@ -28,19 +30,6 @@ TMLayer::~TMLayer()
 			// Free the tiles array
 			if(_tiles)
 				free(_tiles);
-
-			// Free the vertex arrays and dirty flags
-			if(_va)
-			{
-				for(int c = 0; c<_h; c++)
-					if(_va[c])
-						delete _va[c];
-
-				free(_va);
-			}
-
-			if(_dirty)
-				free(_dirty);
 
 			break;
 

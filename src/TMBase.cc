@@ -11,13 +11,9 @@ struct BaseTile
 	uint32_t col[4];
 };
 
-struct PosVertex
-{
-	float x, y;
-};
-
 struct TileVertex
 {
+	float x, y;
 	uint32_t col;
 	float u, v;
 };
@@ -67,6 +63,10 @@ TMBase::TMBase(int mw, int mh, int tw, int th, int tsz)
 	_tw = tw;
 	_th = th;
 	_tsz = tsz;
+
+	_rect = Rect(100, 100, 320, 240);
+	_x = 0;
+	_y = 0;
 
 	// Load the shader
 	_shad = Shader::create_from_source("TileMapShader", (char*)data_sprite_vs, data_sprite_vs_len, (char*)data_sprite_fs, data_sprite_fs_len);
@@ -128,56 +128,14 @@ int TMBase::add_layer_tiles(Texture *ts)
 	lay->_uf = 1.0f / (float)lay->_tx;
 	lay->_vf = 1.0f / (float)lay->_ty;
 
-	// Prepare the vertex definitions
-	VertexDef vd1;
-	vd1.add(VertexComp::float2("pos", 0));
+	// Create the vertex array
+	VertexDef vd;
+	vd.add(VertexComp::float2("pos", 0));
+	vd.add(VertexComp::ubyte4("col", true, 8));
+	vd.add(VertexComp::float2("texcoord", 12));
 
-	VertexDef vd2;
-	vd2.add(VertexComp::ubyte4("col", true, 0));
-	vd2.add(VertexComp::float2("texcoord", 4));
-
-	// Create the vertex arrays
-	lay->_va = (VertexArray**)malloc(_mh*sizeof(VertexArray*));
-	for(int y = 0; y<_mh; y++)
-	{
-		// Create the VA
-		VertexArray *va = new VertexArray();
-
-		// Add the 2 streams
-		va->add_stream(vd1, sizeof(PosVertex), VertexBufferUsage::Static);
-		va->add_stream(vd2, sizeof(TileVertex));
-
-		// Setup the static position of each vertex
-		PosVertex *v = (PosVertex*)va->lock(0, 0, 4*_mw);
-		int bx = 0;
-		for(int x = 0; x<_mw; x++)
-		{
-			v->x = bx;
-			v->y = 0;
-			v++;
-
-			v->x = bx+_tw;
-			v->y = 0;
-			v++;
-
-			v->x = bx+_tw;
-			v->y = _th;
-			v++;
-
-			v->x = bx;
-			v->y = _th;
-			v++;
-
-			bx += _tw;
-		}
-
-		lay->_va[y] = va;
-	}
-
-	// Create the dirty flags array
-	lay->_dirty = (bool*)malloc(_mh*sizeof(bool));
-	for(int c = 0; c<_mh; c++)
-		lay->_dirty[c] = true;
+	lay->_vb = new VertexBuffer(vd, sizeof(TileVertex), VertexBufferUsage::Stream);
+	lay->_vb->resize((_rect.w/_tw+2)*(_rect.h/_th+2)*4);
 
 	#ifdef DBG
 	Log::debug("Added tiles layer, tileset is %ix%i and holds %i tiles of %ix%i pixels", lay->_tx, lay->_ty, lay->_tx*lay->_ty, _tw, _th);
@@ -238,7 +196,7 @@ int TMBase::add_layer_str(const Str& def)
 }
 
 
-void *TMBase::get_tile_base(int layer, int x, int y, bool set_dirty)
+void *TMBase::get_tile_base(int layer, int x, int y)
 {
 	// Validate
 	if(layer<0 || layer>=_layers.size())
@@ -249,10 +207,6 @@ void *TMBase::get_tile_base(int layer, int x, int y, bool set_dirty)
 	TMLayer *lay = _layers[layer];
 	if(lay->_type!=LayerType::Tiles)
 		E::BadLayerType("TileMap::get_tile(): Layer is not a tiles layer");
-
-	// Mark the row dirty if needed
-	if(set_dirty)
-		lay->_dirty[y] = true;
 
 	// Return the base address of the tile with the specified coordinates
 	return ((uint8_t*)lay->_tiles) + (y*_mw+x)*_tsz;
@@ -279,6 +233,26 @@ int TMBase::get_vt_cur(uint32_t vti)
 	return vt->tiles.size()-1;
 }
 
+void TMBase::set_rect(const Rect& r)
+{
+	_rect = r;
+
+	// Resize the VB to be large enough to hold all the draw area
+	for(int c = 0; c<_layers.size(); c++)
+	{
+		TMLayer *lay = _layers[c];
+
+		if(lay->_vb)
+			lay->_vb->resize((r.w/_tw+2)*(r.h/_th+2)*4);
+	}
+}
+
+void TMBase::set_pos(int x, int y)
+{
+	_x = x;
+	_y = y;
+}
+
 void TMBase::draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by)
 {
 	// Bind the shader and tileset texture
@@ -287,122 +261,108 @@ void TMBase::draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx,
 
 	// Prepare the matrix
 	Matrix mat = Matrix::identity();
+	mat._14 = bx;
+	mat._24 = by;
+	_shad->set_uniform("mat", mat);
 
-	// Draw each row
+	// Build the vertices
+	TileVertex *v = (TileVertex*)lay->_vb->lock(0, w*h*4);
+
+	int dy = 0;
+
 	for(int y = 0; y<h; y++)
 	{
-		int yy = y1+y;
-		VertexArray *va = lay->_va[yy];
+		// Get the first tile of the row
+		uint8_t *ptr = (uint8_t*)get_tile_base(lay->_index, x1, y1+y);
 
-		// Check if there is a virtual tile in the visible part of the row
-		// If so, force the row dirty
-		if(!lay->_dirty[yy])
+		int dx = 0;
+
+		for(int x = 0; x<w; x++)
 		{
-			uint8_t *ptr = (uint8_t*)get_tile_base(lay->_index, x1, yy, false);
+			BaseTile *bt = (BaseTile*)ptr;
+			ptr += _tsz;
 
-			for(int x = 0; x<w; x++)
+			int tx, ty;
+
+			// Handle virtual tiles
+			if(bt->tile & 0x80000000)
 			{
-				BaseTile *bt = (BaseTile*)ptr;
-				ptr += _tsz;
-
-				if(bt->tile & 0x80000000)
+				uint32_t vti = bt->tile & 0x7FFFFFFF;
+				if(vti<(uint32_t)_vtiles.size())
 				{
-					lay->_dirty[yy] = true;
-					break;
-				}
-			}
-		}
-
-		// Rebuild the vertices if dirty
-		if(lay->_dirty[yy])
-		{
-			// Lock the VBO
-			TileVertex *v = (TileVertex*)va->lock(1, 0, 4*_mw);
-
-			// Get the first tile of the row
-			uint8_t *ptr = (uint8_t*)get_tile_base(lay->_index, 0, yy, false);
-
-			for(int x = 0; x<_mw; x++)
-			{
-				BaseTile *bt = (BaseTile*)ptr;
-				ptr += _tsz;
-
-				int tx, ty;
-
-				// Handle virtual tiles
-				if(bt->tile & 0x80000000)
-				{
-					uint32_t vti = bt->tile & 0x7FFFFFFF;
-					if(vti<(uint32_t)_vtiles.size())
-					{
-						// Pick the proper sub-tile from the virtual tile
-						uint32_t t = _vtiles[vti]->tiles[get_vt_cur(vti)]->tile;
-						tx = t % lay->_tx;
-						ty = t / lay->_tx;
-					}
-					else
-					{
-						tx = 0;
-						ty = 0;
-					}
+					// Pick the proper sub-tile from the virtual tile
+					uint32_t t = _vtiles[vti]->tiles[get_vt_cur(vti)]->tile;
+					tx = t % lay->_tx;
+					ty = t / lay->_tx;
 				}
 				else
 				{
-					tx = bt->tile % lay->_tx;
-					ty = bt->tile / lay->_tx;
+					tx = 0;
+					ty = 0;
 				}
-
-				float u1 = (float)tx * lay->_uf;
-				float v1 = (float)ty * lay->_vf;
-
-				// Fill in the 4 vertices
-				v->col = bt->col[0];
-				v->u = u1;
-				v->v = v1;
-				v++;
-
-				v->col = bt->col[1];
-				v->u = u1+lay->_uf;
-				v->v = v1;
-				v++;
-
-				v->col = bt->col[2];
-				v->u = u1+lay->_uf;
-				v->v = v1+lay->_vf;
-				v++;
-
-				v->col = bt->col[3];
-				v->u = u1;
-				v->v = v1+lay->_vf;
-				v++;
+			}
+			else
+			{
+				tx = bt->tile % lay->_tx;
+				ty = bt->tile / lay->_tx;
 			}
 
-			lay->_dirty[yy] = false;
+			float u1 = (float)tx * lay->_uf;
+			float v1 = (float)ty * lay->_vf;
+
+			// Fill in the 4 vertices
+			v->x = dx;
+			v->y = dy;
+			v->col = bt->col[0];
+			v->u = u1;
+			v->v = v1;
+			v++;
+
+			v->x = dx+_tw;
+			v->y = dy;
+			v->col = bt->col[1];
+			v->u = u1+lay->_uf;
+			v->v = v1;
+			v++;
+
+			v->x = dx+_tw;
+			v->y = dy+_th;
+			v->col = bt->col[2];
+			v->u = u1+lay->_uf;
+			v->v = v1+lay->_vf;
+			v++;
+
+			v->x = dx;
+			v->y = dy+_th;
+			v->col = bt->col[3];
+			v->u = u1;
+			v->v = v1+lay->_vf;
+			v++;
+
+			dx += _tw;
 		}
 
-		// Set the matrix
-		mat._14 = bx - x1*_tw;
-		mat._24 = by + y*_th;
-		_shad->set_uniform("mat", mat);
-
-		// Draw the tiles
-		va->bind(_shad);
-		Display::draw(x1*4, w*4);
+		dy += _th;
 	}
+		
+	// Draw the tiles
+	lay->_vb->bind();
+	lay->_vb->set_attribs(_shad);
+	Display::draw(0, w*h*4);
 }
 
-void TMBase::draw(const Rect& dest, int x, int y)
+void TMBase::draw()
 {
 	// Calc the draw range
-	int dx = dest.x;
-	int dy = dest.y;
-	int w = dest.w;
-	int h = dest.h;
+	int dx = _rect.x;
+	int dy = _rect.y;
+	int w = _rect.w;
+	int h = _rect.h;
 
-	int x1 = x/_tw;
-	int x2 = (x+w-1)/_tw;
-	int y1 = y/_th;
-	int y2 = (y+h-1)/_th;
+	int x1 = _x/_tw;
+	int x2 = (_x+w-1)/_tw;
+	int y1 = _y/_th;
+	int y2 = (_y+h-1)/_th;
 
 	if(x1<0)
 	{
@@ -429,6 +389,9 @@ void TMBase::draw(const Rect& dest, int x, int y)
 	// Prepare to draw
 	Display::get_2d_camera().set();
 
+	// Make sure no VA is bound
+	VertexArray::unbind();
+
 	// Draw each layer
 	for(int c = 0; c<_layers.size(); c++)
 	{
@@ -438,7 +401,7 @@ void TMBase::draw(const Rect& dest, int x, int y)
 		{
 			case LayerType::Tiles:
 				// Tiles layer
-				draw_tile_layer(lay, x1, y1, x2-x1+1, y2-y1+1, dx-(x%_tw), dy-(y%_th));
+				draw_tile_layer(lay, x1, y1, x2-x1+1, y2-y1+1, dx-(_x%_tw), dy-(_y%_th));
 				break;
 
 			default:
@@ -449,7 +412,8 @@ void TMBase::draw(const Rect& dest, int x, int y)
 
 	// Unbind everything
 	Shader::unbind();
-	VertexArray::unbind();
+	VertexBuffer::unbind();
+	VertexBuffer::disable_attribs();
 	Texture::unbind(0);
 }
 

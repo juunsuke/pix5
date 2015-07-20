@@ -41,6 +41,7 @@ public:
 
 	void on_window_resize(int width, int height)
 	{
+		tm->set_rect(Rect(0, 0, width, height));
 	}
 };
 
@@ -64,7 +65,7 @@ int main(int argc, char **argv)
 		for(int y = 0; y<256; y++)
 			for(int x = 0; x<256; x++)
 			{
-				MyTile *t = tm->get_tile(0, x, y, true);
+				MyTile *t = tm->get_tile(0, x, y);
 				t->tile = rand()%171;
 			}
 
@@ -83,7 +84,11 @@ int main(int argc, char **argv)
 		tm->add_virt_tile(vt, 20, 300);
 
 
-		tm->get_tile(0, 4, 3, true)->tile = vt;
+		tm->get_tile(0, 4, 3)->tile = vt;
+
+
+		tm->set_rect(Rect(100, 50, 800, 500));
+		//tm->set_rect(Rect(0, 0, 1246, 1059));
 
 
 		for(;;)
@@ -91,10 +96,10 @@ int main(int argc, char **argv)
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 
-			//tm->draw(Rect(100, 50, 800, 500), bx, by);
+			tm->set_pos(bx, by);
+			tm->draw();
 			//Display::test_draw(99, 49, tex);
 
-			tm->draw(Rect(0, 0, Display::get_mode().width, Display::get_mode().height), bx, by);
 
 			if(Input::get_keyboard()[KEY_LEFT])
 				bx-=2;

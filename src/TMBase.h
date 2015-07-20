@@ -21,6 +21,12 @@ class TMBase
 	List<class VirtualTile*> _vtiles;
 	// Virtual tiles
 
+	Rect _rect;
+	// Display rect
+
+	int _x, _y;
+	// Draw position
+
 
 	TMLayer *add_layer(LayerType::Type type);
 	// Create and insert a new layer
@@ -34,7 +40,7 @@ protected:
 
 	TMBase(int mw, int mh, int tw, int th, int tsz);
 
-	void *get_tile_base(int layer, int x, int y, bool set_dirty);
+	void *get_tile_base(int layer, int x, int y);
 	// Get the base address of a tile
 
 public:
@@ -68,10 +74,24 @@ public:
 	// 'def' is the default value to set all tiles to
 	// Returns the layer index
 
-	void draw(const Rect& dest, int x, int y);
-	// Draw the tiled map in such a way that the 'dest' rectangle is filled with tiles
-	// Drawing might (and will) overlap outside of the bounds defined by 'dest'
-	// (x,y) represents the map coordinate, in pixels, that should be at (dest.x,dest.y)
+	inline Rect rect() { return _rect; }
+	// Get a copy of the destination rectangle used for rendering
+
+	void set_rect(const Rect& r);
+	// Set the destination rectangle, which will be used to draw the map
+	// This will cause the vertex buffers to be re-created on the next render,
+	// so this shouldn't be done at every frame, but when the display area actually changes
+
+	inline int x() { return _x; }
+	inline int y() { return _y; }
+	// Get the draw position
+
+	void set_pos(int x, int y);
+	// Set the draw position of the map, in map-wise pixels
+	// The pixel represented by (x,y) will be located on the top-left of the destination rectangle
+
+	void draw();
+	// Draw the tiled map
 	// This will leave any shader, VB/VA, and texture undbound
 	// The camera will be set to the 2D camera
 

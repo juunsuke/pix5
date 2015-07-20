@@ -21,13 +21,16 @@ static int get_usage(VertexBufferUsage::Type usage)
 }
 
 
-VertexBuffer::VertexBuffer(const VertexDef& def, int stride, VertexBufferUsage::Type usage)
+VertexBuffer::VertexBuffer(const VertexDef& def, int stride, VertexBufferUsage::Type usage, bool double_buf)
 {
 	_size = 0;
 	_data = NULL;
 	_stride = 0;
 	_usage = usage;
-	_vbo = 0;
+	_vbo[0] = 0;
+	_vbo[1] = 0;
+	_double_buf = double_buf;
+	_cur_vbo = 0;
 
 	set_def(def, stride);
 }
@@ -40,10 +43,15 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::delete_gl()
 {
-	if(_vbo)
+	if(_vbo[0])
 	{
-		glDeleteBuffers(1, &_vbo);
-		_vbo = 0;
+		glDeleteBuffers(1, &_vbo[0]);
+		_vbo[0] = 0;
+	}
+	if(_vbo[1])
+	{
+		glDeleteBuffers(1, &_vbo[1]);
+		_vbo[1] = 0;
 	}
 }
 
@@ -120,17 +128,35 @@ void *VertexBuffer::lock(int first, int count)
 	return ((char*)_data)+first*_stride;
 }
 
-void VertexBuffer::create_gl()
+void VertexBuffer::create_gl(int i)
 {
 	// Create the VBO
-	glGenBuffers(1, &_vbo);
+	glGenBuffers(1, &_vbo[i]);
 
 	// Bind it
-	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo[i]);
 
 	// Upload the data
 	glBufferData(GL_ARRAY_BUFFER, _size*_stride, _data, get_usage(_usage));
+}
 
+void VertexBuffer::create_gl()
+{
+	// Create the VBOs
+	if(_double_buf)
+	{
+		// The first time the VBOs are created, upload the data twice
+		// This is to make sure both buffers are defined
+		create_gl(1);
+		create_gl(0);
+	}
+	else
+	{
+		// Just use the one VBO
+		create_gl(0);
+	}
+
+	_cur_vbo = 0;
 	_dirty = false;
 }
 
@@ -138,15 +164,19 @@ void VertexBuffer::bind()
 {
 	ASSERT(Display::get_window(), "VertexBuffer::bind(): No mode currently set")
 
-	// Create the VBO if it doesn't exist
-	if(!_vbo)
+	// Create the VBOs if it they don't exist
+	if(!_vbo[0])
 	{
 		create_gl();
 		return;
 	}
 
-	// It already exists, bind it
-	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+	// If dirty and using double buffering, swap the buffer we'll use
+	if(_double_buf && _dirty)
+		_cur_vbo = (_cur_vbo==0) ? 1 : 0;
+
+	// Bind it
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo[_cur_vbo]);
 
 	// Re-upload the data if dirty
 	if(_dirty)

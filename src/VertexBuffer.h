@@ -32,19 +32,27 @@ class VertexBuffer
 	bool _dirty;
 	// Dirty flag;
 
-	uint32_t _vbo;
-	// OpenGL VBO object
+	uint32_t _vbo[2];
+	// OpenGL VBO objects
+
+	bool _double_buf;
+	// Wether to use double VBOs
+
+	int _cur_vbo;
+	// Next VBO to use when double-buffering
 
 
+	void create_gl(int i);
 	void create_gl();
 	// Create the OpenGL VBO, bind it, and upload data
 
 public:
 
-	VertexBuffer(const VertexDef& def, int stride, VertexBufferUsage::Type usage = VertexBufferUsage::Dynamic);
+	VertexBuffer(const VertexDef& def, int stride, VertexBufferUsage::Type usage = VertexBufferUsage::Dynamic, bool double_buf = false);
 	// The definition will be validated and a copy will be made internally
 	// If the definition isn't valid, an error will be thrown
 	// The stride must be big enough to contain the provided definition
+	// If 'double' is true, the VB will be double-buffered, so 2 OpenGL VBOs will be created
 
 	~VertexBuffer();
 
@@ -68,10 +76,6 @@ public:
 	
 	VertexDef get_def() const { return _def; }
 	// Return a copy of the vertex definition
-
-	uint32_t get_gl_vbo() const { return _vbo; }
-	// Return the OpenGL VBO identifier, to be used with care
-	// The VertexBuffer must be bound before a VBO is created
 
 	void set_def(const VertexDef& def, int stride);
 	// Set a new definition and stride

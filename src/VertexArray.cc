@@ -33,7 +33,7 @@ void VertexArray::delete_gl()
 int VertexArray::add_stream(const VertexDef& def, int stride, VertexBufferUsage::Type usage)
 {
 	// Create a new vertex buffer
-	VertexBuffer *vb = new VertexBuffer(def, stride, usage);
+	VertexBuffer *vb = new VertexBuffer(def, stride, usage, false);
 
 	// Add it and return its index
 	return _vb.add(vb);
