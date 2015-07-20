@@ -7,9 +7,6 @@ namespace PIX {
 
 Anim::Anim()
 {
-	_cur_set = NULL;
-	_cur_frame = 0;
-	_frames = 0;
 }
 
 Anim::~Anim()
@@ -17,31 +14,21 @@ Anim::~Anim()
 	_sets.clear_del();
 }
 
-AnimSet *Anim::get_set(const Str& name, bool add)
+int Anim::get_set(const Str& name, bool add)
 {
 	// Find the set
 	for(int c = 0; c<_sets.size(); c++)
 		if(_sets[c]->_name==name)
-			return _sets[c];
+			return c;
 
 	// Doesn't exist, create it  ?
 	if(!add)
 		// No
-		return NULL;
+		return -1;
 
 	// Yes
 	AnimSet *set = new AnimSet(name);
-	_sets.add(set);
-
-	// If it's the first set, make it active
-	if(!_cur_set)
-	{
-		_cur_set = set;
-		_cur_frame = 0;
-		_frames = 0;
-	}
-
-	return set;
+	return _sets.add(set);
 }
 
 int Anim::add_frame(const Str& set_name, Texture *tex, int frames)
@@ -54,7 +41,7 @@ int Anim::add_frame(const Str& set_name, Texture *tex, int frames, int x, int y,
 	ASSERT(w>0 && h>0, "Anim::add_frame(): Invalid width/height")
 
 	// Get/create the set
-	AnimSet *set = get_set(set_name, true);
+	AnimSet *set = _sets[get_set(set_name, true)];
 
 	// Add the frame to it
 	AnimFrame *frame = new AnimFrame();
@@ -96,59 +83,73 @@ int Anim::add_frame(const Str& set_name, Texture *tex, int frames, int x, int y,
 			add_frame(set_name, tex, frames, x+cx*fw, y+cy*fw, fw, fh);
 
 	// Return the index of the first frame
-	return get_set(set_name, false)->_frames.size()-(fw*fh);
+	return _sets[get_set(set_name, false)]->_frames.size()-(fw*fh);
 }
 
-void Anim::set_set(const Str& name, int frame)
+void Anim::set_set(AnimState &state, const Str& name, int frame)
 {
 	// Change the current set
-	AnimSet *set = get_set(name, false);
-	if(!set)
+	int set = get_set(name, false);
+	if(set==-1)
 		E::BadAnimSet("Anim::set_set(): Unknown set: '%s'", name.ptr());
 
 	// Adjust frame properly
-	if(frame<0 || frame>=set->_frames.size())
+	if(frame<0 || frame>=_sets[set]->_frames.size())
 		frame = 0;
 
 	// Make it active
-	_cur_set = set;
-	_cur_frame = frame;
-	_frames = 0;
+	state.cur_set = set;
+	state.cur_frame = frame;
+	state.counter = 0;
 }
 	
-void Anim::change_set(const Str& name, int frame)
+void Anim::change_set(AnimState &state, const Str& name, int frame)
 {
 	// Do nothing if the current set is the given one
-	if(_cur_set && _cur_set->_name==name)
-		return;
+	int set = get_set(name, false);
+	if(set==-1)
+		E::BadAnimSet("Anim::set_set(): Unknown set: '%s'", name.ptr());
 
-	// Change the set
-	set_set(name, frame);
+	// Change the set if it changed
+	if(set!=state.cur_set)
+	{
+		// Adjust frame properly
+		if(frame<0 || frame>=_sets[set]->_frames.size())
+			frame = 0;
+
+		// Make it active
+		state.cur_set = set;
+		state.cur_frame = frame;
+		state.counter = 0;
+	}
 }
 
-AnimFrame *Anim::get_frame(bool advance)
+AnimFrame *Anim::get_frame(AnimState &state, bool advance)
 {
-	if(!_cur_set)
+	if(_sets.size()==0)
 		E::BadAnimSet("Anim::get_frame(): No defined set");
+	if(state.cur_set<0 || state.cur_set>=_sets.size())
+		E::BadAnimSet("Anim::get_frame(): Invalid state set");
 
 	// Get the current frame
-	AnimFrame *frm = _cur_set->_frames[_cur_frame];
+	AnimSet *set = _sets[state.cur_set];
+	AnimFrame *frm = set->_frames[state.cur_frame];
 
 	// Advance if needed
 	if(advance)
 	{
 		// Advance the counter by 1 frame
-		_frames++;
+		state.counter++;
 
 		// Check if it reached the current frame's limit
-		if(_frames>=frm->frames)
+		if(state.counter>=frm->frames)
 		{
 			// Yes, advance to the next frame
-			_cur_frame++;
-			if(_cur_frame>=_cur_set->_frames.size())
-				_cur_frame = 0;
+			state.cur_frame++;
+			if(state.cur_frame>=set->_frames.size())
+				state.cur_frame = 0;
 
-			_frames = 0;
+			state.counter = 0;
 		}
 	}
 

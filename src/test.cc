@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 		pix_init("Test");
 
 		Display::set_mode(VideoMode::resizable(
-			1366, 768, false
+			//1366, 768, false
 		));
 
 

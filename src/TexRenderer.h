@@ -22,7 +22,7 @@ public:
 	// Add a texture to the queue
 	// If 'w' or 'h' are -1, the size are taken from the texture
 
-	void add(Anim *anim, int x, int y, const Color& col = Color(1,1,1,1), int w = -1, int h = -1, bool advance = true);
+	void add(Anim *anim, AnimState &state, int x, int y, const Color& col = Color(1,1,1,1), int w = -1, int h = -1, bool advance = true);
 	// Add the current frame of the given anim
 	// If 'w' or 'h' are -1, the size are taken from the frame
 	// 'advance' is passed to Anim::get_frame()

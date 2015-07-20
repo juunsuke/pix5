@@ -39,6 +39,41 @@ public:
 	}
 };
 
+class AnimState
+{
+public:
+	int cur_set;
+	int cur_frame;
+	int counter;
+
+	AnimState()
+	{
+		reset();
+	}
+
+	AnimState(const AnimState& o)
+	{
+		cur_set = o.cur_set;
+		cur_frame = o.cur_frame;
+		counter = o.counter;
+	}
+
+	AnimState& operator=(const AnimState& o)
+	{
+		cur_set = o.cur_set;
+		cur_frame = o.cur_frame;
+		counter = o.counter;
+
+		return *this;
+	}
+
+	void reset()
+	{
+		cur_set = 0;
+		cur_frame = 0;
+		counter = 0;
+	}
+};
 
 
 class Anim
@@ -49,15 +84,9 @@ class Anim
 	AnimSet *_cur_set;
 	// Current set
 
-	int _cur_frame;
-	// Current frame index within the set
 
-	int _frames;
-	// Frames counter, to know when its time to change
-
-
-	AnimSet *get_set(const Str& name, bool add);
-	// Get a set
+	int get_set(const Str& name, bool add);
+	// Get a set index
 
 public:
 
@@ -94,16 +123,16 @@ public:
 	//
 	//
 
-	void set_set(const Str& name, int frame = 0);
+	void set_set(AnimState &state, const Str& name, int frame = 0);
 	// Change the current set and starting frame index
 	// The set must exist, or an error will be thrown
 
-	void change_set(const Str& name, int frame = 0);
+	void change_set(AnimState &state, const Str& name, int frame = 0);
 	// Change the current set and starting frame index
 	// The set must exist, or an error will be thrown
 	// If the given set name is the current set, nothing will happen
 
-	AnimFrame *get_frame(bool advance = true);
+	AnimFrame *get_frame(AnimState &state, bool advance = true);
 	// Get the current frame that should be displayed
 	// If 'advance' is true, calculations will be made and frames will advance as needed
 };

@@ -230,7 +230,7 @@ void SpriteSet::draw()
 		if(!s->_anim)
 			continue;
 
-		AnimFrame *frm = s->_anim->get_frame();
+		AnimFrame *frm = s->_anim->get_frame(s->_anim_state);
 
 		// Adjust data
 		s->_tex = frm->tex;
@@ -347,7 +347,9 @@ Sprite *SpriteSet::new_sprite(Texture *tex, int z, int x, int y, int ox, int oy,
 Sprite *SpriteSet::new_sprite(Anim *anim, int z, int x, int y, int ox, int oy, bool vis)
 {
 	// Create a new sprite
-	AnimFrame *frm = anim->get_frame(false);
+	AnimState state;
+
+	AnimFrame *frm = anim->get_frame(state, false);
 
 	Sprite *s = new_sprite(frm->tex, z, x, y, ox, oy, vis, frm->u1, frm->v1, frm->u2, frm->v2);
 	s->_w = frm->w;

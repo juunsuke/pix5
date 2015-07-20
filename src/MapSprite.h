@@ -17,6 +17,8 @@ class MapSprite
 	Anim *_anim;
 	// Anim, for anim-based sprites
 
+	AnimState _anim_state;
+
 	int _w, _h;
 	// Sprite size, either forced or taken from anim
 
@@ -77,5 +79,19 @@ public:
 
 	void set_anim(Anim *anim);
 	// Change the current sprite anim
+
+	inline void set_set(const Str& name, int frame = 0)
+	{
+		// Change the bound anim's set
+		ASSERT(_anim, "MapSprite::set_set(): The sprite is not Anim-based")
+		_anim->set_set(_anim_state, name, frame);
+	}
+
+	inline void change_set(const Str& name, int frame = 0)
+	{
+		// Change the bound anim's set
+		ASSERT(_anim, "MapSprite::change_set(): The sprite is not Anim-based")
+		_anim->change_set(_anim_state, name, frame);
+	}
 };
 

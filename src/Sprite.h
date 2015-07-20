@@ -40,7 +40,9 @@ class Sprite
 	// The current matrix
 
 	Anim *_anim;
-	// The sprite anim, if any
+	AnimState _anim_state;
+	// The sprite anim and its state, if any
+
 
 
 	bool _mat_dirty, _vtx_dirty;
@@ -200,14 +202,14 @@ public:
 	{
 		// Change the bound anim's set
 		ASSERT(_anim, "Sprite::set_set(): The sprite is not Anim-based")
-		_anim->set_set(name, frame);
+		_anim->set_set(_anim_state, name, frame);
 	}
 
 	inline void change_set(const Str& name, int frame = 0)
 	{
 		// Change the bound anim's set
 		ASSERT(_anim, "Sprite::change_set(): The sprite is not Anim-based")
-		_anim->change_set(name, frame);
+		_anim->change_set(_anim_state, name, frame);
 	}
 
 	void calc_matrix();

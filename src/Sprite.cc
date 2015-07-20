@@ -104,9 +104,10 @@ void Sprite::set_anim(Anim *anim)
 
 	// Set the anim
 	_anim = anim;
+	_anim_state.reset();
 
 	// Fix the size
-	AnimFrame *frm = anim->get_frame(false);
+	AnimFrame *frm = anim->get_frame(_anim_state, false);
 	_w = frm->w;
 	_h = frm->h;
 }

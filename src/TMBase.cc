@@ -417,7 +417,7 @@ void TMBase::draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int d
 					}
 					else
 					{
-						AnimFrame *frm = ms->_anim->get_frame(false);
+						AnimFrame *frm = ms->_anim->get_frame(ms->_anim_state, false);
 						ww = frm->w;
 						hh = frm->h;
 						u1 = frm->u1;
@@ -483,7 +483,7 @@ void TMBase::draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int d
 						_shad->set_uniform("mat", ms->_mat);
 
 						// Set the texture
-						Texture * tex = ms->_tex ? ms->_tex : ms->_anim->get_frame()->tex;
+						Texture * tex = ms->_tex ? ms->_tex : ms->_anim->get_frame(ms->_anim_state)->tex;
 						if(tex!=last_tex)
 						{
 							tex->bind(0);
@@ -727,7 +727,7 @@ MapSprite *TMBase::new_sprite(int layer, Anim *anim, float x, float y)
 	ms->_x = x;
 	ms->_y = y;
 
-	AnimFrame *frm = anim->get_frame(false);
+	AnimFrame *frm = anim->get_frame(ms->_anim_state, false);
 	ms->_w = frm->w;
 	ms->_h = frm->h;
 
