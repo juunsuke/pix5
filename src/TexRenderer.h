@@ -22,6 +22,11 @@ public:
 	// Add a texture to the queue
 	// If 'w' or 'h' are -1, the size are taken from the texture
 
+	void add(Anim *anim, int x, int y, const Color& col = Color(1,1,1,1), int w = -1, int h = -1, bool advance = true);
+	// Add the current frame of the given anim
+	// If 'w' or 'h' are -1, the size are taken from the frame
+	// 'advance' is passed to Anim::get_frame()
+
 	void draw(int ox = 0, int oy = 0);
 	// Draw all the queued textures
 	// ox,oy are the global offset to add to each texture's destination coordinates

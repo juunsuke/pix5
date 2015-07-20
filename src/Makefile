@@ -6,7 +6,7 @@ DBG = 1
 
 CLSS  = Error EventHandler Log Cache
 CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer VertexArray Glyph Font
-CLSS += SpriteSet Sprite TexRenderer
+CLSS += SpriteSet Sprite TexRenderer Anim
 CLSS += TMLayer TMBase
 CLSS += Audio SoundClip
 CLSS += GUI GuiTheme GuiElement Label Button

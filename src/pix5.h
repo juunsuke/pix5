@@ -105,6 +105,7 @@ int64_t get_ms();
 #include "VertexBuffer.h"
 #include "VertexArray.h"
 
+#include "Anim.h"
 #include "Sprite.h"
 #include "SpriteSet.h"
 

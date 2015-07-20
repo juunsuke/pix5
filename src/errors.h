@@ -39,6 +39,7 @@ PIXERR( 0x1000000B, BadVertexDef,		"Invalid vertex definition" )
 PIXERR( 0x1000000C, NoAttribute,		"Cannot find the specified attribute" )
 PIXERR( 0x1000000D, BadStreamIndex,		"Invalid stream index" )
 PIXERR( 0x1000000E, FreeType,			"FreeType error" )
+PIXERR( 0x1000000F, BadAnimSet,			"Invalid animation set" )
 
 
 // Audio errors

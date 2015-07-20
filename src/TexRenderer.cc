@@ -91,6 +91,22 @@ void TexRenderer::add(Texture *tex, int x, int y, const Color& col, int w, int h
 	t->v2 = v2;
 
 	_tex.add(t);
+
+	//printf("@(%i,%i)  Col: 0x%08X   (%ix%i)    [%f,%f] - [%f,%f]\n", x, y, (uint32_t)col, w, h, u1, v1, u2, v2);
+}
+	
+void TexRenderer::add(Anim *anim, int x, int y, const Color& col, int w, int h, bool advance)
+{
+	// Get the current frame
+	AnimFrame *frm = anim->get_frame(advance);
+
+	// Add it
+	if(w==-1)
+		w = frm->w;
+	if(h==-1)
+		h = frm->h;
+
+	add(frm->tex, x, y, col, w, h, frm->u1, frm->v1, frm->u2, frm->v2);
 }
 
 void TexRenderer::draw(int ox, int oy)

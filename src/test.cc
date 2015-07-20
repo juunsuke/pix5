@@ -90,6 +90,18 @@ int main(int argc, char **argv)
 		tm->set_rect(Rect(100, 50, 800, 500));
 		//tm->set_rect(Rect(0, 0, 1246, 1059));
 
+		Texture *at = Cache::texture("data/sprites.png");
+
+		Anim *a = new Anim();
+		a->add_frame("walk_down", at, 10, 0, 0, 32*3, 55, 3, 1);
+		a->add_frame("walk_left", at, 10, 0, 55, 32*3, 55, 3, 1);
+		a->add_frame("walk_right", at, 10, 0, 110, 32*3, 55, 3, 1);
+		a->add_frame("walk_up", at, 10, 0, 165, 32*3, 55, 3, 1);
+
+		int sx = 700;
+		int sy = 400;
+
+		TexRenderer tr;
 
 		for(;;)
 		{
@@ -100,18 +112,33 @@ int main(int argc, char **argv)
 			tm->draw();
 			//Display::test_draw(99, 49, tex);
 
+			tr.add(a, sx, sy);
+			tr.draw();
+
 
 			if(Input::get_keyboard()[KEY_LEFT])
+			{
 				bx-=2;
+				a->change_set("walk_left");
+			}
 
-			if(Input::get_keyboard()[KEY_RIGHT])
+			else if(Input::get_keyboard()[KEY_RIGHT])
+			{
 				bx+=2;
+				a->change_set("walk_right");
+			}
 
-			if(Input::get_keyboard()[KEY_UP])
+			else if(Input::get_keyboard()[KEY_UP])
+			{
 				by-=2;
+				a->change_set("walk_up");
+			}
 
-			if(Input::get_keyboard()[KEY_DOWN])
+			else if(Input::get_keyboard()[KEY_DOWN])
+			{
 				by+=2;
+				a->change_set("walk_down");
+			}
 
 			Display::swap();
 
