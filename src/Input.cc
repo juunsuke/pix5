@@ -213,7 +213,10 @@ static void handle_joy_device_added(EventHandler *eh, const SDL_JoyDeviceEvent& 
 	// Add the joystick to the list
 	_joys.add(joy);
 
-	Log::log("Joystick connected: [%i] %s", joy->id, joy->name.ptr());
+	char buf[1024];
+	SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(sj), buf, 1024);
+
+	Log::log("Joystick connected: [%i] {%s} %s", joy->id, buf, joy->name.ptr());
 	Log::log("   %i axes, %i buttons, %i hats", joy->axis.size(), joy->buts.size(), joy->hats.size());
 
 	// Report
