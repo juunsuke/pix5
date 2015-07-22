@@ -73,6 +73,21 @@ public:
 	// When an input method is used (as for Japanese, Chinese, and many more), a large
 	// string can be produced through this function, without any on_key_down() events
 	// This should be used when text input is required
+
+	virtual void on_joy_connect(int id) { }
+	// Called when a new joystick has been connected
+
+	virtual void on_joy_disconnect(int id) { }
+	// Called when a joystick has been disconnected
+
+	virtual void on_joy_axis(int id, int axis, float val) { }
+	// Called when a joystick axis motion was reported
+
+	virtual void on_joy_button(int id, int but, bool val) { }
+	// Called when a joystick button was pressed/released
+
+	virtual void on_joy_hat(int id, int hat, HatDirection::Type val) { }
+	// Called when a joystick hat's position has changed
 };
 
 

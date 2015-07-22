@@ -49,6 +49,21 @@ public:
 	{
 		run = false;
 	}
+
+	void on_joy_axis(int id, int axis, float val)
+	{
+		printf("AXIS %i:%i  :  %f\n", id, axis, val);
+	}
+
+	void on_joy_button(int id, int but, bool val)
+	{
+		printf("BUT  %i:%i  :  %s\n", id, but, val ? "Down" : "Up");
+	}
+
+	void on_joy_hat(int id, int hat, HatDirection::Type val)
+	{
+		printf("HAT  %i:%i  :  %i\n", id, hat, (int)val);
+	}
 };
 
 
@@ -148,29 +163,36 @@ int main(int argc, char **argv)
 
 			ss.draw();
 
-
-			if(Input::get_keyboard()[KEY_LEFT])
+			try
 			{
-				bx-=2;
-				s->change_set("walk_left");
+				Joystick joy = Input::get_joystick(1);
+
+				if(Input::get_keyboard()[KEY_LEFT] || joy.hats[0]->left())
+				{
+					bx-=2;
+					s->change_set("walk_left");
+				}
+
+				else if(Input::get_keyboard()[KEY_RIGHT] || joy.hats[0]->right())
+				{
+					bx+=2;
+					s->change_set("walk_right");
+				}
+
+				else if(Input::get_keyboard()[KEY_UP] || joy.hats[0]->up())
+				{
+					by-=2;
+					s->change_set("walk_up");
+				}
+
+				else if(Input::get_keyboard()[KEY_DOWN] || joy.hats[0]->down())
+				{
+					by+=2;
+					s->change_set("walk_down");
+				}
 			}
-
-			else if(Input::get_keyboard()[KEY_RIGHT])
+			catch(Error)
 			{
-				bx+=2;
-				s->change_set("walk_right");
-			}
-
-			else if(Input::get_keyboard()[KEY_UP])
-			{
-				by-=2;
-				s->change_set("walk_up");
-			}
-
-			else if(Input::get_keyboard()[KEY_DOWN])
-			{
-				by+=2;
-				s->change_set("walk_down");
 			}
 
 			Display::swap();

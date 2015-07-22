@@ -9,6 +9,19 @@ Mouse& get_mouse();
 Keyboard& get_keyboard();
 // Get a reference to the internal keyboard object
 
+Joystick get_joystick(int id);
+// Get a snapshot of the current state of the given joystick ID
+
+float get_joy_axis(int id, int axis);
+// Get the current value of a joystick axis
+
+bool get_joy_button(int id, int but);
+// Get the current state of a joystick button
+
+HatDirection::Type get_joy_hat(int id, int hat);
+// Get the current value of a joystick hat
+
+
 
 void move_mouse(int x, int y);
 // Try to move the mouse cursor to the given location, in window coordinates

@@ -62,5 +62,12 @@ PIXERR( 0x40000002, BadLayerType,		"Invalid layer type" )
 PIXERR( 0x40000003, BadTileIndex,		"Invalid tile index" )
 
 
+// Input errors
+PIXERR( 0x50000001, BadJoyID,			"Invalid joystick ID" )
+PIXERR( 0x50000002, BadJoyAxis,			"Invalid joystick axis index" )
+PIXERR( 0x50000002, BadJoyButton,		"Invalid joystick button index" )
+PIXERR( 0x50000002, BadJoyHat,			"Invalid joystick hat index" )
+
+
 
 

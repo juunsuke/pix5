@@ -13,6 +13,7 @@
 
 
 struct SDL_Window;
+struct _SDL_Joystick;
 struct FT_FaceRec_;
 
 #ifdef DBG
@@ -95,6 +96,10 @@ int64_t get_ms();
 #include "keys.h"
 #include "Key.h"
 #include "Keyboard.h"
+#include "JoyAxis.h"
+#include "JoyButton.h"
+#include "JoyHat.h"
+#include "Joystick.h"
 #include "Input.h"
 
 #include "VideoModeType.h"
