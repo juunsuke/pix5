@@ -90,10 +90,10 @@ void pix_shutdown()
 	sprite_done();
 	tr_done();
 	Display::done();
-	font_done();
 	Action::done();
 	Input::done();
 	Cache::done();
+	font_done();
 
 	SDL_Quit();
 

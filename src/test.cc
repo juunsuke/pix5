@@ -11,6 +11,7 @@ TileMap<MyTile> *tm;
 
 
 bool run = true;
+Texture *at;
 
 class MyEventHandler: public EventHandler
 {
@@ -30,6 +31,25 @@ public:
 
 	void on_key_down(Key& key)
 	{
+		if(key==KEY_Q)
+			Input::show_cursor();
+		if(key==KEY_W)
+			Input::hide_cursor();
+		if(key==KEY_E)
+			Input::set_cursor(at->sub(0, 0, 32, 55));
+		if(key==KEY_R)
+		{
+			Texture *t = Texture::create(20, 12);
+			t->rect(0, 0, 18, 6, Color(0, 0, 0, 1));
+			t->rect_fill(1, 1, 17, 5, Color(1, 1, 1, 1));
+
+			Input::set_cursor(t, 0, 0, true);
+		}
+
+		if(key.code>=KEY_1 && key.code<=KEY_ESCAPE)
+		{
+			Input::set_cursor((SystemCursor::Type)(key.code-KEY_1));
+		}
 	}
 
 	void on_key_up(Key& key)
@@ -78,19 +98,13 @@ public:
 
 
 
-
-void *t(void *p)
+void test()
 {
-
-	return NULL;
 }
 
 
 int main(int argc, char **argv)
 {
-	pthread_t th;
-	pthread_create(&th, NULL, t, NULL);
-
 	try
 	{
 		pix_init("Test");
@@ -132,7 +146,8 @@ int main(int argc, char **argv)
 		tm->set_rect(Rect(300, 250, 500, 300));
 		//tm->set_rect(Rect(0, 0, 1246, 1059));
 
-		Texture *at = Cache::texture("data/sprites.png");
+		at = Cache::texture("data/sprites.png");
+
 
 		Anim *a = new Anim();
 		a->add_frame("walk_down", at, 10, 0, 0, 32*3, 55, 3, 1);
@@ -160,6 +175,7 @@ int main(int argc, char **argv)
 
 
 		Action::map_key("main", "jump", KEY_SPACE);
+		Action::map_mouse_button("main", "jump", 33);
 
 		Action::map_joy_button("main", "move_down", "proute", 0);
 		Action::map_joy_button("main", "move_up", "proute", 3);
@@ -197,19 +213,19 @@ int main(int argc, char **argv)
 				s->change_set("walk_left");
 			}
 
-			else if(Action::is_down("move_right"))
+			if(Action::is_down("move_right"))
 			{
 				bx+=2;
 				s->change_set("walk_right");
 			}
 
-			else if(Action::is_down("move_up"))
+			if(Action::is_down("move_up"))
 			{
 				by-=2;
 				s->change_set("walk_up");
 			}
 
-			else if(Action::is_down("move_down"))
+			if(Action::is_down("move_down"))
 			{
 				by+=2;
 				s->change_set("walk_down");
@@ -220,7 +236,10 @@ int main(int argc, char **argv)
 			eh.process_events();
 		}
 
+		delete a;
+		delete a2;
 		delete tm;
+		delete tex;
 
 		pix_shutdown();
 	}

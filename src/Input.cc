@@ -31,6 +31,9 @@ static List<Joystick*> _joys;
 static int _last_joy_id = 0;
 // Last used Joystick ID
 
+static SDL_Cursor *_cur_cur = NULL;
+// Current cursor
+
 
 
 void reset();
@@ -68,10 +71,21 @@ void init()
 	_last_joy_id = 0;
 }
 
+static void free_cur()
+{
+	if(_cur_cur)
+	{
+		SDL_FreeCursor(_cur_cur);
+		_cur_cur = NULL;
+	}
+}
+
 void done()
 {
 	// Clear the joysticks
 	_joys.clear_del();
+
+	free_cur();
 }
 
 
@@ -81,6 +95,8 @@ void reset()
 	// Happens after a mode change or window resize
 	_mouse.reset();
 	_kbd.reset();
+
+	free_cur();
 }
 
 Mouse& get_mouse()
@@ -100,6 +116,113 @@ void move_mouse(int x, int y)
 	SDL_WarpMouseInWindow(Display::get_window(), x, y);
 }
 
+void show_cursor(bool show)
+{
+	SDL_ShowCursor(show ? 1 : 0);
+}
+
+void set_cursor(SystemCursor::Type cur)
+{
+	// Free any current cursor
+	free_cur();
+
+	// Create a system cursor
+	_cur_cur = SDL_CreateSystemCursor((SDL_SystemCursor)cur);
+	if(!_cur_cur)
+		E::SDL("Error creating system cursor: %s", SDL_GetError());
+
+	// Set it
+	SDL_SetCursor(_cur_cur);
+}
+
+static void create_mono_cursor(Texture *tex, int hx, int hy)
+{
+	// Create buffers for the data and mask
+	int cw = (tex->width()+7)/8;
+	int ch = tex->height();
+
+	uint8_t *data = (uint8_t*)calloc(1, cw*ch);
+	uint8_t *mask = (uint8_t*)calloc(1, cw*ch);
+
+	for(int y = 0; y<tex->height(); y++)
+	{
+		int pos = y*cw;
+
+		for(int x = 0; x<tex->width(); x++)
+		{
+			switch(tex->get_pixel_fast(x, y))
+			{
+				case 0xFF000000:
+					// Black
+					data[pos+x/8] |= 1<<(7-x%8);
+					mask[pos+x/8] |= 1<<(7-x%8);
+					break;
+
+				case 0xFFFFFFFF:
+					// White
+					mask[pos+x/8] |= 1<<(7-x%8);
+					break;
+
+				default:
+					// Transparant
+					break;
+			}
+		}
+	}
+
+	_cur_cur = SDL_CreateCursor(data, mask, cw*8, ch, hx, hy);
+	free(data);
+	free(mask);
+
+	if(!_cur_cur)
+		E::SDL("Error creating mono cursor: %s", SDL_GetError());
+}
+
+static void create_color_cursor(Texture *tex, int hx, int hy)
+{
+	// Create a surface out of the texture
+	SDL_Surface *sur = SDL_CreateRGBSurface(0, tex->width(), tex->height(), 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+	if(!sur)
+		E::SDL("Input::set_cursor(): Error creating a surface: %s", SDL_GetError());
+
+	// Copy the texture data to it
+	SDL_LockSurface(sur);
+	
+	uint8_t *ptr = (uint8_t*)sur->pixels;
+
+	for(int y = 0; y<tex->height(); y++)
+	{
+		for(int x = 0; x<tex->width(); x++)
+			((uint32_t*)ptr)[x] = tex->get_pixel_fast(x, y);
+
+		ptr += sur->pitch;
+	}
+
+	SDL_UnlockSurface(sur);
+
+	// Create a color cursor
+	_cur_cur = SDL_CreateColorCursor(sur, hx, hy);
+	SDL_FreeSurface(sur);
+
+	if(!_cur_cur)
+		E::SDL("Error creating color cursor: %s", SDL_GetError());
+
+}
+
+void set_cursor(Texture *tex, int hx, int hy, bool mono)
+{
+	// Free any current cursor
+	free_cur();
+
+	// Create the cursor
+	if(mono)
+		create_mono_cursor(tex, hx, hy);
+	else
+		create_color_cursor(tex, hx, hy);
+		
+	// Set it
+	SDL_SetCursor(_cur_cur);
+}
 
 
 static void handle_mouse_motion(EventHandler *eh, const SDL_MouseMotionEvent& ev)

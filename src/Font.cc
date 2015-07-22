@@ -31,6 +31,7 @@ Font::Font()
 {
 	_face = NULL;
 	_glyphs = NULL;
+	_num_glyphs = 0;
 }
 	
 Font *Font::load(const Str& fname, int ptsize)
@@ -68,7 +69,7 @@ Font::~Font()
 	// Free the glyphs
 	if(_glyphs)
 	{
-		for(int c = 0; c<_face->num_glyphs; c++)
+		for(int c = 0; c<_num_glyphs; c++)
 			if(_glyphs[c])
 				delete _glyphs[c];
 
@@ -76,8 +77,8 @@ Font::~Font()
 	}
 
 	// Free the face
-	//if(_face)
-	//	FT_Done_Face(_face);
+	if(_face)
+		FT_Done_Face(_face);
 }
 	
 void Font::setup(struct FT_FaceRec_* face, int ptsize)
@@ -89,16 +90,18 @@ void Font::setup(struct FT_FaceRec_* face, int ptsize)
 	if(FT_Set_Char_Size(_face, 0, ptsize*64, 96, 96))
 		E::FreeType("Error setting the font size to %i points", ptsize);
 
-	#ifdef DBG
-	Log::debug("Success. %i glyphs, %i sizes, %i fixed sizes", _face->num_glyphs, _face->available_sizes, _face->num_fixed_sizes);
-	#endif
-
 	// Allocate the glyphs buffers
-	_glyphs = (Glyph**)calloc(_face->num_glyphs, sizeof(Glyph*));
+	_num_glyphs = _face->num_glyphs;
+	_glyphs = (Glyph**)calloc(_num_glyphs, sizeof(Glyph*));
 
 	// Get the height and spacing
 	_height = (_face->size->metrics.ascender + _face->size->metrics.descender)/64 + 1;
 	_spacing = _face->size->metrics.height/64;
+	
+	#ifdef DBG
+	Log::debug("Success. %i glyphs, %i sizes, %i fixed sizes", _num_glyphs, _face->available_sizes, _face->num_fixed_sizes);
+	#endif
+
 }
 
 Glyph *Font::get_glyph(int ch)
@@ -106,7 +109,7 @@ Glyph *Font::get_glyph(int ch)
 	// Get the glyph index for the given character
 	int i = FT_Get_Char_Index(_face, ch);
 
-	ASSERT(i>=0 && i<_face->num_glyphs, "FT_Get_Char_Index() returned an out-of-range index, this shouldn't happen")
+	ASSERT(i>=0 && i<_num_glyphs, "FT_Get_Char_Index() returned an out-of-range index, this shouldn't happen")
 
 	// Return the glyph if it's already loaded
 	if(_glyphs[i])

@@ -9,6 +9,9 @@ class Font
 	Glyph **_glyphs;
 	// All the glyphs
 
+	int _num_glyphs;
+	// Number of glyphs
+
 	int _height, _spacing;
 	// Font height and vertical spacing
 
