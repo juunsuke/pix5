@@ -163,36 +163,28 @@ int main(int argc, char **argv)
 
 			ss.draw();
 
-			try
+			if(Input::get_keyboard()[KEY_LEFT])
 			{
-				Joystick joy = Input::get_joystick(1);
-
-				if(Input::get_keyboard()[KEY_LEFT] || joy.hats[0]->left())
-				{
-					bx-=2;
-					s->change_set("walk_left");
-				}
-
-				else if(Input::get_keyboard()[KEY_RIGHT] || joy.hats[0]->right())
-				{
-					bx+=2;
-					s->change_set("walk_right");
-				}
-
-				else if(Input::get_keyboard()[KEY_UP] || joy.hats[0]->up())
-				{
-					by-=2;
-					s->change_set("walk_up");
-				}
-
-				else if(Input::get_keyboard()[KEY_DOWN] || joy.hats[0]->down())
-				{
-					by+=2;
-					s->change_set("walk_down");
-				}
+				bx-=2;
+				s->change_set("walk_left");
 			}
-			catch(Error)
+
+			else if(Input::get_keyboard()[KEY_RIGHT])
 			{
+				bx+=2;
+				s->change_set("walk_right");
+			}
+
+			else if(Input::get_keyboard()[KEY_UP])
+			{
+				by-=2;
+				s->change_set("walk_up");
+			}
+
+			else if(Input::get_keyboard()[KEY_DOWN])
+			{
+				by+=2;
+				s->change_set("walk_down");
 			}
 
 			Display::swap();
