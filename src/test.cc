@@ -52,17 +52,27 @@ public:
 
 	void on_joy_axis(int id, int axis, float val)
 	{
-		printf("AXIS %i:%i  :  %f\n", id, axis, val);
+		//printf("AXIS %i:%i  :  %f\n", id, axis, val);
 	}
 
 	void on_joy_button(int id, int but, bool val)
 	{
-		printf("BUT  %i:%i  :  %s\n", id, but, val ? "Down" : "Up");
+		//printf("BUT  %i:%i  :  %s\n", id, but, val ? "Down" : "Up");
 	}
 
 	void on_joy_hat(int id, int hat, HatDirection::Type val)
 	{
-		printf("HAT  %i:%i  :  %i\n", id, hat, (int)val);
+		//printf("HAT  %i:%i  :  %i\n", id, hat, (int)val);
+	}
+
+	void on_action(const Str& action)
+	{
+		Log::log("Action: '%s'", action.ptr());
+	}
+
+	void on_joy_connect(int id)
+	{
+		Input::map_joystick("proute", id);
 	}
 };
 
@@ -145,11 +155,29 @@ int main(int argc, char **argv)
 			ms->set_origin(16, 55-16);
 		}
 
-		int sx = 700;
-		int sy = 400;
-
 		SpriteSet ss;
-		Sprite *s = ss.new_sprite(a, 0, sx, sy);
+		Sprite *s = ss.new_sprite(a, 0, 700, 400);
+
+
+		Action::map_key("main", "jump", KEY_SPACE);
+
+		Action::map_joy_button("main", "move_down", "proute", 0);
+		Action::map_joy_button("main", "move_up", "proute", 3);
+
+		Action::map_key("main", "move_left", KEY_LEFT);
+		Action::map_key("main", "move_right", KEY_RIGHT);
+		Action::map_key("main", "move_up", KEY_UP);
+		Action::map_key("main", "move_down", KEY_DOWN);
+		
+		Action::map_mouse_button("main", "move_left", 1);
+		Action::map_mouse_button("main", "move_right", 3);
+
+		Action::map_joy_hat("main", "move_left", "proute", 0, HatDirection::Left);
+		Action::map_joy_hat("main", "move_right", "proute", 0, HatDirection::Right);
+		Action::map_joy_hat("main", "move_up", "proute", 0, HatDirection::Up);
+		Action::map_joy_hat("main", "move_down", "proute", 0, HatDirection::Down);
+
+		Action::enable("main");
 
 		while(run)
 		{
@@ -163,25 +191,25 @@ int main(int argc, char **argv)
 
 			ss.draw();
 
-			if(Input::get_keyboard()[KEY_LEFT])
+			if(Action::is_down("move_left"))
 			{
 				bx-=2;
 				s->change_set("walk_left");
 			}
 
-			else if(Input::get_keyboard()[KEY_RIGHT])
+			else if(Action::is_down("move_right"))
 			{
 				bx+=2;
 				s->change_set("walk_right");
 			}
 
-			else if(Input::get_keyboard()[KEY_UP])
+			else if(Action::is_down("move_up"))
 			{
 				by-=2;
 				s->change_set("walk_up");
 			}
 
-			else if(Input::get_keyboard()[KEY_DOWN])
+			else if(Action::is_down("move_down"))
 			{
 				by+=2;
 				s->change_set("walk_down");

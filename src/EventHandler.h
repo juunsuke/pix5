@@ -88,6 +88,9 @@ public:
 
 	virtual void on_joy_hat(int id, int hat, HatDirection::Type val) { }
 	// Called when a joystick hat's position has changed
+
+	virtual void on_action(const Str& action) { }
+	// Called when an action is triggered
 };
 
 

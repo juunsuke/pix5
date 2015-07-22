@@ -3,7 +3,17 @@
 
 
 namespace PIX {
+
+namespace Action
+{
+	void trigger_key(EventHandler *eh, KeyCode key);
+	void trigger_mouse(EventHandler *eh, int but);
+	void trigger_joy_button(EventHandler *eh, const Str& joy_name, int but);
+	void trigger_joy_hat(EventHandler *eh, const Str& joy_name, int hat, HatDirection::Type dir);
+}
+
 namespace Input {
+
 
 
 static Mouse _mouse;
@@ -19,6 +29,8 @@ static List<Joystick*> _joys;
 // List of connected joysticks
 
 static int _last_joy_id = 0;
+// Last used Joystick ID
+
 
 
 void reset();
@@ -119,6 +131,9 @@ static void handle_mouse_down(EventHandler *eh, const SDL_MouseButtonEvent& ev)
 
 	// Send a notification
 	eh->on_mouse_down(ev.button, _mouse);
+
+	// Check for action triggers
+	Action::trigger_mouse(eh, ev.button);
 }
 
 static void handle_mouse_up(EventHandler *eh, const SDL_MouseButtonEvent& ev)
@@ -142,9 +157,15 @@ static void handle_mouse_wheel(EventHandler *eh, const SDL_MouseWheelEvent& ev)
 {
 	// Mouse wheel action
 	if(ev.y==1)
+	{
 		eh->on_mouse_wheel(false, _mouse);
+		Action::trigger_mouse(eh, 33);
+	}
 	else if(ev.y==-1)
+	{
 		eh->on_mouse_wheel(true, _mouse);
+		Action::trigger_mouse(eh, 34);
+	}
 }
 
 static void handle_key_down(EventHandler *eh, const SDL_KeyboardEvent& ev)
@@ -159,6 +180,9 @@ static void handle_key_down(EventHandler *eh, const SDL_KeyboardEvent& ev)
 
 	// Send a notification
 	eh->on_key_down(key);
+
+	// Check for action triggers
+	Action::trigger_key(eh, key.code);
 }
 
 static void handle_key_up(EventHandler *eh, const SDL_KeyboardEvent& ev)
@@ -275,7 +299,7 @@ static void handle_joy_device_removed(EventHandler *eh, const SDL_JoyDeviceEvent
 	}
 
 	Log::log("Joystick disconnected: [%i] %s", joy->id, joy->name.ptr());
-	
+
 	// Remove it from the list and delete it
 	SDL_JoystickClose(joy->_sj);
 	_joys.remove_del(index);
@@ -359,6 +383,10 @@ static void handle_joy_button(EventHandler *eh, const SDL_JoyButtonEvent& ev)
 
 	// Report
 	eh->on_joy_button(joy->id, but->index, val);
+	
+	// Check for action triggers
+	if(joy->mapped_name.len())
+		Action::trigger_joy_button(eh, joy->mapped_name, but->index);
 }
 
 static void handle_joy_hat(EventHandler *eh, const SDL_JoyHatEvent& ev)
@@ -411,6 +439,10 @@ static void handle_joy_hat(EventHandler *eh, const SDL_JoyHatEvent& ev)
 
 	// Report
 	eh->on_joy_hat(joy->id, hat->index, val);
+	
+	// Check for action triggers
+	if(joy->mapped_name.len())
+		Action::trigger_joy_hat(eh, joy->mapped_name, hat->index, val);
 }
 
 void handle_event(EventHandler *eh, SDL_Event *ev)
@@ -486,5 +518,106 @@ HatDirection::Type get_joy_hat(int id, int hat)
 	return joy->hats[hat]->val;
 }
 
+float get_joy_dead_zone(int id, int axis)
+{
+	Joystick *joy = get_joy_id(id);
+	if(!joy)
+		E::BadJoyID("Input::get_joy_dead_zone(): Unknown joystick ID: %i", id);
+
+	if(axis<0 || axis>=joy->axis.size())
+		E::BadJoyAxis("Input::get_joy_dead_zone(): Invalid axis index: %i", axis);
+
+	return joy->axis[axis]->dead_zone;
+}
+
+void set_joy_dead_zone(int id, int axis, float dead_zone)
+{
+	Joystick *joy = get_joy_id(id);
+	if(!joy)
+		E::BadJoyID("Input::get_joy_dead_zone(): Unknown joystick ID: %i", id);
+
+	if(axis<0 || axis>=joy->axis.size())
+		E::BadJoyAxis("Input::get_joy_dead_zone(): Invalid axis index: %i", axis);
+
+	joy->axis[axis]->dead_zone = Math::fclamp(dead_zone);
+}
+
+void map_joystick(const Str& joy_name, int id)
+{
+	// Give a mapping name to the joystick
+	Joystick *joy = get_joy_id(id);
+	if(!joy)
+		E::BadJoyID("Input::map_joystick(): Unknown joystick ID: %i", id);
+
+	joy->mapped_name = joy_name;
+
+	#ifdef DBG
+	Log::debug("Mapped joystick %i to '%s'", id, joy_name.ptr());
+	#endif
+}
+
+bool is_joy_button_down(const Str& joy_name, int but)
+{
+	// Check if a joystick with the given name has the given button down
+	if(but<0)
+		return false;
+
+	for(int c = 0; c<_joys.size(); c++)
+	{
+		Joystick *joy = _joys[c];
+
+		if(joy->mapped_name==joy_name && but<joy->buts.size() && joy->buts[but]->val)
+			return true;
+	}
+
+	return false;
+}
+
+bool is_joy_hat(const Str& joy_name, int hat, HatDirection::Type dir, bool exclusive)
+{
+	// Check if a joystick with the given name has the given hat in the given direction
+	if(hat<0)
+		return false;
+
+	for(int c = 0; c<_joys.size(); c++)
+	{
+		Joystick *joy = _joys[c];
+
+		if(joy->mapped_name==joy_name && hat<joy->hats.size())
+		{
+			HatDirection::Type cur = joy->hats[hat]->val;
+
+			if(cur==dir)
+				return true;
+
+			if(!exclusive && is_hat_sub(cur, dir))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool is_hat_sub(HatDirection::Type dir, HatDirection::Type sub)
+{
+	switch(sub)
+	{
+		case HatDirection::Left:
+			return (dir==HatDirection::Left) || (dir==HatDirection::UpLeft) || (dir==HatDirection::DownLeft);
+
+		case HatDirection::Right:
+			return (dir==HatDirection::Right) || (dir==HatDirection::UpRight) || (dir==HatDirection::DownRight);
+
+		case HatDirection::Up:
+			return (dir==HatDirection::Up) || (dir==HatDirection::UpLeft) || (dir==HatDirection::UpRight);
+
+		case HatDirection::Down:
+			return (dir==HatDirection::Down) || (dir==HatDirection::DownLeft) || (dir==HatDirection::DownRight);
+
+		default:
+			return sub==dir;
+	}
+}
 
 }}

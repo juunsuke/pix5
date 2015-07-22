@@ -7,6 +7,7 @@ class Joystick
 		id = o.id;
 		instance_id = o.instance_id;
 		name = o.name;
+		mapped_name = name;
 
 		for(int c = 0; c<o.axis.size(); c++)
 			axis.add(new JoyAxis(*o.axis.get(c)));
@@ -40,6 +41,9 @@ public:
 
 	Str name;
 	// Joystick name
+
+	Str mapped_name;
+	// Input actions name mapping for the joystick
 
 	List<JoyAxis*> axis;
 	// List of the joystick's axis

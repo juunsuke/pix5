@@ -17,6 +17,7 @@ static bool _has_parachute = false;
 
 namespace Display		{ void init(); void done(); }
 namespace Input			{ void init(); void done(); }
+namespace Action		{ void init(); void done(); }
 namespace Audio			{ void init(); void done(); }
 namespace Cache			{ void init(); void done(); }
 namespace GUI			{ void init(); void done(); }
@@ -63,6 +64,7 @@ void pix_init(const Str& app_name)
 	}
 
 	Input::init();
+	Action::init();
 	font_init();
 	Display::init();
 	tr_init();
@@ -89,6 +91,7 @@ void pix_shutdown()
 	tr_done();
 	Display::done();
 	font_done();
+	Action::done();
 	Input::done();
 	Cache::done();
 

@@ -101,6 +101,7 @@ int64_t get_ms();
 #include "JoyHat.h"
 #include "Joystick.h"
 #include "Input.h"
+#include "Action.h"
 
 #include "VideoModeType.h"
 #include "VideoMode.h"

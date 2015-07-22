@@ -3,6 +3,8 @@
 namespace Input
 {
 
+
+
 Mouse& get_mouse();
 // Get a reference to the internal mouse object
 
@@ -21,6 +23,12 @@ bool get_joy_button(int id, int but);
 HatDirection::Type get_joy_hat(int id, int hat);
 // Get the current value of a joystick hat
 
+float get_joy_dead_zone(int id, int axis);
+// Get the dead-zone value for the given joystick axis, between 0 and 1
+
+void set_joy_dead_zone(int id, int axis, float dead_zone);
+// Set the dead-zone value for the given joystick axis, between 0 and 1
+
 
 
 void move_mouse(int x, int y);
@@ -32,6 +40,14 @@ void set_key_down_repeat(bool repeat);
 // Default is false
 // Note that this only affects on_key_down(), on_text() will always repeat
 
+
+
+void map_joystick(const Str& joy_name, int id);
+// Map the joystick with ID 'id' to the given name
+
+bool is_hat_sub(HatDirection::Type dir, HatDirection::Type sub);
+// Check if 'sub' is considered a sub-component of 'dir'
+// For instance, returns true if 'sub' is HatDirection::Left and 'dir' is HatDirection::TopLeft
 
 
 }

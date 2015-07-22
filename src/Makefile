@@ -10,7 +10,7 @@ CLSS += SpriteSet Sprite TexRenderer Anim
 CLSS += TMLayer TMBase MapSprite
 CLSS += Audio SoundClip
 CLSS += GUI GuiTheme GuiElement Label Button
-CLSS += Input
+CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
