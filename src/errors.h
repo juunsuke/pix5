@@ -22,6 +22,7 @@ PIXERR( 0x00000002,	Assert,				"Debug assertion failed" )
 PIXERR( 0x00000003, SDL,				"SDL error" )
 PIXERR( 0x00000004, OutOfBounds,		"Value out of bounds" )
 PIXERR( 0x00000006, LoadFile,			"Error opening/reading a file" )
+PIXERR( 0x00000007, EmptyFIFO,			"FIFO list is empty" )
 
 
 // Graphics errors

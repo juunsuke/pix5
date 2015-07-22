@@ -15,11 +15,12 @@ MapSprite::MapSprite(TMBase *tm, int layer)
 	_w = 0;
 	_h = 0;
 
-	ox = 0;
-	oy = 0;
-	angle = 0;
-	hscale = 1.0f;
-	vscale = 1.0f;
+	_ox = 0;
+	_oy = 0;
+	_angle = 0;
+	_hscale = 1.0f;
+	_vscale = 1.0f;
+	_mat_dirty = true;
 
 	col = Color(1,1,1,1);
 	visible = true;

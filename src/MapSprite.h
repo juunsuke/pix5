@@ -28,6 +28,18 @@ class MapSprite
 	float _u1, _v1, _u2, _v2;
 	// Texture coordinates
 
+	int _ox, _oy;
+	// Origin coordinates
+
+	float _angle;
+	// Rotation angle
+
+	float _hscale, _vscale;
+	// Horizontal/vertical scale
+
+	bool _mat_dirty;
+	// Dirty matrix flag
+
 
 	MapSprite *_next;
 	// Next sprite, for linked list
@@ -41,14 +53,6 @@ class MapSprite
 
 public:
 
-	int ox, oy;
-	// Origin coordinates
-
-	float angle;
-	// Rotation angle
-
-	float hscale, vscale;
-	// Horizontal/vertical scale
 
 	Color col;
 	// Sprite color
@@ -64,11 +68,61 @@ public:
 	inline float x() { return _x; }
 	inline float y() { return _y; }
 	// Get the current position, expressed in fractional tile values
+	
+	inline int ox() const			{ return _ox; }
+	inline int oy() const			{ return _oy; }
+	inline float angle() const		{ return _angle; }
+	inline float hscale() const		{ return _hscale; }
+	inline float vscale() const		{ return _vscale; }
+	// Get the map sprite parameters
 
 	void set_pos(float x, float y);
 	// Change the sprite position
 	// The position is expressed in fractional values, with integer values
 	// representing the center of the given tile
+
+	inline void set_origin(int ox, int oy)
+	{
+		if(ox!=_ox || oy!=_oy)
+		{
+			_ox = ox;
+			_oy = oy;
+			_mat_dirty = true;
+		}
+	}
+
+	inline void set_angle(float a)
+	{
+		if(a!=_angle)
+		{
+			_angle = a;
+			_mat_dirty = true;
+		}
+	}
+
+	inline void set_hscale(float hscale)
+	{
+		if(hscale!=_hscale)
+		{
+			_hscale = hscale;
+			_mat_dirty = true;
+		}
+	}
+
+	inline void set_vscale(float vscale)
+	{
+		if(vscale!=_vscale)
+		{
+			_vscale = vscale;
+			_mat_dirty = true;
+		}
+	}
+
+	inline void set_scale(float scale)
+	{
+		set_hscale(scale);
+		set_vscale(scale);
+	}
 
 	inline void show() { visible = true; }
 	inline void hide() { visible = false; }

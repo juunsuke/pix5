@@ -11,12 +11,14 @@ CLSS += TMLayer TMBase MapSprite
 CLSS += Audio SoundClip
 CLSS += GUI GuiTheme GuiElement Label Button
 CLSS += Input
+CLSS += Thread JobThread ThreadPool Job
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
-HDRS += pix5.h Str.h List.h SortedList.h Error.h errors.h Math.h
+HDRS += pix5.h Str.h List.h SortedList.h FIFO.h Error.h errors.h Math.h
 HDRS += VideoModeType.h VideoMode.h Color.h Rect.h BlendMode.h TextAlign.h
 HDRS += TileMap.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h 
+HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc load_file.cc get_ms.cc
@@ -61,8 +63,8 @@ run: test
 CC = g++ -o
 LD = g++ -o
 
-CFLAGS = -c -Wall -Werror
-LFLAGS =
+CFLAGS = -c -Wall -Werror -pthread
+LFLAGS = -pthread
 
 ifdef DBG
 CFLAGS += -Og -g -DDBG

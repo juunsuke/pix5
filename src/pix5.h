@@ -8,6 +8,9 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <pthread.h>
+#include <sys/time.h>
+
 
 struct SDL_Window;
 struct FT_FaceRec_;
@@ -76,7 +79,17 @@ int64_t get_ms();
 #include "Log.h"
 #include "List.h"
 #include "SortedList.h"
+#include "FIFO.h"
 #include "Math.h"
+
+#include "Mutex.h"
+#include "Condition.h"
+#include "Barrier.h"
+#include "RWLock.h"
+#include "Thread.h"
+#include "Job.h"
+#include "JobThread.h"
+#include "ThreadPool.h"
 
 #include "Mouse.h"
 #include "keys.h"

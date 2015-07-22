@@ -378,29 +378,29 @@ void TMBase::draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int d
 			for(MapSprite *ms = lay->_sprites[(y1+y)*_mw+x1+x]; ms; ms = ms->_next)
 				if(ms->visible)
 				{
-					// Build the matrix for this sprite
-					glLoadIdentity();
+					// Recalc the matrix ?
+					if(ms->_mat_dirty)
+					{
+						// Build the matrix for this sprite
+						glLoadIdentity();
 
-					float fx = (float)dx + (ms->_x * (float)_tw) - (float)_x + (float)_tw/2.0f;
-					float fy = (float)dy + (ms->_y * (float)_th) - (float)_y + (float)_th/2.0f;
+						// Rotation
+						if(ms->_angle)
+							glRotatef(ms->_angle, 0, 0, 1.0f);
 
-					// Position
-					glTranslatef(fx, fy, 0);
-					
-					// Rotation
-					if(ms->angle)
-						glRotatef(ms->angle, 0, 0, 1.0f);
+						// Scaling
+						if(ms->_hscale!=1.0f || ms->_vscale!=1.0f)
+							glScalef(ms->_hscale, ms->_vscale, 1.0f);
 
-					// Scaling
-					if(ms->hscale!=1.0f || ms->vscale!=1.0f)
-						glScalef(ms->hscale, ms->vscale, 1.0f);
+						// Origin
+						if(ms->_ox || ms->_oy)
+							glTranslatef(-ms->_ox, -ms->_oy, 0);
 
-					// Origin
-					if(ms->ox || ms->oy)
-						glTranslatef(-ms->ox, -ms->oy, 0);
+						// Save the matrix
+						ms->_mat = Matrix::get_modelview();
 
-					// Save the matrix
-					ms->_mat = Matrix::get_modelview();
+						ms->_mat_dirty = false;
+					}
 
 					float u1, v1, u2, v2;
 					int ww, hh;
@@ -426,30 +426,33 @@ void TMBase::draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int d
 						v2 = frm->v2;
 					}
 
+					float fx = (float)dx + (ms->_x * (float)_tw) - (float)_x + (float)_tw/2.0f;
+					float fy = (float)dy + (ms->_y * (float)_th) - (float)_y + (float)_th/2.0f;
+
 					// Setup the vertices
-					v->x = 0;
-					v->y = 0;
+					v->x = fx;
+					v->y = fy;
 					v->col = ms->col;
 					v->u = u1;
 					v->v = v1;
 					v++;
 
-					v->x = ww;
-					v->y = 0;
+					v->x = fx+ww;
+					v->y = fy;
 					v->col = ms->col;
 					v->u = u2;
 					v->v = v1;
 					v++;
 
-					v->x = ww;
-					v->y = hh;
+					v->x = fx+ww;
+					v->y = fy+hh;
 					v->col = ms->col;
 					v->u = u2;
 					v->v = v2;
 					v++;
 
-					v->x = 0;
-					v->y = hh;
+					v->x = fx;
+					v->y = fy+hh;
 					v->col = ms->col;
 					v->u = u1;
 					v->v = v2;

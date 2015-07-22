@@ -78,5 +78,11 @@ public:
 	{
 		return down;
 	}
+
+	inline bool operator==(KeyCode code) const
+	{
+		// Compare the codes
+		return this->code==code;
+	}
 };
 

@@ -9,6 +9,8 @@ class VertexArray
 	uint32_t _vao;
 	// OpenGL VAO
 
+	int _size;
+	// Max locked size
 
 	void create_gl(Shader *shad);
 	// Create the OpenGL VAO and the associated VBOs

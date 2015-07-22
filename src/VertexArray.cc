@@ -9,6 +9,7 @@ namespace PIX {
 VertexArray::VertexArray()
 {
 	_vao = 0;
+	_size = 0;
 }
 
 VertexArray::~VertexArray()
@@ -24,6 +25,8 @@ void VertexArray::delete_gl()
 		glDeleteVertexArrays(1, &_vao);
 		_vao = 0;
 	}
+
+	_size = 0;
 
 	// Do the same for the vertex buffers
 	for(int c = 0; c<_vb.size(); c++)
@@ -73,6 +76,12 @@ void *VertexArray::lock(int stream, int first, int count)
 {
 	if(stream<0 || stream>=_vb.size())
 		E::BadStreamIndex("VertexArray::lock()");
+
+	if((first+count)>_size && _vao)
+		delete_gl();
+
+	if((first+count)>_size)
+		_size = first+count;
 
 	// Lock the VB
 	return _vb[stream]->lock(first, count);

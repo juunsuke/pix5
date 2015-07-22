@@ -12,7 +12,6 @@ TileMap<MyTile> *tm;
 
 bool run = true;
 
-
 class MyEventHandler: public EventHandler
 {
 public:
@@ -54,14 +53,25 @@ public:
 
 
 
+
+void *t(void *p)
+{
+
+	return NULL;
+}
+
+
 int main(int argc, char **argv)
 {
+	pthread_t th;
+	pthread_create(&th, NULL, t, NULL);
+
 	try
 	{
 		pix_init("Test");
 
 		Display::set_mode(VideoMode::resizable(
-			//1366, 768, false
+			1366, 768, false
 		));
 
 
@@ -116,9 +126,8 @@ int main(int argc, char **argv)
 
 		for(int c = 0; c<10000; c++)
 		{
-			MapSprite *ms = tm->new_sprite(1, a2, rand()%256, rand()%256);
-			ms->ox = 16;
-			ms->oy = 55-16;
+			MapSprite *ms = tm->new_sprite(1, a2, rand()%40, rand()%25);
+			ms->set_origin(16, 55-16);
 		}
 
 		int sx = 700;
