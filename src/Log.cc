@@ -4,14 +4,14 @@ namespace PIX {
 namespace Log {
 
 
-static void plog(const char *code, const char *fmt, va_list vl)
+void plog(const char *code, const char *fmt, va_list vl)
 {
 	printf("[%s] ", code);
 	vprintf(fmt, vl);
 	printf("\n");
 }
 
-static void plog(const char *code, const Str& str)
+void plog(const char *code, const Str& str)
 {
 	printf("[%s] %s\n", code, str.ptr());
 }

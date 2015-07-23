@@ -13,6 +13,9 @@ TileMap<MyTile> *tm;
 bool run = true;
 Texture *at;
 
+Lua lua;
+
+
 class MyEventHandler: public EventHandler
 {
 public:
@@ -108,6 +111,8 @@ int main(int argc, char **argv)
 	try
 	{
 		pix_init("Test");
+
+		lua.load("test.lua");
 
 		Display::set_mode(VideoMode::resizable(
 			1366, 768, false

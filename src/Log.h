@@ -6,6 +6,10 @@ namespace Log
 
 
 
+void plog(const char *code, const char *fmt, va_list vl);
+void plog(const char *code, const Str& str);
+// Raw/custom log output
+
 void log(const char *fmt, ...);
 // Add a standard log message notice to the log
 

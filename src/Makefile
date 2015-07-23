@@ -12,6 +12,7 @@ CLSS += Audio SoundClip
 CLSS += GUI GuiTheme GuiElement Label Button
 CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
+CLSS += Lua
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
 HDRS += pix5.h Str.h List.h SortedList.h FIFO.h Error.h errors.h Math.h
@@ -23,10 +24,11 @@ HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc load_file.cc get_ms.cc
 SRCS += GuiTheme_Label.cc
+SRCS += lua_print.cc
 
 DATA = sprite.vs sprite.fs LiberationSans-Regular.ttf
 
-PKGS = sdl2 SDL2_image gl glew freetype2 vorbisfile
+PKGS = sdl2 SDL2_image gl glew freetype2 vorbisfile luajit
 
 ########################################################################################################################
 

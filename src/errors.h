@@ -69,5 +69,10 @@ PIXERR( 0x50000002, BadJoyButton,		"Invalid joystick button index" )
 PIXERR( 0x50000002, BadJoyHat,			"Invalid joystick hat index" )
 
 
+// LUA errors
+PIXERR( 0x60000001, Lua,				"Lua error" )
+
+
+
 
 

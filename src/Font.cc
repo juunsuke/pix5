@@ -197,11 +197,6 @@ int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, b
 	{
 		Glyph *g = get_glyph(text[c]);
 
-		if(tex)
-			draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g, blend);
-
-		x += g->metrics.advance;
-
 		// Apply kerning
 		if(kerning && FT_HAS_KERNING(_face) && last)
 		{
@@ -209,6 +204,11 @@ int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, b
 			FT_Get_Kerning(_face, last->index, g->index, FT_KERNING_DEFAULT, &delta);
 			x += delta.x/64;
 		}
+
+		if(tex)
+			draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g, blend);
+
+		x += g->metrics.advance;
 
 		// Remember the glyph, for kerning
 		last = g;

@@ -11,6 +11,9 @@
 #include <pthread.h>
 #include <sys/time.h>
 
+#include <lua.hpp>
+#include <lauxlib.h>
+
 
 struct SDL_Window;
 struct _SDL_Joystick;
@@ -148,6 +151,8 @@ int64_t get_ms();
 #include "TMLayer.h"
 #include "TMBase.h"
 #include "TileMap.h"
+
+#include "Lua.h"
 
 #include "EventHandler.h"
 
