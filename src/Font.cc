@@ -188,7 +188,7 @@ void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g, 
 	}
 }
 
-int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, BlendMode::Type blend)
+int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, bool kerning, BlendMode::Type blend)
 {
 	Glyph *last = NULL;
 	int ox = x;
@@ -203,7 +203,7 @@ int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, B
 		x += g->metrics.advance;
 
 		// Apply kerning
-		if(FT_HAS_KERNING(_face) && last)
+		if(kerning && FT_HAS_KERNING(_face) && last)
 		{
 			FT_Vector delta;
 			FT_Get_Kerning(_face, last->index, g->index, FT_KERNING_DEFAULT, &delta);
