@@ -12,13 +12,30 @@ namespace ImageLocation
 	};
 }
 
+namespace LabelAlign
+{
+	enum Type
+	{
+		TopLeft,
+		TopRight,
+		TopCenter,
+
+		BottomLeft,
+		BottomRight,
+		BottomCenter,
+
+		MiddleLeft,
+		MiddleRight,
+		MiddleCenter,
+	};
+}
 
 class Label: public GuiElement
 {
 	Str _text;
 	// Label text
 
-	TextAlign::Type _align;
+	LabelAlign::Type _align;
 	// Alignment
 
 	Texture *_image;
@@ -34,7 +51,7 @@ public:
 
 
 	inline Str text() { return _text; }
-	inline TextAlign::Type align() { return _align; }
+	inline LabelAlign::Type align() { return _align; }
 	inline Texture *image() { return _image; }
 	inline ImageLocation::Type image_location() { return _image_loc; }
 	// Get info about the label
@@ -45,7 +62,7 @@ public:
 		set_dirty();
 	}
 
-	void set_align(TextAlign::Type align)
+	void set_align(LabelAlign::Type align)
 	{
 		_align = align;
 		set_dirty();

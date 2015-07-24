@@ -5,18 +5,20 @@ namespace TextAlign
 {
 	enum Type
 	{
-		TopLeft,
-		TopRight,
-		TopCenter,
-
-		BottomLeft,
-		BottomRight,
-		BottomCenter,
-
-		MiddleLeft,
-		MiddleRight,
-		MiddleCenter,
+		Left,
+		Right,
+		Center,
+		Justify
 	};
 }
 
+namespace VertTextAlign
+{
+	enum Type
+	{
+		Top,
+		Bottom,
+		Middle
+	};
+}
 

@@ -4,23 +4,23 @@ namespace PIX {
 
 
 
-static void align(TextAlign::Type align, int tw, int th, int w, int h, int spacing, int *x, int *y)
+static void align(LabelAlign::Type align, int tw, int th, int w, int h, int spacing, int *x, int *y)
 {
 	// Align the (w x h) rectangle using the current alignment
 	switch(align)
 	{
-		case TextAlign::TopLeft:				*x = spacing;			*y = spacing;			break;
-		case TextAlign::BottomLeft: 			*x = spacing;			*y = th-h-spacing;		break;
-		case TextAlign::MiddleLeft: 			*x = spacing;			*y = (th-h)/2;			break;
+		case LabelAlign::TopLeft:				*x = spacing;			*y = spacing;			break;
+		case LabelAlign::BottomLeft: 			*x = spacing;			*y = th-h-spacing;		break;
+		case LabelAlign::MiddleLeft: 			*x = spacing;			*y = (th-h)/2;			break;
 
-		case TextAlign::TopRight:				*x = tw-w-spacing;		*y = spacing;			break;
-		case TextAlign::BottomRight:			*x = tw-w-spacing;		*y = th-h-spacing;		break;
-		case TextAlign::MiddleRight:			*x = tw-w-spacing;		*y = (th-h)/2;			break;
+		case LabelAlign::TopRight:				*x = tw-w-spacing;		*y = spacing;			break;
+		case LabelAlign::BottomRight:			*x = tw-w-spacing;		*y = th-h-spacing;		break;
+		case LabelAlign::MiddleRight:			*x = tw-w-spacing;		*y = (th-h)/2;			break;
 
-		case TextAlign::TopCenter:				*x = (tw-w)/2;			*y = spacing;			break;
-		case TextAlign::BottomCenter:   		*x = (tw-w)/2;			*y = th-h-spacing;		break;
-		case TextAlign::MiddleCenter:   		*x = (tw-w)/2;			*y = (th-h)/2;			break;
-		//case TextAlign::MiddleCenter:   		*x = (tw-w)/2;			*y = (th-h-(h-ha))/2;		break;
+		case LabelAlign::TopCenter:				*x = (tw-w)/2;			*y = spacing;			break;
+		case LabelAlign::BottomCenter:   		*x = (tw-w)/2;			*y = th-h-spacing;		break;
+		case LabelAlign::MiddleCenter:   		*x = (tw-w)/2;			*y = (th-h)/2;			break;
+		//case LabelAlign::MiddleCenter:   		*x = (tw-w)/2;			*y = (th-h-(h-ha))/2;		break;
 
 		default:
 			*x = 0;

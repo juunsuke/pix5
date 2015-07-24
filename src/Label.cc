@@ -7,7 +7,7 @@ Label::Label(const Str& name, int w, int h, const Str& text, Texture *image, Ima
 {
 	// Set the default values
 	_text = text;
-	_align = TextAlign::MiddleCenter;
+	_align = LabelAlign::MiddleCenter;
 	_image = image;
 	_image_loc = image_loc;
 }

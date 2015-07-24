@@ -1,5 +1,5 @@
 #include "pix5.h"
-#include <math.h>
+#include "data.h"
 
 
 struct MyTile
@@ -200,17 +200,48 @@ int main(int argc, char **argv)
 
 		Action::enable("main");
 
+
+		TextFormat tf;
+
+		tf.add_newline();
+		tf.add_text("In the English language, nigger is an ");
+		
+		tf.set_color(Color(0, 1, 0));
+		//tf.set_font(Cache::font(data_LiberationSans_Regular_ttf, data_LiberationSans_Regular_ttf_len, 18));
+		tf.set_font(Cache::font("data/DejaVuSans.ttf", 11));
+		tf.add_text("Ethnic Slur Tg");
+		printf("%i\n", Cache::font("data/DejaVuSans.ttf", 11)->height());
+		printf("%i\n", Cache::font("data/DejaVuSans.ttf", 11)->spacing());
+
+		tf.set_font();
+		tf.set_color(Color(1, 1, 1));
+		tf.set_bg_color(Color(0, 0, 1));
+
+		int z = tf.add_text(" usually directed at black people. The word originated as a neutral term referring to people with black skin,[1] as a variation of the Spanish/Portuguese noun negro, a descendant of the Latin adjective niger (\"black\").[2]\n\nIt was often used disparagingly, and by the mid-20th century, particularly in the United States, its usage became unambiguously pejorative, a racist insult. Accordingly, it began to disappear from popular culture, and its continued inclusion in classic works of literature has sparked controversy.");
+
+		tf.add_newline();
+		tf.add_text("Proute");
+
+		tf.calc(tex->width());
+		tf.render(tex);
+
+		List<Rect> lr = tf.get_pos(z);
+		for(int c = 0; c<lr.size(); c++)
+			tex->rect(lr[c], Color(1, 0, 0));
+		lr.clear_nodel();
+
+
 		while(run)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 			//Display::clear();
 
-			//Display::test_draw(299, 249, tex);
-
 			tm->set_pos(bx, by);
 			tm->draw();
 
 			ss.draw();
+			
+			Display::test_draw(299, 249, tex);
 
 			if(Action::is_down("move_left"))
 			{

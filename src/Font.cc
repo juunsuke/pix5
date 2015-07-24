@@ -95,7 +95,7 @@ void Font::setup(struct FT_FaceRec_* face, int ptsize)
 	_glyphs = (Glyph**)calloc(_num_glyphs, sizeof(Glyph*));
 
 	// Get the height and spacing
-	_height = (_face->size->metrics.ascender + _face->size->metrics.descender)/64 + 1;
+	_height = (_face->size->metrics.ascender - _face->size->metrics.descender)/64;
 	_spacing = _face->size->metrics.height/64;
 	
 	#ifdef DBG

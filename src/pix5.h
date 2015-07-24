@@ -116,6 +116,7 @@ int64_t get_ms();
 #include "Glyph.h"
 #include "Font.h"
 #include "Texture.h"
+#include "TextFormat.h"
 
 #include "Matrix.h"
 #include "Camera.h"
