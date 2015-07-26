@@ -21,6 +21,7 @@ namespace Action		{ void init(); void done(); }
 namespace Audio			{ void init(); void done(); }
 namespace Cache			{ void init(); void done(); }
 namespace GUI			{ void init(); void done(); }
+namespace IO			{ void init(); void done(); }
 
 
 void font_init();		void font_done();
@@ -63,6 +64,7 @@ void pix_init(const Str& app_name)
 		_has_parachute = true;
 	}
 
+	IO::init();
 	Input::init();
 	Action::init();
 	font_init();
@@ -94,6 +96,7 @@ void pix_shutdown()
 	Input::done();
 	Cache::done();
 	font_done();
+	IO::done();
 
 	SDL_Quit();
 

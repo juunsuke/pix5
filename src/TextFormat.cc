@@ -106,15 +106,40 @@ public:
 	// All the calculated words
 
 
+	void copy(const TFElement& o)
+	{
+		state = o.state;
+		type = o.type;
+		text = o.text;
+		val = o.val;
+		tex = o.tex;
+		tex_rect = o.tex_rect;
+
+		// Don't copy the words
+	}
+
+
 	TFElement(const TFState& state, ElementType::Type type)
 	{
 		this->state = state;
 		this->type = type;
 	}
 
+	TFElement(const TFElement& o)
+	{
+		copy(o);
+	}
+
 	~TFElement()
 	{
 		words.clear_nodel();
+	}
+
+	TFElement& operator=(const TFElement& o)
+	{
+		words.clear_nodel();
+		copy(o);
+		return *this;
 	}
 };
 
@@ -156,6 +181,16 @@ void TextFormat::reset_calc()
 
 	for(int c = 0; c<_elements.size(); c++)
 		_elements[c]->words.clear_nodel();
+}
+
+void TextFormat::copy(const TextFormat& o)
+{
+	// Copy the current state
+	_state = o._state;
+	
+	// Duplicate the elements
+	for(int c = 0; c<o._elements.size(); c++)
+		_elements.add(new TFElement(*o._elements.get(c)));
 }
 
 void TextFormat::set_font(Font *font)

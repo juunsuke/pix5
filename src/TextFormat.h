@@ -71,6 +71,9 @@ class TextFormat
 	// Calculated widht and height
 
 
+	void copy(const TextFormat& o);
+	// Copy another format
+
 	void add_word(class TFElement *el, int *px, int *py, int w, const Str& text);
 	// Add a word to the current line
 	
@@ -92,6 +95,7 @@ class TextFormat
 public:
 
 	TextFormat();
+	TextFormat(const TextFormat& o) { copy(o); }
 	~TextFormat();
 
 	void reset();
@@ -102,6 +106,15 @@ public:
 
 	void reset_calc();
 	// Reset the positioning calculations in elements
+
+	TextFormat& operator=(const TextFormat& o)
+	{
+		// Affectation
+		// Calculations will NOT carry over, only the definition
+		reset();
+		copy(o);
+		return *this;
+	}
 
 
 	//

@@ -12,6 +12,7 @@ CLSS += Audio SoundClip
 CLSS += GUI GuiTheme GuiElement Label Button
 CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
+CLSS += IO FileSource LinuxFileSource
 CLSS += Lua
 
 HDRS  = $(patsubst %,%.h,$(CLSS))

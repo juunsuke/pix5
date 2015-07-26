@@ -95,6 +95,10 @@ int64_t get_ms();
 #include "JobThread.h"
 #include "ThreadPool.h"
 
+#include "FileSource.h"
+#include "LinuxFileSource.h"
+#include "IO.h"
+
 #include "Mouse.h"
 #include "keys.h"
 #include "Key.h"
