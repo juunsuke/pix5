@@ -16,7 +16,9 @@ void unmount(const Str& mount_point);
 // If any file is still open within that file source, an error will be thrown
 // The filesource will be deleted
 
-
+File *open(const FilePath& fname, FileAccess::Type access = FileAccess::ReadOnly);
+// Open the file with the given name using the given access
+// Throws an error if the file can't be opened
 
 
 

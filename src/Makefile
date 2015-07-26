@@ -12,7 +12,7 @@ CLSS += Audio SoundClip
 CLSS += GUI GuiTheme GuiElement Label Button
 CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
-CLSS += IO FileSource LinuxFileSource
+CLSS += IO FileSource LinuxFileSource File CFile
 CLSS += Lua
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
@@ -21,6 +21,7 @@ HDRS += VideoModeType.h VideoMode.h Color.h Rect.h TextAlign.h
 HDRS += TileMap.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h Joystick.h JoyAxis.h JoyButton.h JoyHat.h
 HDRS += Mutex.h Condition.h Barrier.h RWLock.h
+HDRS += FilePath.h FileAccess.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc load_file.cc get_ms.cc

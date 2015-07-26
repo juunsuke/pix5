@@ -238,24 +238,45 @@ int main(int argc, char **argv)
 		tf.set_align(TextAlign::Right);
 		tf.add_text("Oink");
 
-		tf.calc(tex->width());
-		tex->rect(Rect(0, 0, tf.get_width(), tf.get_height()), Color(1, 1, 0));
-		tf.render(tex);
+		TextFormat tf2;
+		tf2.set_valign(VertTextAlign::Middle);
+		tf2.add_text("Proute");
+
+		tf2.calc();
+		tex->rect(Rect(0, 0, tf2.get_width(), tf2.get_height()), Color(1, 1, 0));
+		tf2.render(tex);
 
 		for(int zz = 0; zz<6; zz++)
 		{
 			if(z[zz]!=-1)
 			{
-				List<Rect> lr = tf.get_pos(z[zz]);
+				/*List<Rect> lr = tf2.get_pos(z[zz]);
 				for(int c = 0; c<lr.size(); c++)
 					tex->rect(lr[c], Color(1, 0, 0));
-				lr.clear_nodel();
+				lr.clear_nodel();*/
 			}
 		}
 
 		tex->line(10, 10, 500, 300, 3, Color(0.9f, 0.4f, 0.3f));
 		tex->line(10, 50, 500, 340, 3, Color(0.9f, 0.4f, 0.3f, 0.5f));
 
+
+		FilePath fp("data/test.png");
+		if(fp.valid())
+		{
+			printf("Full: '%s'\n", fp.full().ptr());
+			printf("  MP: '%s'\n", fp.mount_point().ptr());
+			printf("Path: '%s'\n", fp.path().ptr());
+			printf(" Dir: '%s'\n", fp.dir().ptr());
+			printf("File: '%s'\n", fp.file().ptr());
+			printf("Base: '%s'\n", fp.file_base().ptr());
+			printf(" Ext: '%s'\n", fp.ext().ptr());
+		}
+		else
+			printf("Error: %s\n", fp.error().ptr());
+
+
+		//IO::open("root:/test.txt", FileAccess::ReadOnly);
 
 		while(run)
 		{

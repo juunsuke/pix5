@@ -128,6 +128,8 @@ void mount(const Str& mount_point, FileSource *fs)
 		delete mnt;
 		throw;
 	}
+
+	Log::log("Mounted '%s' on '%s:'", fs->get_info_str().ptr(), mount_point.ptr());
 }
 
 void unmount(const Str& mount_point)
@@ -147,6 +149,19 @@ void unmount(const Str& mount_point)
 	delete mnt;
 }
 
+File *open(const FilePath& fname, FileAccess::Type access)
+{
+	if(!fname.valid())
+		E::BadPath("IO::open(): Invalid file path: '%s'", fname.full().ptr());
+
+	// Get the mount
+	Mount *mnt = get_mount(fname.mount_point());
+	if(!mnt)
+		E::BadPath("IO::open(): Invald mount point for file path: '%s'", fname.full().ptr());
+
+	// Let the file source do the opening
+	return mnt->fs->open_file(fname, access);
+}
 
 
 

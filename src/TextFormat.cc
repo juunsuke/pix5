@@ -70,7 +70,11 @@ public:
 	// Line height
 
 
-	TFLine() { }
+	TFLine()
+	{
+		h = 0;
+	}
+
 	~TFLine()
 	{
 		words.clear_del();
@@ -546,6 +550,10 @@ void TextFormat::calc(int width)
 		}
 	}
 
+	// If there is no empty line at the end, add one for proper height calculation
+	if(!_lines.size() || _lines[_lines.size()-1]->words.size())
+		calc_newline(&px, &py);
+
 	// Add a final align point to each line and align them
 	for(int c = 0; c<_lines.size(); c++)
 	{
@@ -557,10 +565,6 @@ void TextFormat::calc(int width)
 		// Align the line
 		align_line(line);
 	}
-
-	// If there is no empty line at the end, add one for proper height calculation
-	if(!_lines.size() || _lines[_lines.size()-1]->words.size())
-		calc_newline(&px, &py);
 
 	// Mark the total size
 	_cw = width;

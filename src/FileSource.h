@@ -11,6 +11,14 @@ public:
 
 	virtual ~FileSource();
 
+	virtual Str get_info_str() = 0;
+	// Return an information string about the file source
+
+
+	virtual File *open_file(const FilePath& fname, FileAccess::Type access) = 0;
+	// Open the file represented by 'fname'
+	// The file path is guaranteed to be valid
+	// Throw an error if the file can't be opened using the requested access
 
 	virtual void on_mount(const Str& mount_point) {}
 	// Called after the file source has been pointed on the given mount point
