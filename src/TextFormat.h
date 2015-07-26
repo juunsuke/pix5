@@ -71,17 +71,27 @@ class TextFormat
 	List<class TFLine*> _lines;
 	// Calculated lines
 
+	int _cw, _ch;
+	// Calculated widht and height
+
+
 	void add_word(class TFElement *el, int *px, int *py, int w, const Str& text);
 	// Add a word to the current line
 	
-	void add_words(class TFElement *el, int *px, int *py, const Str& text);
-	// Split 'text' in space-divided words and add them
-
 	void calc_text(class TFElement *el, int *px, int *py, int width);
 	// Calc a text element's positioning
 
+	void calc_texture(class TFElement *el, int *px, int *py, int width);
+	// Calc a texture element's positioning
+
 	void calc_newline(int *px, int *py);
 	// Add a new line
+
+	void add_align_point(int x, class TFLine *line = NULL);
+	// Add a new align point in a line
+
+	void align_line(class TFLine *line);
+	// Perform alignments on a line
 
 public:
 
@@ -164,11 +174,16 @@ public:
 	// Changing the X position this will will create an alignment point at 'x', so any
 	// elements before or after the call to set_x() will use this coordinate as an
 	// alignment bound
-	// Going backwards is possible, and may cause elements to overwrite previous ones
 
 	void add_x(int x);
 	// Add X pixels between the previous element and the next
 
+	int add_tex(Texture *tex, const Rect& r);
+	inline int add_tex(Texture *tex, int x, int y, int w, int h) { return add_tex(tex, Rect(x, y, w, h)); }
+	inline int add_tex(Texture *tex) { return add_tex(tex, Rect(0, 0, tex->width(), tex->height())); }
+	// Add the specified sub-section of a texture (or a whole texture) as a new element
+	// The texture acts as a word of text and follows all states except the font
+	// The texture is not copied, and must remain valid until the TextFormat is rendered
 
 
 	//
@@ -192,8 +207,8 @@ public:
 	// Recalculate the positioning of elements and render them into a created texture
 	// There is no need to call calc(), as this function will do it automatically
 
-	int get_width();
-	int get_height();
+	inline int get_width() { return _cw; }
+	inline int get_height() { return _ch; }
 	// Get the total width/height required to hold everything
 	// Must be called after calculating
 

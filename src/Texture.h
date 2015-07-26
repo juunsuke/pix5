@@ -222,6 +222,7 @@ public:
 	// Print a string using the given font
 
 	void blit(int dx, int dy, Texture *src, int sx, int sy, int w, int h, bool alpha = true);
+	inline void blit(int dx, int dy, Texture *src, const Rect& sr, bool alpha = true) { blit(dx, dy, src, sr.x, sr.y, sr.w, sr.h, alpha); }
 	inline void blit(int dx, int dy, Texture *src, bool alpha = true) { blit(dx, dy, src, 0, 0, src->_w, src->_h, alpha); }
 };
 

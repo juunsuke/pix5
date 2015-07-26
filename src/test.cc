@@ -131,8 +131,8 @@ int main(int argc, char **argv)
 			}
 
 
-		Texture *tex = Texture::create(502, 302);
-		tex->rect(0, 0, 501, 301, Color(1,1,1));
+		Texture *tex = Texture::create(502, 402);
+		tex->rect(0, 0, 501, 401, Color(1,1,1));
 
 		MyEventHandler eh;
 
@@ -203,32 +203,55 @@ int main(int argc, char **argv)
 
 		TextFormat tf;
 
-		tf.add_newline();
-		tf.add_text("In the English language, nigger is an ");
+		tf.set_align(TextAlign::Center);
+		tf.set_valign(VertTextAlign::Middle);
+		tf.add_text("Elfrea is a nigger\n\n");
+
+		tf.set_align(TextAlign::Justify);
+		int z[6] = { -1, -1, -1, -1, -1, -1};
+		z[0] = tf.add_text("In the English language, nigger is an ");
 		
 		tf.set_color(Color(0, 1, 0));
-		//tf.set_font(Cache::font(data_LiberationSans_Regular_ttf, data_LiberationSans_Regular_ttf_len, 18));
-		tf.set_font(Cache::font("data/DejaVuSans.ttf", 11));
-		tf.add_text("Ethnic Slur Tg");
-		printf("%i\n", Cache::font("data/DejaVuSans.ttf", 11)->height());
-		printf("%i\n", Cache::font("data/DejaVuSans.ttf", 11)->spacing());
+		tf.set_font(Cache::font(data_LiberationSans_Regular_ttf, data_LiberationSans_Regular_ttf_len, 18));
+		z[1] = tf.add_text("Ethnic Slur");
 
 		tf.set_font();
 		tf.set_color(Color(1, 1, 1));
 		tf.set_bg_color(Color(0, 0, 1));
 
-		int z = tf.add_text(" usually directed at black people. The word originated as a neutral term referring to people with black skin,[1] as a variation of the Spanish/Portuguese noun negro, a descendant of the Latin adjective niger (\"black\").[2]\n\nIt was often used disparagingly, and by the mid-20th century, particularly in the United States, its usage became unambiguously pejorative, a racist insult. Accordingly, it began to disappear from popular culture, and its continued inclusion in classic works of literature has sparked controversy.");
+		z[2] = tf.add_text(" usually directed at black people. The word originated as a neutral term referring to people with black skin,[1] as a variation of the Spanish/Portuguese noun negro, a descendant of the Latin adjective niger (\"black\").[2]\n\n");
+
+		tf.set_align(TextAlign::Right);
+		tf.set_valign();
+		
+		z[3] = tf.add_text("It was often used disparagingly, and ");
+
+		tf.add_tex(Cache::texture("data/sprites.png"), Rect(0, 0, 32, 55));
+
+		tf.set_valign(VertTextAlign::Middle);
+
+		z[5] = tf.add_text(" by the mid-20th century, particularly in the United States, its usage became unambiguously pejorative, a racist insult. Accordingly, it began to disappear from popular culture, and its continued inclusion in classic works of literature has sparked controversy.\n");
 
 		tf.add_newline();
+		tf.set_align(TextAlign::Left);
 		tf.add_text("Proute");
+		tf.set_align(TextAlign::Right);
+		tf.add_text("Oink");
 
 		tf.calc(tex->width());
+		tex->rect(Rect(0, 0, tf.get_width(), tf.get_height()), Color(1, 1, 0));
 		tf.render(tex);
 
-		List<Rect> lr = tf.get_pos(z);
-		for(int c = 0; c<lr.size(); c++)
-			tex->rect(lr[c], Color(1, 0, 0));
-		lr.clear_nodel();
+		for(int zz = 0; zz<6; zz++)
+		{
+			if(z[zz]!=-1)
+			{
+				List<Rect> lr = tf.get_pos(z[zz]);
+				for(int c = 0; c<lr.size(); c++)
+					tex->rect(lr[c], Color(1, 0, 0));
+				lr.clear_nodel();
+			}
+		}
 
 
 		while(run)

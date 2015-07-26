@@ -11,8 +11,21 @@ namespace ElementType
 		Text,
 		SetX,
 		AddX,
+		Texture,
 	};
 }
+
+
+class TFAlignPoint
+{
+public:
+
+	int i;
+	// Word index, within the line, that the align point precedes
+
+	int x;
+	// X position of the align point
+};
 
 class TFWord
 {
@@ -24,8 +37,23 @@ public:
 	Str text;
 	// Word text
 
+	Texture *tex;
+	Rect tex_rect;
+	// Texture, for texture words
+
 	class TFElement *el;
 	// The element the word is part of
+
+
+	TFWord()
+	{
+		tex = NULL;
+		el = NULL;
+	}
+
+	~TFWord()
+	{
+	}
 };
 
 class TFLine
@@ -35,10 +63,18 @@ public:
 	List<TFWord*> words;
 	// Words in the line
 
+	List<TFAlignPoint*> apoints;
+	// Aling points of the line
+
+	int h;
+	// Line height
+
+
 	TFLine() { }
 	~TFLine()
 	{
 		words.clear_del();
+		apoints.clear_del();
 	}
 };
 
@@ -60,6 +96,10 @@ public:
 	// Value, for various elements:
 	// SetX
 	// AddX
+
+	Texture *tex;
+	Rect tex_rect;
+	// Texture and its sub-section
 
 
 	List<TFWord*> words;
@@ -84,6 +124,8 @@ TextFormat::TextFormat()
 {
 	// Default state
 	reset_state();
+	_cw = 0;
+	_ch = 0;
 }
 
 TextFormat::~TextFormat()
@@ -103,6 +145,8 @@ void TextFormat::reset_elements()
 	// Delete all the elements
 	_elements.clear_del();
 	_lines.clear_del();
+	_cw = 0;
+	_ch = 0;
 }
 	
 void TextFormat::reset_calc()
@@ -149,6 +193,16 @@ void TextFormat::add_x(int x)
 	el->val = x;
 	_elements.add(el);
 }
+	
+int TextFormat::add_tex(Texture *tex, const Rect& r)
+{
+	// Create a texture element
+	TFElement *el = new TFElement(_state, ElementType::Texture);
+	el->tex = tex;
+	el->tex_rect = r;
+
+	return _elements.add(el);
+}
 
 
 
@@ -169,176 +223,71 @@ void TextFormat::add_word(TFElement *el, int *px, int *py, int w, const Str& tex
 	// Adjust the pen
 	*px += w;
 }
-	
-void TextFormat::add_words(class TFElement *el, int *px, int *py, const Str& text)
-{
-	// Split the string into space-separated words and add them individually
-	int len = text.len();
 
-	if(!len)
-		return;
+void TextFormat::calc_text(class TFElement *el, int *px, int *py, int width)
+{
+	// Divide the text in words
+	int start = 0;
+	int len = el->text.len();
 
 	// First get the size of a space
 	int space_size = el->state.font->get_glyph(' ')->metrics.advance;
 
-	// Split in words
-	int start = 0;
-	int pos = text.find(' ');
-
-	if(pos==-1)
-		pos = len;
-
-	for(;;)
+	// Look for a word cuts (space) or a new line characters (\n)
+	for(int c = 0; c<=len; c++)
 	{
-		if(pos>start)
+		char ch = el->text[c];
+
+		if(ch==' ' || ch=='\n' || ch==0)
 		{
-			// Add a word
-			Str w = text.sub(start, pos-start);
-			add_word(el, px, py, el->state.font->len(w), w);
+			// There is a splitting point
+			// Add a word if needed
+			if(c>start)
+			{
+				// Word text
+				Str s = el->text.sub(start, c-start);
+				int w = el->state.font->len(s);
+
+				// Add a new line if it doesn't fit
+				if(width>0 && (*px) && (*px+w)>width)
+					calc_newline(px, py);
+
+				// Add the word
+				add_word(el, px, py, w, s);
+			}
+
+			// Add room for a space character, or change line
+			if(ch==' ')
+				*px += space_size;
+			else if(ch=='\n')
+				calc_newline(px, py);
+		
+			start = c+1;
 		}
-
-		// Add a space
-		*px += space_size;
-
-		// Move on
-		start = pos+1;
-
-		// Done ?
-		if(start>=len)
-			break;
-
-		pos = text.find(' ', start);
-		if(pos==-1)
-			pos = len;
 	}
 }
-
-void TextFormat::calc_text(class TFElement *el, int *px, int *py, int width)
+	
+void TextFormat::calc_texture(class TFElement *el, int *px, int *py, int width)
 {
-	// Simplest case: No line changes (\n) and unlimited width
-	int pos = el->text.find('\n');
-	if(pos==-1 && width<=0)
-	{
-		// Super simple, add a single word
-		add_words(el, px, py, el->text);
-		return;
-	}
-
-	// There will be line changes one way or another
-	Str cur, remain;
-
-	bool force_nl = false;
-	bool force_last_nl = false;
-
-	if(pos==-1)
-	{
-		// No manual line skip
-		cur = el->text;
-	}
-	else
-	{
-		// Manual skip
-		cur = el->text.left(pos);
-		remain = el->text.sub(pos+1);
-		force_nl = true;
-	}
-
-	// Process the text
-	while(cur.len() || remain.len() || force_nl)
-	{
-		if(cur.len())
-		{
-			// There is a section to process
-			// Does it fit ?
-			int curlen = el->state.font->len(cur);
-			if(width<=0 || (*px+curlen)<=width)
-			{
-				// Yes, create a word for it
-				add_words(el, px, py, cur);
-				cur = "";
-			}
-			else
-			{
-				// The whole of cur doesn't fit
-				// It may have to be split
-
-				// Find the farthest split point
-				bool was_cut = false;
-
-				for(int c = cur.len()-1; c>0; c--)
-				{
-					char ch = cur[c];
-
-					//if(!((ch>='a' && ch<='z') || (ch>='A' && ch<='Z') || (ch>='0' && ch<='9') || ch=='_'))
-					if(ch==' ')
-					{
-						Str part = cur.left(c);
-						int len = el->state.font->len(part);
-
-						if((*px+len)<=width)
-						{
-							// It fits
-							// Add this part as a word
-							add_words(el, px, py, part);
-
-							// Set the remains, skipping leading spaces
-							while(c<cur.len() && cur[c]==' ')
-								c++;
-
-							cur = cur.sub(c);
-							was_cut = true;
-							break;
-						}
-					}
-				}
-
-				// If there was no cut, the whole thing is a non-breakable word
-				// Add it as a word, can't be helped
-				if(!was_cut)
-				{
-					add_words(el, px, py, cur);
-					cur = "";
-				}
-			}
-		}
-
-		// Done ?
-		if(!force_nl && !cur.len() && !remain.len())
-			break;
-
-		force_nl = false;
-
-		// We must skip a line at this point
+	// Add a new line ?
+	if(width>0 && (*px) && (*px+el->tex_rect.w)>width)
 		calc_newline(px, py);
 
-		// If there's still something left in cur, start over
-		if(cur.len())
-			continue;
+	// Add a word for the texture
+	TFWord *wd = new TFWord();
+	wd->r = Rect(*px, *py, el->tex_rect.w, el->tex_rect.h);
+	wd->tex = el->tex;
+	wd->tex_rect = el->tex_rect;
+	wd->el = el;
 
-		// Check for manual new lines
-		pos = remain.find('\n');
-		if(pos==-1)
-		{
-			// No more
-			cur = remain;
-			remain = "";
-		}
-		else
-		{
-			// Cut
-			cur = remain.left(pos);
-			remain = remain.sub(pos+1);
-			force_nl = true;
+	// Add a word to the current line
+	_lines[_lines.size()-1]->words.add(wd);
 
-			// Special case: If remain is now empty, force a last newline
-			if(cur.len() && !remain.len())
-				force_last_nl = true;
-		}
-	}
+	// Add it to the element also
+	el->words.add(wd);
 
-	// Forced last new line ?
-	if(force_last_nl)
-		calc_newline(px, py);
+	// Adjust the pen
+	*px += el->tex_rect.w;
 }
 
 void TextFormat::calc_newline(int *px, int *py)
@@ -377,12 +326,115 @@ void TextFormat::calc_newline(int *px, int *py)
 			h = wd->r.h;
 	}
 
+	// Mark the line's height
+	line->h = h;
+
 	// Adjust the pen
 	*px = 0;
 	*py += h;
 
 	// Add a new line
 	_lines.add(new TFLine());
+
+	// Add the initial align point
+	add_align_point(0);
+}
+	
+void TextFormat::add_align_point(int x, TFLine *line)
+{
+	// Get the last line if one is not provided
+	if(!line)
+		line = _lines[_lines.size()-1];
+
+	// Create an align point for the line
+	TFAlignPoint *ap = new TFAlignPoint();
+	ap->i = line->words.size();
+	ap->x = x;
+
+	// Add it
+	line->apoints.add(ap);
+}
+	
+void TextFormat::align_line(class TFLine *line)
+{
+	// Perform alignment between each align point pairs
+	for(int c = 0; c<line->apoints.size()-1; c++)
+	{
+		TFAlignPoint *ap1 = line->apoints[c];
+		TFAlignPoint *ap2 = line->apoints[c+1];
+
+		if(ap1->i==ap2->i)
+			continue;
+
+		// Perform horizontal alignment ?
+		// Get the alignment of the element of the first word
+		TextAlign::Type align = line->words[ap1->i]->el->state.align;
+
+		// Calc the width span between the two align points
+		int apw = ap2->x-ap1->x-1;
+
+		// Calc the width of the words between the align points
+		int x1 = line->words[ap1->i]->r.x;
+		int ww = (line->words[ap2->i-1]->r.x + line->words[ap2->i-1]->r.w) - x1 - 1;
+		int off = apw-ww;
+
+		if(off>0)
+		{
+			if(align==TextAlign::Right || align==TextAlign::Center)
+			{
+				// Align and center are similar, an offset must be added to each word
+				if(align==TextAlign::Center)
+					off /= 2;
+
+				// Adjust each word
+				for(int d = ap1->i; d<ap2->i; d++)
+					line->words[d]->r.x += off;
+			}
+
+			else if(align==TextAlign::Justify && (ap2->i-ap1->i)>1)
+			{
+				// Justify the text, distributing the extra space as evenly as possible between all the words
+				int num = ap2->i-ap1->i-1;
+				float off_per = (float)off / (float)num;
+				float off_tot = 0;
+
+				for(int d = ap1->i+1; d<ap2->i; d++)
+				{
+					if(d==(ap2->i-1))
+						off_tot = off;
+					else
+						off_tot += off_per;
+
+					line->words[d]->r.x += (int)off_tot;
+				}
+			}
+		}
+	}
+
+	// Perform vertical alignments
+	for(int c = 0; c<line->words.size(); c++)
+	{
+		TFWord *wd = line->words[c];
+
+		int off = line->h - wd->r.h;
+
+		switch(wd->el->state.valign)
+		{
+			case VertTextAlign::Top:
+				// Do nothing
+				break;
+
+			case VertTextAlign::Bottom:
+				// Bring to bottom
+				wd->r.y += off;
+				break;
+
+			case VertTextAlign::Middle:
+				// Center vertically
+				wd->r.y += off/2;
+				break;
+		}
+	}
 }
 
 void TextFormat::calc(int width)
@@ -390,8 +442,9 @@ void TextFormat::calc(int width)
 	// Reset any current calculation
 	reset_calc();
 	
-	// Create the first line
+	// Create the first line and its align point
 	_lines.add(new TFLine());
+	add_align_point(0);
 
 	// Calculate the positionning of every element
 	int px = 0;
@@ -400,6 +453,16 @@ void TextFormat::calc(int width)
 	for(int c = 0; c<_elements.size(); c++)
 	{
 		TFElement *el = _elements[c];
+
+		// Some state changes require the insertion of an align point
+		if(c)
+		{
+			TFState& s1 = _elements[c-1]->state;
+			TFState& s2 = el->state;
+
+			if(s1.align!=s2.align)
+				add_align_point(px);
+		}
 
 		switch(el->type)
 		{
@@ -410,11 +473,19 @@ void TextFormat::calc(int width)
 			case ElementType::SetX:
 				// Change px
 				px = el->val;
+
+				// Add an align point
+				add_align_point(px);
+
 				break;
 
 			case ElementType::AddX:
 				// Add a value to px
 				px += el->val;
+				break;
+
+			case ElementType::Texture:
+				calc_texture(el, &px, &py, width);
 				break;
 		}
 
@@ -422,6 +493,43 @@ void TextFormat::calc(int width)
 		if(width>0 && px>=width)
 			calc_newline(&px, &py);
 	}
+
+	// If no width was given, find out the maximum width
+	if(width<=0)
+	{
+		for(int c = 0; c<_lines.size(); c++)
+		{
+			TFLine *line = _lines[c];
+
+			if(line->words.size())
+			{
+				TFWord *wd = line->words[line->words.size()-1];
+
+				if((wd->r.x+wd->r.w)>width)
+					width = wd->r.x+wd->r.w;
+			}
+		}
+	}
+
+	// Add a final align point to each line and align them
+	for(int c = 0; c<_lines.size(); c++)
+	{
+		TFLine *line = _lines[c];
+
+		// Add the final align point
+		add_align_point(width, line);
+
+		// Align the line
+		align_line(line);
+	}
+
+	// If there is no empty line at the end, add one for proper height calculation
+	if(!_lines.size() || _lines[_lines.size()-1]->words.size())
+		calc_newline(&px, &py);
+
+	// Mark the total size
+	_cw = width;
+	_ch = py;
 }
 
 
@@ -439,8 +547,19 @@ void TextFormat::render(Texture *tex)
 		{
 			TFWord *wd = el->words[d];
 	
+			// Background
 			tex->rect_fill(wd->r, el->state.bg_col);
-			tex->print(el->state.font, wd->r.x, wd->r.y, el->state.fg_col, wd->text, true, el->state.blend);
+
+			if(wd->tex)
+			{
+				// Texture word
+				tex->blit(wd->r.x, wd->r.y, wd->tex, wd->tex_rect);
+			}
+			else
+			{
+				// Text word
+				tex->print(el->state.font, wd->r.x, wd->r.y, el->state.fg_col, wd->text, true, el->state.blend);
+			}
 		}
 	}
 }
@@ -455,16 +574,6 @@ Texture *TextFormat::build_tex(int width, int height)
 	render(tex);
 
 	return tex;
-}
-
-int TextFormat::get_width()
-{
-	return 0;
-}
-
-int TextFormat::get_height()
-{
-	return 0;
 }
 
 List<Rect> TextFormat::get_pos(int i)
