@@ -109,34 +109,27 @@ public:
 		return ((a&0xFF)<<24) | ((b&0xFF)<<16) | ((g&0xFF)<<8) | (r&0xFF);
 	}
 
-	static Color mix(const Color& col1, const Color& col2, uint8_t ratio, bool alpha1 = true)
+	static Color mix(const Color& col1, const Color& col2, float ratio = 1.0f)
 	{
-		// Mix col1 and col2 together, using 'ratio'
-		// A ratio of 0 returns col1
-		// A ratio of 255 returns col2 (with proper alpha processing according to alpha1)
-		// A ratio of 127 retuns half of each color
-		// If 'alpha1' is true, the alpha channel of 'col1' is used as-is in the returned color
-		// If it is false, the alpha channel is also mixed
-		if(ratio==0)
-			return col1;
+		// Perform alpha blending
+		float dr = col1.fr();
+		float dg = col1.fg();
+		float db = col1.fb();
+		float da = col1.fa();
 
-		if(ratio==255)
-		{
-			if(alpha1)
-				return Color((((uint32_t)col2)&0xFFFFFF)|(col1.ia()<<24));
-			else
-				return col2;
-		}
+		float sr = col2.fr();
+		float sg = col2.fg();
+		float sb = col2.fb();
+		float sa = ratio*col2.fa();
 
-		uint32_t rr = 255-ratio;
-		uint32_t ri = ratio;
+		float inv_sa = 1.0f - sa;
 
-		uint32_t r = ((col1.ir()*rr) + (col2.ir()*ri)) / 255;
-		uint32_t g = ((col1.ig()*rr) + (col2.ig()*ri)) / 255;
-		uint32_t b = ((col1.ib()*rr) + (col2.ib()*ri)) / 255;
-		uint32_t a = alpha1 ? col1.ia() : ((col1.ia()*rr) + (col2.ia()*ri)) / 255;
+		float ra = sa + da*inv_sa;
+		float rr = (sr*sa + dr*da*inv_sa)/ra;
+		float rg = (sg*sa + dg*da*inv_sa)/ra;
+		float rb = (sb*sa + db*da*inv_sa)/ra;
 
-		return Color(((a&0xFF)<<24) | ((b&0xFF)<<16) | ((g&0xFF)<<8) | (r&0xFF));
+		return Color(rr, rg, rb, ra);
 	}
 };
 

@@ -558,7 +558,7 @@ void TextFormat::render(Texture *tex)
 			else
 			{
 				// Text word
-				tex->print(el->state.font, wd->r.x, wd->r.y, el->state.fg_col, wd->text, true, el->state.blend);
+				tex->print(el->state.font, wd->r.x, wd->r.y, el->state.fg_col, wd->text, true);
 			}
 		}
 	}

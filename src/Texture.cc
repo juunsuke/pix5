@@ -436,7 +436,7 @@ void Texture::line(int x1, int y1, int x2, int y2, float width, const Color& col
 	for(;;)
 	{
 		if(_clip.contains(x1, y1))
-			set_pixel_fast(x1, y1, Color::mix(get_pixel_fast(x1, y1), col, 255-Math::max(0, 255*(abs(err-dx+dy)/ed-width+1))));
+			set_pixel_fast(x1, y1, Color::mix(get_pixel_fast(x1, y1), col, (float)(255-Math::max(0, 255*(abs(err-dx+dy)/ed-width+1)))/255.0f));
 
 		int e2 = err;
 		int x3 = x1;
@@ -449,7 +449,7 @@ void Texture::line(int x1, int y1, int x2, int y2, float width, const Color& col
 				y3 += sy;
 
 				if(_clip.contains(x1, y3))
-					set_pixel_fast(x1, y3, Color::mix(get_pixel_fast(x1, y3), col, 255-Math::max(0, 255*(abs(e2)/ed-width+1))));
+					set_pixel_fast(x1, y3, Color::mix(get_pixel_fast(x1, y3), col, (float)(255-Math::max(0, 255*(abs(e2)/ed-width+1)))/255.0f));
 			}
 
 			if(x1==x2)
@@ -467,7 +467,7 @@ void Texture::line(int x1, int y1, int x2, int y2, float width, const Color& col
 				x3 += sx;
 
 				if(_clip.contains(x3, y1))
-					set_pixel_fast(x3, y1, Color::mix(get_pixel_fast(x3, y1), col, 255-Math::max(0, 255*(abs(e2)/ed-width+1))));
+					set_pixel_fast(x3, y1, Color::mix(get_pixel_fast(x3, y1), col, (float)(255-Math::max(0, 255*(abs(e2)/ed-width+1)))/255.0f));
 			}
 
 			if(y1==y2)
@@ -635,7 +635,7 @@ void Texture::blit_alpha(uint32_t *dptr, uint32_t *sptr, int w, int h, int spitc
 	for(int y = 0; y<h; y++)
 	{
 		for(int x = 0; x<w; x++)
-			dptr[x] = Color::mix(dptr[x], sptr[x], ((sptr[x]&0xFF000000)>>24));
+			dptr[x] = Color::mix(dptr[x], sptr[x]);
 
 		dptr += _w;
 		sptr += spitch;

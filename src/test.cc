@@ -253,6 +253,9 @@ int main(int argc, char **argv)
 			}
 		}
 
+		tex->line(10, 10, 500, 300, 3, Color(0.9f, 0.4f, 0.3f));
+		tex->line(10, 50, 500, 340, 3, Color(0.9f, 0.4f, 0.3f, 0.5f));
+
 
 		while(run)
 		{

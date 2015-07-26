@@ -109,7 +109,6 @@ int64_t get_ms();
 #include "VideoModeType.h"
 #include "VideoMode.h"
 
-#include "BlendMode.h"
 #include "TextAlign.h"
 #include "Color.h"
 #include "Rect.h"

@@ -18,9 +18,6 @@ public:
 	VertTextAlign::Type valign;
 	// Vertical text aligning, within the spacing
 
-	BlendMode::Type blend;
-	// Blend mode
-
 	int vspacing;
 	// Vertical spacing
 
@@ -47,7 +44,6 @@ public:
 		bg_col = o.bg_col;
 		align = o.align;
 		valign = o.valign;
-		blend = o.blend;
 		vspacing = o.vspacing;
 	}
 
@@ -121,22 +117,15 @@ public:
 	inline void set_color(const Color& col = Color(0, 0, 0))				{ _state.fg_col = col; }
 	// Set the foreground color
 
-	inline void set_bg_color(const Color& col = 0, bool auto_blend = true)
+	inline void set_bg_color(const Color& col = 0)
 	{
 		// Set the background color
 		_state.bg_col = col;
-
-		// Auto-set the blend mode if needed
-		if(auto_blend)
-			set_blend((uint32_t)col==0 ? BlendMode::Copy : BlendMode::DestAlpha);
 	}
 
 	inline void set_align(TextAlign::Type align = TextAlign::Left)			{ _state.align = align; }
 	inline void set_valign(VertTextAlign::Type align = VertTextAlign::Top)	{ _state.valign = align; }
 	// Set text alignment
-
-	inline void set_blend(BlendMode::Type blend = BlendMode::Copy)			{ _state.blend = blend; }
-	// Set the blend mode
 
 	inline void set_vspacing(int vspacing = 0)								{ _state.vspacing = vspacing; }
 	// Set vertical spacing
@@ -152,7 +141,6 @@ public:
 		set_bg_color();
 		set_align();
 		set_valign();
-		set_blend();
 		set_vspacing();
 	}
 

@@ -21,7 +21,7 @@ class Font
 	void setup(struct FT_FaceRec_* face, int ptsize);
 	// Setup the font once the face was loaded
 
-	void draw_glyph(class Texture *tex, int dx, int dy, const Color& col, Glyph *g, BlendMode::Type blend);
+	void draw_glyph(class Texture *tex, int dx, int dy, const Color& col, Glyph *g);
 	// Draw a glyphr
 
 public:
@@ -41,7 +41,7 @@ public:
 	// Per freetype convention, if the font doesn't have a glyph for the given
 	// character, the first glyph (index 0) is returned, which is usually a square mark
 
-	int print(class Texture *tex, int x, int y, const Color& col, const Str& text, bool kerning = true, BlendMode::Type blend = BlendMode::DestAlpha);
+	int print(class Texture *tex, int x, int y, const Color& col, const Str& text, bool kerning = true);
 	// Print a string on the given texture
 	// Returns the width, in pixels, used by the string
 

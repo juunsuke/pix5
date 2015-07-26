@@ -10,8 +10,8 @@ public:
 	int width, height;
 	// Glyph raw size, in pixels
 
-	uint8_t *data;
-	// Raw glyph data, width*height bytes in size
+	float *data;
+	// Raw glyph data
 
 
 	//

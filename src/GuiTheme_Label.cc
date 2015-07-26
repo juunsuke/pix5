@@ -170,7 +170,7 @@ void GuiTheme::label_draw_back(Label *lab, Texture *tex)
 
 void GuiTheme::label_draw_text(Label *lab, Texture *tex, int x, int y)
 {
-	tex->print(label.font, x, y, label.fg_col, lab->text(), (uint32_t)label.bg_col==0 ? BlendMode::Copy : BlendMode::DestAlpha);
+	tex->print(label.font, x, y, label.fg_col, lab->text());
 }
 
 void GuiTheme::label_draw_image(Label *lab, Texture *tex, int x, int y)

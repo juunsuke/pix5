@@ -130,11 +130,18 @@ Glyph *Font::get_glyph(int ch)
 	// Copy the raw bitmap data
 	g->width = bmp->width;
 	g->height = bmp->rows;
-	g->data = (uint8_t*)malloc(g->width*g->height);
+	g->data = (float*)malloc(g->width*g->height*sizeof(float));
 
-	// Copy row by row, as we don't use a pitch whereas freetype uses one
+	// Build the glyph data
+	float *dp = g->data;
+
 	for(int y = 0; y<g->height; y++)
-		memcpy(g->data+y*g->width, bmp->buffer+y*bmp->pitch, g->width);
+	{
+		uint8_t *sp = bmp->buffer+y*bmp->pitch;
+
+		for(int x = 0; x<g->width; x++)
+			*(dp++) = (float)sp[x] / 255.0f;
+	}
 		
 	// Fill in the required metrics
 	FT_Glyph_Metrics *met = &_face->glyph->metrics;
@@ -148,7 +155,7 @@ Glyph *Font::get_glyph(int ch)
 	return g;
 }
 	
-void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g, BlendMode::Type blend)
+void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g)
 {
 	// Clip
 	Rect r;
@@ -156,39 +163,21 @@ void Font::draw_glyph(Texture *tex, int dx, int dy, const Color& col, Glyph *g, 
 	if(!Rect::clip(Rect(dx, dy, g->width, g->height), tex->get_clip(), r, &ox, &oy))
 		return;
 
-	uint8_t *ptr = g->data + oy*g->width + ox;
+	float *ptr = g->data + oy*g->width + ox;
 	dx += ox;
 	dy += oy;
 
 	for(int y = 0; y<r.h; y++)
 	{
-		switch(blend)
-		{
-			case BlendMode::Copy:
-				// Raw copy
-				for(int x = 0; x<r.w; x++)
-				{
-					Color col2(col);
-					col2.ia(ptr[x]);
-					tex->set_pixel_fast(dx+x, dy, col2);
-				}
-				break;
-
-			default:
-				// Dest blend
-				for(int x = 0; x<r.w; x++)
-					tex->set_pixel_fast(dx+x, dy, Color::mix(tex->get_pixel_fast(dx+x, dy), col, ptr[x]));
-
-				break;
-		}
-
+		for(int x = 0; x<r.w; x++)
+			tex->set_pixel_fast(dx+x, dy, Color::mix(tex->get_pixel_fast(dx+x, dy), col, ptr[x]));
 	
 		ptr += g->width;
 		dy++;
 	}
 }
 
-int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, bool kerning, BlendMode::Type blend)
+int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, bool kerning)
 {
 	Glyph *last = NULL;
 	int ox = x;
@@ -206,7 +195,7 @@ int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, b
 		}
 
 		if(tex)
-			draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g, blend);
+			draw_glyph(tex, x+g->metrics.x_bearing, y+g->metrics.y_bearing, col, g);
 
 		x += g->metrics.advance;
 

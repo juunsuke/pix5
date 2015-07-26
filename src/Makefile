@@ -16,7 +16,7 @@ CLSS += Lua
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
 HDRS += pix5.h Str.h List.h SortedList.h FIFO.h Error.h errors.h Math.h
-HDRS += VideoModeType.h VideoMode.h Color.h Rect.h BlendMode.h TextAlign.h
+HDRS += VideoModeType.h VideoMode.h Color.h Rect.h TextAlign.h
 HDRS += TileMap.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h Joystick.h JoyAxis.h JoyButton.h JoyHat.h
 HDRS += Mutex.h Condition.h Barrier.h RWLock.h
