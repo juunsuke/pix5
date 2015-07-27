@@ -20,6 +20,11 @@ File *open(const FilePath& fname, FileAccess::Type access = FileAccess::ReadOnly
 // Open the file with the given name using the given access
 // Throws an error if the file can't be opened
 
+size_t read_file(const FilePath& fname, void **buf);
+// Open the file referenced to by 'fname', allocate a buffer large enough to
+// hold the whole file and read it all
+// The buffer's address is set at the address pointed to by 'buf'
+// Returns the file size
 
 
 }

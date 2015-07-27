@@ -57,13 +57,16 @@ Shader *Shader::load(const Str& name, const Str& vs_file, const Str& fs_file)
 	// Load both files
 	char *vs, *fs;
 
-	if(load_file(vs_file, &vs)==-1)
-		E::LoadFile("Error loading vertex shader file: %s", vs_file.ptr());
+	IO::read_file(vs_file, (void**)&vs);
 
-	if(load_file(fs_file, &fs)==-1)
+	try
+	{
+		IO::read_file(fs_file, (void**)&fs);
+	}
+	catch(Error)
 	{
 		free(vs);
-		E::LoadFile("Error loading fragment shader file: %s", fs_file.ptr());
+		throw;
 	}
 
 	try

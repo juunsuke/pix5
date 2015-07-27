@@ -77,6 +77,8 @@ PIXERR( 0x60000001, Lua,				"Lua error" )
 PIXERR( 0x70000001, BadMountPoint,		"Invalid mount point" )
 PIXERR( 0x70000002, BadPath,			"Invalid path" )
 PIXERR( 0x70000003, OpenFile,			"Error opening a file" )
+PIXERR( 0x70000004, ClosedFile,			"The file is closed" )
+PIXERR( 0x70000005, ReadFile,			"Error reading file" )
 
 
 

@@ -7,6 +7,11 @@ protected:
 
 	FileSource();
 
+	virtual void on_close(class File *file) {}
+	// Called by File::close() when a file is being closed
+
+	friend class File;
+
 public:
 
 	virtual ~FileSource();

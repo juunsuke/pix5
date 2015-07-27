@@ -163,6 +163,25 @@ File *open(const FilePath& fname, FileAccess::Type access)
 	return mnt->fs->open_file(fname, access);
 }
 
+size_t read_file(const FilePath& fname, void **buf)
+{
+	File *f = open(fname);
+
+	size_t sz;
+
+	try
+	{
+		sz = f->read_all(buf);
+	}
+	catch(Error)
+	{
+		delete f;
+		throw;
+	}
+
+	delete f;
+	return sz;
+}
 
 
 }}

@@ -24,7 +24,7 @@ HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 HDRS += FilePath.h FileAccess.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
-SRCS += init.cc load_file.cc get_ms.cc
+SRCS += init.cc get_ms.cc
 SRCS += GuiTheme_Label.cc
 SRCS += lua_print.cc
 

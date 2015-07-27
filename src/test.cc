@@ -276,7 +276,13 @@ int main(int argc, char **argv)
 			printf("Error: %s\n", fp.error().ptr());
 
 
-		//IO::open("root:/test.txt", FileAccess::ReadOnly);
+		File *f = IO::open("data/konata.png", FileAccess::ReadOnly);
+		printf("Size: %li\n", f->size());
+		char buf[1000000];
+
+		int rr = f->read(buf, 1000000);
+		printf("Read: %i bytes\n", rr);
+		delete f;
 
 		while(run)
 		{

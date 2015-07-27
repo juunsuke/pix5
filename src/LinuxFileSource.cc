@@ -69,7 +69,11 @@ File *LinuxFileSource::open_file(const FilePath& fname, FileAccess::Type access)
 		// Failure to open the file
 		E::OpenFile("Error opening '%s': %s", fn.ptr(), strerror(errno));
 
-	return NULL;
+	// Success
+	// Create a CFile for it
+	CFile *cf = new CFile(this, access, f);
+
+	return cf;
 }
 
 
