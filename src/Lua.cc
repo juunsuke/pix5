@@ -40,6 +40,22 @@ void Lua::load(const Str& fname, bool run)
 		E::Lua("%s", get_error().ptr());
 }
 
+bool Lua::pcall(int narg, int nres)
+{
+	return lua_pcall(_lua, narg, nres, 0)==0;
+}
+
+LuaData *Lua::get_data(const Str& name)
+{
+	// Get the global variable
+	get_global(name);
+	
+	// Build a LuaData out of it
+	LuaData *ld = new LuaData(this, get_top());
+	pop();
+
+	return ld;
+}
 
 
 }

@@ -155,6 +155,7 @@ int64_t get_ms();
 #include "TileMap.h"
 
 #include "Lua.h"
+#include "LuaData.h"
 
 #include "EventHandler.h"
 

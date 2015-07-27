@@ -112,8 +112,6 @@ int main(int argc, char **argv)
 	{
 		pix_init("Test");
 
-		lua.load("test.lua");
-
 		Display::set_mode(VideoMode::resizable(
 			1366, 768, false
 		));
@@ -238,11 +236,9 @@ int main(int argc, char **argv)
 		tf.set_align(TextAlign::Right);
 		tf.add_text("Oink");
 
-		TextFormat tf2;
-		tf2.set_valign(VertTextAlign::Middle);
-		tf2.add_text("Proute");
+		TextFormat tf2 = tf;
 
-		tf2.calc();
+		tf2.calc(tex->width());
 		tex->rect(Rect(0, 0, tf2.get_width(), tf2.get_height()), Color(1, 1, 0));
 		tf2.render(tex);
 
@@ -260,29 +256,21 @@ int main(int argc, char **argv)
 		tex->line(10, 10, 500, 300, 3, Color(0.9f, 0.4f, 0.3f));
 		tex->line(10, 50, 500, 340, 3, Color(0.9f, 0.4f, 0.3f, 0.5f));
 
+		printf("\n\n");
 
-		FilePath fp("data/test.png");
-		if(fp.valid())
-		{
-			printf("Full: '%s'\n", fp.full().ptr());
-			printf("  MP: '%s'\n", fp.mount_point().ptr());
-			printf("Path: '%s'\n", fp.path().ptr());
-			printf(" Dir: '%s'\n", fp.dir().ptr());
-			printf("File: '%s'\n", fp.file().ptr());
-			printf("Base: '%s'\n", fp.file_base().ptr());
-			printf(" Ext: '%s'\n", fp.ext().ptr());
-		}
-		else
-			printf("Error: %s\n", fp.error().ptr());
+		lua.load("test.lua");
+		LuaData *ld = lua.get_data("z");
+		printf("%s\n", ld->str_type().ptr());
 
+		printf("  Num: %f\n", ld->get_number());
+		printf("  int: %i\n", ld->get_int());
+		printf(" bool: %s\n", ld->get_bool() ? "true" : "false");
+		printf("  Str: '%s'\n", ld->get_str().ptr());
 
-		File *f = IO::open("data/konata.png", FileAccess::ReadOnly);
-		printf("Size: %li\n", f->size());
-		char buf[1000000];
+		ld->get_func();
+		lua.pcall(0, 0);
 
-		int rr = f->read(buf, 1000000);
-		printf("Read: %i bytes\n", rr);
-		delete f;
+		printf("\n\n");
 
 		while(run)
 		{

@@ -13,7 +13,7 @@ CLSS += GUI GuiTheme GuiElement Label Button
 CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
 CLSS += IO FileSource LinuxFileSource File CFile
-CLSS += Lua
+CLSS += Lua LuaData
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
 HDRS += pix5.h Str.h List.h SortedList.h FIFO.h Error.h errors.h Math.h
