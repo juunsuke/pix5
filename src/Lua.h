@@ -15,8 +15,10 @@ public:
 	// Load a LUA source file and leave a function pointer on the stack
 	// If 'run' is true, automatically call it
 
+	inline lua_State *state()							{ return _lua; }
 
 	inline void push_value(int i)						{ lua_pushvalue(_lua, i); }
+	inline void push_nil()								{ lua_pushnil(_lua); }
 
 	inline double to_number(int i = -1)					{ return lua_tonumber(_lua, i); }
 	inline bool to_bool(int i = -1)						{ return lua_toboolean(_lua, i) ? true : false; }
@@ -30,6 +32,7 @@ public:
 	inline int type(int i = -1)							{ return lua_type(_lua, i); }
 	inline void rawgeti(int t, int r)					{ lua_rawgeti(_lua, t, r); }
 	inline void rawseti(int t, int r)					{ lua_rawseti(_lua, t, r); }
+	inline int next(int t)								{ return lua_next(_lua, t); }
 
 	inline int ref(int t)								{ return luaL_ref(_lua, t); }
 	inline void unref(int t, int r)						{ luaL_unref(_lua, t, r); }

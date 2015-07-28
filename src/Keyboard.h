@@ -59,7 +59,7 @@ public:
 	inline bool alt()	{ return keys[KEY_LALT].down   || keys[KEY_RALT].down; }
 	inline bool gui()	{ return keys[KEY_LGUI].down   || keys[KEY_RGUI].down; }
 
-	inline int mods()
+	int mods()
 	{
 		int mod = 0;
 

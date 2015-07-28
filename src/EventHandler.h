@@ -6,7 +6,7 @@ class EventHandler
 public:
 
 	EventHandler();
-	~EventHandler();
+	virtual ~EventHandler();
 
 
 	void process_events();

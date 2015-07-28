@@ -23,6 +23,9 @@ class LuaData
 	Lua *_lua;
 	// The lua state
 
+	LuaData *_master;
+	// Master LuaData, for nested tables
+
 	LuaType::Type _type;
 	// Data type
 
@@ -37,9 +40,21 @@ class LuaData
 	int _func;
 	// For functions, is a reference in the registry
 
+	int _int_key;
+	Str _str_key;
+	bool _is_str_key;
+	// Integer/string key, when is an entry of a higher level table
+
+	List<LuaData*> _subs;
+	// Sub-data elements, for tables
+
+
+	void extract_table(int i);
+	// Extract a table
+
 public:
 
-	LuaData(Lua *lua, int i);
+	LuaData(Lua *lua, int i, LuaData *master);
 	~LuaData();
 
 	inline LuaType::Type type() { return _type; }
@@ -69,6 +84,13 @@ public:
 	void get_func();
 	// Push the function on top of the stack
 	// Will throw an error if not a function
+
+	#ifdef DBG
+	void log(int spacing = 0);
+	// Print out on the debug log the table data type and value
+	// Will recursively print tables
+	#endif
 };
+
 
 

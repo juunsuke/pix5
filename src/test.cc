@@ -260,15 +260,8 @@ int main(int argc, char **argv)
 
 		lua.load("test.lua");
 		LuaData *ld = lua.get_data("z");
-		printf("%s\n", ld->str_type().ptr());
+		ld->log();
 
-		printf("  Num: %f\n", ld->get_number());
-		printf("  int: %i\n", ld->get_int());
-		printf(" bool: %s\n", ld->get_bool() ? "true" : "false");
-		printf("  Str: '%s'\n", ld->get_str().ptr());
-
-		ld->get_func();
-		lua.pcall(0, 0);
 
 		printf("\n\n");
 

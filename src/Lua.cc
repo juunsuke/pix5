@@ -51,8 +51,10 @@ LuaData *Lua::get_data(const Str& name)
 	get_global(name);
 	
 	// Build a LuaData out of it
-	LuaData *ld = new LuaData(this, get_top());
+	LuaData *ld = new LuaData(this, get_top(), NULL);
 	pop();
+
+	ASSERT(get_top()==0, "Lua::get_data(): Stack inconsistency")
 
 	return ld;
 }
