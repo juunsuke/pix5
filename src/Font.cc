@@ -182,9 +182,18 @@ int Font::print(Texture *tex, int x, int y, const Color& col, const Str& text, b
 	Glyph *last = NULL;
 	int ox = x;
 
-	for(int c = 0; c<text.len(); c++)
+	int pos = 0;
+	for(;;)
 	{
-		Glyph *g = get_glyph(text[c]);
+		// Get an UTF8 character
+		int l;
+		uint32_t ch = text.get_utf8_char(pos, l);
+		if(!ch)
+			break;
+
+		pos += l;
+
+		Glyph *g = get_glyph(ch);
 
 		// Apply kerning
 		if(kerning && FT_HAS_KERNING(_face) && last)

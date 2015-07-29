@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 
 		tf.set_align(TextAlign::Justify);
 		int z[6] = { -1, -1, -1, -1, -1, -1};
-		z[0] = tf.add_text("In the English language, nigger is an ");
+		z[0] = tf.add_text("Résolu - In the English language, nigger is an ");
 		
 		tf.set_color(Color(0, 1, 0));
 		tf.set_font(Cache::font(data_LiberationSans_Regular_ttf, data_LiberationSans_Regular_ttf_len, 18));

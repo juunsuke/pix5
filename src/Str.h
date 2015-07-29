@@ -363,5 +363,85 @@ public:
 		va_start(vl, fmt);
 		return buildv(fmt, vl);
 	}
+
+
+	//
+	// Conversions
+	//
+
+	uint32_t get_utf8_char(int pos, int &len) const
+	{
+		// Check if the next character is 1, 2, 3 or 4 bytes
+		if(pos<0 || pos>=_len)
+			return 0;
+
+		char *src = _buf+pos;
+
+		if(((*src)&0xF8) == 0xF0)
+		{
+			// 4 bytes
+			// Validate the 2nd, 3rd and 4th bytes
+			if((src[1]&0xC0) != 0x80)
+				return 0;
+			if((src[2]&0xC0) != 0x80)
+				return 0;
+			if((src[3]&0xC0) != 0x80)
+				return 0;
+
+			int b1 = (*src) & 0x07;
+			int b2 = src[1] & 0x3F;
+			int b3 = src[2] & 0x3F;
+			int b4 = src[3] & 0x3F;
+
+			len = 4;
+
+			return (b1<<18) | (b2<<12) | (b3<<6) | b4;
+		}
+
+		if(((*src)&0xF0) == 0xE0)
+		{
+			// 3 bytes
+			// Validate the 2nd abd 3rd byte
+			if((src[1]&0xC0) != 0x80)
+				return 0;
+			if((src[2]&0xC0) != 0x80)
+				return 0;
+
+			int b1 = (*src) & 0x0F;
+			int b2 = src[1] & 0x3F;
+			int b3 = src[2] & 0x3F;
+
+			len = 3;
+
+			return (b1<<12) | (b2<<6) | b3;
+		}
+
+		if(((*src)&0xE0) == 0xC0)
+		{
+			// 2 bytes
+			// Validate the 2nd byte
+			if((src[1]&0xC0) != 0x80)
+				return 0;
+
+			int b1 = (*src) & 0x1F;
+			int b2 = src[1] & 0x3F;
+
+			len = 2;
+
+			return (b1<<6) | b2;
+		}
+
+		if(((*src)&0x80) == 0)
+		{
+			// 1 byte
+			len = 1;
+
+			return *src;
+		}
+
+		// Error
+		return 0;
+	}
+
 };
 
