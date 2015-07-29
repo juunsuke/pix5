@@ -366,7 +366,7 @@ public:
 
 
 	//
-	// Conversions
+	// UTF8
 	//
 
 	uint32_t get_utf8_char(int pos, int &len) const
@@ -441,6 +441,38 @@ public:
 
 		// Error
 		return 0;
+	}
+
+	int get_utf8_len() const
+	{
+		// Return the number of characters in an UTF8 string
+		int tot = 0;
+		int pos = 0;
+		int len;
+		while(get_utf8_char(pos, len))
+		{
+			tot++;
+			pos += len;
+		}
+
+		return tot;
+	}
+
+	int get_utf8_start(int i) const
+	{
+		// Return the starting offset of the i'th unicode character
+		// Returns -1 if 'i' is an invalid index
+		int pos = 0;
+		for(int c = 0; c<i; c++)
+		{
+			int len;
+			if(!get_utf8_char(pos, len))
+				return -1;
+
+			pos += len;
+		}
+
+		return pos;
 	}
 
 };

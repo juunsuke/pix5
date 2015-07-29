@@ -265,6 +265,9 @@ int main(int argc, char **argv)
 
 		printf("\n\n");
 
+		Str str = "Résolu";
+		printf("%i   %i    %i\n", str.len(), str.get_utf8_len(), str.get_utf8_start(2));
+
 		while(run)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
