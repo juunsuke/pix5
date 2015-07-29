@@ -30,6 +30,9 @@ public:
 	VertexBuffer *_vb;
 	// The array's VB, if any
 
+	bool _enabled;
+	// Wether the layer is enabled
+
 	union
 	{
 		struct

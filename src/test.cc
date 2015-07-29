@@ -173,6 +173,15 @@ int main(int argc, char **argv)
 			ms->set_origin(16, 55-16);
 		}
 
+		tm->add_layer_int32(3);
+		tm->enable_layer(2);
+		tm->enable_layer(1,false);
+
+		for(int y = 0; y<tm->height(); y++)
+			for(int x = 0; x<tm->width(); x++)
+				tm->set_int32(2, x, y, rand()%1000);
+
+
 		SpriteSet ss;
 		Sprite *s = ss.new_sprite(a, 0, 700, 400);
 

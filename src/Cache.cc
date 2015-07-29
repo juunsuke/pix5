@@ -21,6 +21,11 @@ public:
 	{
 		delete tex;
 	}
+
+	int comp(CachedTexture *o)
+	{
+		return name.comp(o->name);
+	}
 };
 
 class CachedFont
@@ -46,7 +51,7 @@ public:
 
 
 
-static List<CachedTexture*> _tex;
+static SortedList<CachedTexture*> _tex;
 static List<CachedFont*> _fnt;
 // All the cached items
 
@@ -70,12 +75,21 @@ void flush()
 }
 
 
-Texture *texture(const Str& fname)
+static int find_tex_index(const Str& name)
+{
+	CachedTexture ct(name, NULL);
+	return _tex.find(&ct);
+}
+
+Texture *texture(const Str& fname, bool try_load)
 {
 	// Check if its already loaded
-	for(int c = 0; c<_tex.size(); c++)
-		if(_tex[c]->name==fname)
-			return _tex[c]->tex;
+	int i = find_tex_index(fname);
+	if(i>=0)
+		return _tex[i]->tex;
+
+	if(!try_load)
+		return NULL;
 
 	// Load it
 	Texture *tex = Texture::load(fname);
@@ -85,6 +99,24 @@ Texture *texture(const Str& fname)
 
 	return tex;
 }
+
+void texture(const Str& name, Texture *tex)
+{
+	// Make sure it doesn't exist
+	if(has_texture(name))
+		E::DoubleCache("Cache::texture(): Manually added texture '%s' already exists", name.ptr());
+
+	// Add it
+	_tex.add(new CachedTexture(name, tex));
+}
+
+bool has_texture(const Str& name)
+{
+	// Check if we have this texture
+	return find_tex_index(name)>=0;
+}
+
+
 
 Font *font(const Str& fname, int ptsize)
 {

@@ -33,6 +33,7 @@ class TMBase
 
 	void draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by);
 	void draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int dx, int dy);
+	void draw_int32_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by);
 
 	int get_vt_cur(uint32_t vti);
 	// Get the current VT sub-tile index for the given VT index based on time
@@ -43,6 +44,9 @@ class TMBase
 
 	void get_ipos(MapSprite *ms, int *ix, int *iy);
 	// Calc the map position for the sprite
+
+	void create_vb(TMLayer *lay);
+	// Create the VB for a layer
 
 	friend class MapSprite;
 
@@ -105,6 +109,12 @@ public:
 	// Set the draw position of the map, in map-wise pixels
 	// The pixel represented by (x,y) will be located on the top-left of the destination rectangle
 
+	void enable_layer(int layer, bool enable = true);
+	inline void disable_layer(int layer) { enable_layer(layer, false); }
+	// Enable/disable a layer
+	// Disabled layers will not be drawn when draw() is called
+
+	void draw(int first, int last);
 	void draw();
 	// Draw the tiled map
 	// This will leave any shader, VB/VA, and texture undbound

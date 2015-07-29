@@ -23,6 +23,7 @@ PIXERR( 0x00000003, SDL,				"SDL error" )
 PIXERR( 0x00000004, OutOfBounds,		"Value out of bounds" )
 PIXERR( 0x00000006, LoadFile,			"Error opening/reading a file" )
 PIXERR( 0x00000007, EmptyFIFO,			"FIFO list is empty" )
+PIXERR( 0x00000008, DoubleCache,		"Double cache entry" )
 
 
 // Graphics errors
@@ -60,6 +61,7 @@ PIXERR( 0x30000003, NoChild,			"The child element was not found" )
 PIXERR( 0x40000001, BadTileCoord,		"Invalid tile coordinates" )
 PIXERR( 0x40000002, BadLayerType,		"Invalid layer type" )
 PIXERR( 0x40000003, BadTileIndex,		"Invalid tile index" )
+PIXERR( 0x40000004, BadLayerIndex,		"Invalid layer index" )
 
 
 // Input errors

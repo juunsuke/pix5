@@ -93,6 +93,17 @@ TMLayer *TMBase::add_layer(LayerType::Type type)
 
 	return lay;
 }
+	
+void TMBase::create_vb(TMLayer *lay)
+{
+	// Create the vertex array
+	VertexDef vd;
+	vd.add(VertexComp::float2("pos", 0));
+	vd.add(VertexComp::ubyte4("col", true, 8));
+	vd.add(VertexComp::float2("texcoord", 12));
+
+	lay->_vb = new VertexBuffer(vd, sizeof(TileVertex), VertexBufferUsage::Stream);
+}
 
 int TMBase::add_layer_tiles(Texture *ts)
 {
@@ -102,6 +113,7 @@ int TMBase::add_layer_tiles(Texture *ts)
 
 	// Add a tiles layer
 	TMLayer *lay = add_layer(LayerType::Tiles);
+	lay->_enabled = true;
 
 	// Setup the tiles array
 	lay->_tiles = calloc(_mw*_mh, _tsz);
@@ -129,13 +141,8 @@ int TMBase::add_layer_tiles(Texture *ts)
 	lay->_uf = 1.0f / (float)lay->_tx;
 	lay->_vf = 1.0f / (float)lay->_ty;
 
-	// Create the vertex array
-	VertexDef vd;
-	vd.add(VertexComp::float2("pos", 0));
-	vd.add(VertexComp::ubyte4("col", true, 8));
-	vd.add(VertexComp::float2("texcoord", 12));
-
-	lay->_vb = new VertexBuffer(vd, sizeof(TileVertex), VertexBufferUsage::Stream);
+	// Create the vertex buffer
+	create_vb(lay);
 
 	#ifdef DBG
 	Log::debug("Added tiles layer, tileset is %ix%i and holds %i tiles of %ix%i pixels", lay->_tx, lay->_ty, lay->_tx*lay->_ty, _tw, _th);
@@ -148,17 +155,13 @@ int TMBase::add_layer_sprites()
 {
 	// Add a sprites layer
 	TMLayer *lay = add_layer(LayerType::Sprites);
+	lay->_enabled = true;
 
 	lay->_sprites = (MapSprite**)calloc(_mw*_mh, sizeof(MapSprite*));
 	lay->_num_sprite = 0;
 
-	// Create the vertex array
-	VertexDef vd;
-	vd.add(VertexComp::float2("pos", 0));
-	vd.add(VertexComp::ubyte4("col", true, 8));
-	vd.add(VertexComp::float2("texcoord", 12));
-
-	lay->_vb = new VertexBuffer(vd, sizeof(TileVertex), VertexBufferUsage::Stream);
+	// Create the vertex buffer
+	create_vb(lay);
 
 	return lay->_index;
 }
@@ -176,6 +179,9 @@ int TMBase::add_layer_int32(int32_t def)
 	int32_t *ptr = lay->_i32;
 	for(int c = 0; c<sz; c++)
 		*(ptr++) = def;
+
+	// Create the VB, in case it is needed
+	create_vb(lay);
 
 	return lay->_index;
 }
@@ -261,6 +267,14 @@ void TMBase::set_pos(int x, int y)
 {
 	_x = x;
 	_y = y;
+}
+	
+void TMBase::enable_layer(int layer, bool enable)
+{
+	if(layer<0 || layer>=_layers.size())
+		E::BadLayerIndex("TMBase::enable_layer(): Invalid layer");
+
+	_layers[layer]->_enabled = enable;
 }
 
 void TMBase::draw_tile_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by)
@@ -501,9 +515,120 @@ void TMBase::draw_sprite_layer(TMLayer *lay, int x1, int y1, int w, int h, int d
 		}
 	}
 }
+	
+void TMBase::draw_int32_layer(TMLayer *lay, int x1, int y1, int w, int h, int bx, int by)
+{
+	// Prepare the matrix
+	Matrix mat = Matrix::identity();
+	mat._14 = bx;
+	mat._24 = by;
+	_shad->set_uniform("mat", mat);
+
+	// Build the vertices
+	TileVertex *v = (TileVertex*)lay->_vb->lock(0, w*h*4);
+
+	int dy = 0;
+
+	for(int y = 0; y<h; y++)
+	{
+		int dx = 0;
+
+		for(int x = 0; x<w; x++)
+		{
+			// Fill in the 4 vertices
+			v->x = dx;
+			v->y = dy;
+			v->col = 0xFFFFFFFF;
+			v->u = 0;
+			v->v = 0;
+			v++;
+
+			v->x = dx+_tw;
+			v->y = dy;
+			v->col = 0xFFFFFFFF;
+			v->u = 1;
+			v->v = 0;
+			v++;
+
+			v->x = dx+_tw;
+			v->y = dy+_th;
+			v->col = 0xFFFFFFFF;
+			v->u = 1;
+			v->v = 1;
+			v++;
+
+			v->x = dx;
+			v->y = dy+_th;
+			v->col = 0xFFFFFFFF;
+			v->u = 0;
+			v->v = 1;
+			v++;
+
+			dx += _tw;
+		}
+
+		dy += _th;
+	}
+		
+	// Draw the tiles
+	lay->_vb->bind();
+	lay->_vb->set_attribs(_shad);
+
+	int pos = 0;
+
+	Font *font = Cache::font(data_LiberationSans_Regular_ttf, data_LiberationSans_Regular_ttf_len, 8);
+	int sh = font->height();
+
+	for(int y = 0; y<h; y++)
+		for(int x = 0; x<w; x++)
+		{
+			// Get the texture for that number
+			Str s = Str::build("%i", get_int32(lay->_index, x1+x, y1+y));
+			Texture *tex;
+
+			tex = Cache::texture(s, false);
+			if(!tex)
+			{
+				// Doesn't exist
+				// Build it
+				tex = Texture::create(_tw, _th);
+
+				int sw = font->len(s);
+
+				int tx = (_tw-sw)/2;
+				int ty = (_th-sh)/2;
+
+				tex->rect_fill(Rect(tx-1, ty-1, sw+2, sh+2), Color(0, 0, 0));
+				tex->print(font, tx, ty, Color(1, 1, 1, 1), s);
+
+				// Cache it
+				Cache::texture(s, tex);
+			}
+
+			// Render the tile
+			tex->bind(0);
+
+			Display::draw(pos, 4);
+			pos += 4;
+		}
+}
 
 void TMBase::draw()
 {
+	if(_layers.size()==0)
+		return;
+
+	draw(0, _layers.size()-1);
+}
+
+void TMBase::draw(int first, int last)
+{
+	// Validate first/last
+	if(first<0 || first>=_layers.size())
+		E::BadLayerIndex("TMBase::draw(): Invalid first layer index");
+	if(last<0 || last>=_layers.size())
+		E::BadLayerIndex("TMBase::draw(): Invalid last layer index");
+
 	// Calc the draw range
 	int dx = _rect.x;
 	int dy = _rect.y;
@@ -562,6 +687,8 @@ void TMBase::draw()
 	for(int c = 0; c<_layers.size(); c++)
 	{
 		TMLayer *lay = _layers[c];
+		if(!lay->_enabled)
+			continue;
 
 		switch(lay->_type)
 		{
@@ -573,6 +700,11 @@ void TMBase::draw()
 			case LayerType::Sprites:
 				// Sprites layer
 				draw_sprite_layer(lay, sx1, sy1, sw, sh, _rect.x, _rect.y);
+				break;
+
+			case LayerType::Int32:
+				// Int32 layer
+				draw_int32_layer(lay, x1, y1, x2-x1+1, y2-y1+1, dx-(_x%_tw), dy-(_y%_th));
 				break;
 
 			default:

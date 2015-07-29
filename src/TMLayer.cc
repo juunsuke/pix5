@@ -12,6 +12,7 @@ TMLayer::TMLayer(LayerType::Type type, int w, int h)
 	_w = w;
 	_h = h;
 	_vb = NULL;
+	_enabled = false;
 
 	// Clear the union
 	_tiles = NULL;

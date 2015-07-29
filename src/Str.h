@@ -165,7 +165,7 @@ public:
 	// Comparisons
 	//
 
-	inline bool comp(const Str& o) const			{ return strcmp(_buf, o._buf); }
+	inline int comp(const Str& o) const				{ return strcmp(_buf, o._buf); }
 	inline bool operator==(const Str& o) const		{ return comp(o)==0; }
 	inline bool operator!=(const Str& o) const		{ return comp(o)!=0; }
 	inline bool operator< (const Str& o) const		{ return comp(o)< 0; }
@@ -173,7 +173,7 @@ public:
 	inline bool operator> (const Str& o) const		{ return comp(o)> 0; }
 	inline bool operator>=(const Str& o) const		{ return comp(o)>=0; }
 
-	inline bool comp(const char *o) const			{ return strcmp(_buf, o); }
+	inline int comp(const char *o) const			{ return strcmp(_buf, o); }
 	inline bool operator==(const char *o) const		{ return comp(o)==0; }
 	inline bool operator!=(const char *o) const		{ return comp(o)!=0; }
 	inline bool operator< (const char *o) const		{ return comp(o)< 0; }
