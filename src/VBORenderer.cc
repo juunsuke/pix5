@@ -126,7 +126,6 @@ void VBORenderer::on_prepare()
 void VBORenderer::on_finish()
 {
 	// Deactivate everything
-	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
