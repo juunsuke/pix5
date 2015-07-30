@@ -5,11 +5,12 @@ DBG = 1
 ########################################################################################################################
 
 CLSS  = Error EventHandler Log Cache
-CLSS += Display Texture Shader VertexBuffer Renderer ImmRenderer VBORenderer ShaderRenderer
+CLSS += Display Texture Renderer ImmRenderer VBORenderer ShaderRenderer
 CLSS += Glyph Font TextFormat
 CLSS += Audio SoundClip
 CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
+CLSS += Lua LuaAPI
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
 HDRS += pix5.h Str.h List.h SortedList.h FIFO.h Error.h errors.h Math.h
@@ -19,10 +20,11 @@ HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc get_ms.cc
+SRCS += la_print.cc
 
 DATA = vs.glsl fs.glsl LiberationSans-Regular.ttf
 
-PKGS = sdl2 SDL2_image gl glew freetype2 vorbisfile
+PKGS = sdl2 SDL2_image gl glew freetype2 vorbisfile luajit
 
 ########################################################################################################################
 

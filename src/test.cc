@@ -60,31 +60,15 @@ int main(int argc, char **argv)
 			1366, 768, false
 		));
 
-
-		Texture *tex = Cache::texture("data/konata.png")->sub(0, 0, 32, 32);
-
+		Lua lua;
+		lua.load_file("test.lua");
 
 		MyEventHandler eh;
-
-		float a = 0;
 
 		while(run)
 		{
 			Display::clear(Color(0.2f, 0.3f, 0.9f));
 
-			tex->draw(100, 10);
-
-			for(int c = 0; c<16000; c++)
-				tex->draw(rand()%1000, rand()%1000);
-		
-			tex->draw(Input::get_mouse().x, Input::get_mouse().y, tex->width()/2, tex->height()/2, a, 1, 1);
-			tex->draw(Input::get_mouse().x+100, Input::get_mouse().y+100, Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1), Color(1, 1, 1));
-
-
-			a += 1.0f;
-
-
-			Display::render();
 
 			Display::swap();
 

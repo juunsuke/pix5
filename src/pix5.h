@@ -118,10 +118,6 @@ int load_file(const Str& fname, char **buf);
 #include "TextAlign.h"
 #include "TextFormat.h"
 
-#include "Shader.h"
-
-#include "VertexBuffer.h"
-
 #include "RenderElement.h"
 #include "Renderer.h"
 #include "ImmRenderer.h"
@@ -133,6 +129,9 @@ int load_file(const Str& fname, char **buf);
 #include "Audio.h"
 
 #include "Cache.h"
+
+#include "LuaAPI.h"
+#include "Lua.h"
 
 #include "EventHandler.h"
 
