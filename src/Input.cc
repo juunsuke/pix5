@@ -278,8 +278,6 @@ static void handle_mouse_up(EventHandler *eh, const SDL_MouseButtonEvent& ev)
 
 static void handle_mouse_wheel(EventHandler *eh, const SDL_MouseWheelEvent& ev)
 {
-	printf("Wheel: %i\n", ev.y);
-
 	// Mouse wheel action
 	if(ev.y==1)
 	{
