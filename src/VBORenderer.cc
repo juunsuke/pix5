@@ -35,6 +35,9 @@ void VBORenderer::on_init()
 
 	// Create both VBOs
 	glGenBuffers(2, _vbo);
+	
+	// Enable textures
+	glEnable(GL_TEXTURE_2D);
 }
 
 void VBORenderer::on_done()
@@ -58,8 +61,6 @@ void VBORenderer::on_prepare()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
-
-	glEnable(GL_TEXTURE_2D);
 
 	// Should the buffer be enlarged ?
 	if(_elements.size()>_size[_cur_vbo])
