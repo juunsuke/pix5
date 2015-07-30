@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 		));
 
 
-		Texture *tex = Cache::texture("data/konata.png")->sub(0, 0, 16, 16);
+		Texture *tex = Cache::texture("data/konata.png")->sub(0, 0, 32, 32);
 
 
 		MyEventHandler eh;

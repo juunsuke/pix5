@@ -49,7 +49,7 @@ endif
 all: $(LIB_OUT)
 
 clean:
-	@rm -f $(LIB_DBG) $(LIB_RLS) $(OBJS) test.o test data.h data.cc $(DATA_H) $(DATA_CC)
+	@rm -f $(LIB_DBG) $(LIB_RLS) $(OBJS) test.o test data.h data.cc data.o $(DATA_H) $(DATA_CC)
 
 run: test
 	./test
