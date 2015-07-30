@@ -1,7 +1,7 @@
 #pragma once
 
 
-class DirectRenderer: public Renderer
+class ImmRenderer: public Renderer
 {
 	void on_init();
 	void on_done();
@@ -9,8 +9,8 @@ class DirectRenderer: public Renderer
 
 public:
 
-	DirectRenderer();
-	~DirectRenderer();
+	ImmRenderer();
+	~ImmRenderer();
 
 };
 

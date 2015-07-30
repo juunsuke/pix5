@@ -5,8 +5,8 @@ namespace RendererType
 {
 	enum Type
 	{
-		Direct,
-		VB,
+		Immediate,
+		VBO,
 		Shader
 	};
 }

@@ -5,24 +5,24 @@
 namespace PIX {
 
 
-DirectRenderer::DirectRenderer()
+ImmRenderer::ImmRenderer()
 {
 }
 
-DirectRenderer::~DirectRenderer()
+ImmRenderer::~ImmRenderer()
 {
 }
 
-void DirectRenderer::on_init()
+void ImmRenderer::on_init()
 {
 	glEnable(GL_TEXTURE_2D);
 }
 
-void DirectRenderer::on_done()
+void ImmRenderer::on_done()
 {
 }
 
-void DirectRenderer::on_render(int start, int num)
+void ImmRenderer::on_render(int start, int num)
 {
 	// Start rendering directly
 	glBegin(GL_QUADS);

@@ -103,6 +103,60 @@ void unset_mode()
 	_cur_mode.clear();
 }
 
+static void set_renderer(RendererType::Type type)
+{
+	_cur_mode.renderer = type;
+
+	if(_cur_mode.renderer==RendererType::Shader)
+	{
+		// Create an shader renderer
+		try
+		{
+			Log::log("Using the OpenGL Shader renderer");
+			E::Renderer("Not done yet");
+			//_renderer = new VBORenderer();
+			//_renderer->init();
+
+			return;
+		}
+		catch(Error)
+		{
+			Log::log("Failure to create the Shader renderer, falling back to a lower renderer");
+			_cur_mode.renderer = RendererType::VBO;
+		}
+	}
+
+	if(_cur_mode.renderer==RendererType::VBO)
+	{
+		// Create an VBO renderer
+		try
+		{
+			Log::log("Using the OpenGL VBO renderer");
+			_renderer = new VBORenderer();
+			_renderer->init();
+
+			return;
+		}
+		catch(Error)
+		{
+			Log::log("Failure to create the VBO renderer, falling back to a lower renderer");
+			_cur_mode.renderer = RendererType::Immediate;
+		}
+	}
+
+	if(_cur_mode.renderer==RendererType::Immediate)
+	{
+		// Create an immediate mode renderer
+		Log::log("Using the OpenGL Immediate Mode renderer");
+		_renderer = new ImmRenderer();
+		_renderer->init();
+
+		return;
+	}
+
+	ASSERT(0, "Huh?")
+}
+
 void set_mode(const VideoMode& vm)
 {
 	// Unset the current mode if any
@@ -192,18 +246,7 @@ void set_mode(const VideoMode& vm)
 		Input::reset();
 
 		// Create the renderer
-		switch(_cur_mode.renderer)
-		{
-			case RendererType::Direct:
-			case RendererType::VB:
-			case RendererType::Shader:
-				// Create a direct renderer
-				_renderer = new DirectRenderer();
-				_renderer->init();
-
-				_cur_mode.renderer = RendererType::Shader;
-				break;
-		}
+		set_renderer(_cur_mode.renderer);
 	}
 	catch(Error)
 	{

@@ -118,7 +118,8 @@ int64_t get_ms();
 
 #include "RenderElement.h"
 #include "Renderer.h"
-#include "DirectRenderer.h"
+#include "ImmRenderer.h"
+#include "VBORenderer.h"
 #include "Display.h"
 
 #include "SoundClip.h"

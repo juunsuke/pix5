@@ -5,7 +5,7 @@ DBG = 1
 ########################################################################################################################
 
 CLSS  = Error EventHandler Log Cache
-CLSS += Display Texture Shader VertexBuffer Renderer DirectRenderer
+CLSS += Display Texture Shader VertexBuffer Renderer ImmRenderer VBORenderer
 CLSS += Glyph Font TextFormat
 CLSS += Audio SoundClip
 CLSS += Input Action
