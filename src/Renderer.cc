@@ -98,6 +98,7 @@ void Renderer::render()
 	clear();
 
 	on_finish();
+	Texture::unbind(0);
 }
 
 

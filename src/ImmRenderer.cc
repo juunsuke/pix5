@@ -15,11 +15,20 @@ ImmRenderer::~ImmRenderer()
 
 void ImmRenderer::on_init()
 {
-	glEnable(GL_TEXTURE_2D);
 }
 
 void ImmRenderer::on_done()
 {
+}
+	
+void ImmRenderer::on_prepare()
+{
+	glEnable(GL_TEXTURE_2D);
+}
+
+void ImmRenderer::on_finish()
+{
+	glDisable(GL_TEXTURE_2D);
 }
 
 void ImmRenderer::on_render(int start, int num)

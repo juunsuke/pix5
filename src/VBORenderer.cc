@@ -35,14 +35,16 @@ void VBORenderer::on_init()
 
 	// Create both VBOs
 	glGenBuffers(2, _vbo);
-	
-	// Enable textures
-	glEnable(GL_TEXTURE_2D);
+
+	_size[0] = 0;
+	_size[1] = 0;
 }
 
 void VBORenderer::on_done()
 {
 	glDeleteBuffers(2, _vbo);
+	_vbo[0] = 0;
+	_vbo[1] = 0;
 }
 
 void VBORenderer::on_prepare()
@@ -116,6 +118,19 @@ void VBORenderer::on_prepare()
 	}
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+	
+	// Enable textures
+	glEnable(GL_TEXTURE_2D);
+}
+	
+void VBORenderer::on_finish()
+{
+	// Deactivate everything
+	glDisable(GL_TEXTURE_2D);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void VBORenderer::on_render(int start, int num)

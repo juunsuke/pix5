@@ -13,9 +13,11 @@ class VBORenderer: public Renderer
 	// VBO index currently in use
 
 
+protected:
 	void on_init();
 	void on_done();
 	void on_prepare();
+	void on_finish();
 	void on_render(int start, int num);
 
 public:

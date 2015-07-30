@@ -5,7 +5,7 @@ DBG = 1
 ########################################################################################################################
 
 CLSS  = Error EventHandler Log Cache
-CLSS += Display Texture Shader VertexBuffer Renderer ImmRenderer VBORenderer
+CLSS += Display Texture Shader VertexBuffer Renderer ImmRenderer VBORenderer ShaderRenderer
 CLSS += Glyph Font TextFormat
 CLSS += Audio SoundClip
 CLSS += Input Action
@@ -20,7 +20,7 @@ HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc get_ms.cc
 
-DATA = sprite.vs sprite.fs LiberationSans-Regular.ttf
+DATA = vs.glsl fs.glsl LiberationSans-Regular.ttf
 
 PKGS = sdl2 SDL2_image gl glew freetype2 vorbisfile
 

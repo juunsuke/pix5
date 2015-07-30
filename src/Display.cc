@@ -103,8 +103,21 @@ void unset_mode()
 	_cur_mode.clear();
 }
 
-static void set_renderer(RendererType::Type type)
+void set_renderer(RendererType::Type type)
 {
+	// Is there already a renderer ?
+	if(_renderer)
+	{
+		// Do nothing if it's the same type
+		if(_cur_mode.renderer==type)
+			return;
+
+		// Shut it down
+		_renderer->done();
+		delete _renderer;
+		_renderer = NULL;
+	}
+
 	_cur_mode.renderer = type;
 
 	if(_cur_mode.renderer==RendererType::Shader)
@@ -113,9 +126,8 @@ static void set_renderer(RendererType::Type type)
 		try
 		{
 			Log::log("Using the OpenGL Shader renderer");
-			E::Renderer("Not done yet");
-			//_renderer = new VBORenderer();
-			//_renderer->init();
+			_renderer = new ShaderRenderer();
+			_renderer->init();
 
 			return;
 		}
@@ -154,7 +166,7 @@ static void set_renderer(RendererType::Type type)
 		return;
 	}
 
-	ASSERT(0, "Huh?")
+	ASSERT(0, "Display::set_renderer(): Invalid renderer type")
 }
 
 void set_mode(const VideoMode& vm)

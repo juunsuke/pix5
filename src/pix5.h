@@ -52,6 +52,12 @@ int64_t get_ms();
 // Get an ever-increasing time value in milliseconds
 // Usually the time since the OS booted, but not guaranteed to be so
 
+int load_file(const Str& fname, char **buf);
+// Loads a file, allocates a buffer and sets its address into buf
+// A terminal zero is added at the end
+// Returns the number of bytes read, exclusing the terminal zero
+// Returns -1 on error
+
 
 #ifdef DBG
 	#define ASSERT(x, m) if(!(x)) E::Assert("%s: %i: %s", __FILE__, __LINE__, m);
@@ -120,6 +126,7 @@ int64_t get_ms();
 #include "Renderer.h"
 #include "ImmRenderer.h"
 #include "VBORenderer.h"
+#include "ShaderRenderer.h"
 #include "Display.h"
 
 #include "SoundClip.h"

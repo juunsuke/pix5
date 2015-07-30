@@ -22,6 +22,12 @@ public:
 
 	void on_key_down(Key& key)
 	{
+		if(key==KEY_1)
+			Display::set_renderer(RendererType::Immediate);
+		if(key==KEY_2)
+			Display::set_renderer(RendererType::VBO);
+		if(key==KEY_3)
+			Display::set_renderer(RendererType::Shader);
 	}
 
 	void on_key_up(Key& key)
@@ -58,6 +64,7 @@ int main(int argc, char **argv)
 		Texture *tex = Cache::texture("data/konata.png")->sub(0, 0, 16, 16);
 		Texture *tex2 = Cache::texture("data/konata.png")->sub(160, 160, 16, 16);
 
+
 		MyEventHandler eh;
 
 		float a = 0;
@@ -69,7 +76,7 @@ int main(int argc, char **argv)
 			tex->draw(100, 10);
 
 			for(int c = 0; c<16000; c++)
-				(c%2 ? tex2 : tex)->draw(rand()%1000, rand()%1000, 0, 0, (float)rand(), 1, 1);
+				(c%2 ? tex2 : tex)->draw(rand()%1000, rand()%1000);
 		
 			tex->draw(Input::get_mouse().x, Input::get_mouse().y, tex->width()/2, tex->height()/2, a, 1, 1);
 			tex->draw(Input::get_mouse().x+100, Input::get_mouse().y+100, Color(1, 0, 0), Color(0, 1, 0), Color(0, 0, 1), Color(1, 1, 1));

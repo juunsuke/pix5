@@ -54,6 +54,9 @@ Renderer *renderer();
 void render();
 // Shortcut for renderer()->render()
 
+void set_renderer(RendererType::Type type);
+// Change the current renderer type
+
 
 }
 
