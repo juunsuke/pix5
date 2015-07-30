@@ -11,6 +11,7 @@ class VideoMode
 		vsync = o.vsync;
 		x = o.x;
 		y = o.y;
+		renderer = o.renderer;
 	}
 
 public:
@@ -26,6 +27,9 @@ public:
 
 	int x, y;
 	// Used to control the window position for windowed and resizable modes
+
+	RendererType::Type renderer;
+	// Renderer type to use
 
 
 	VideoMode()
@@ -47,6 +51,7 @@ public:
 		this->vsync = vsync;
 		this->x = x;
 		this->y = y;
+		this->renderer = RendererType::Shader;
 	}
 
 	~VideoMode()
@@ -72,6 +77,7 @@ public:
 		vsync = true;
 		x = 0x2FFF0000;
 		y = 0x2FFF0000;
+		renderer = RendererType::Shader;
 	}
 
 

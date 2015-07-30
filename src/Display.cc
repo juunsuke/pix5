@@ -17,12 +17,13 @@ static SDL_GLContext _gl = NULL;
 static VideoMode _cur_mode;
 // Current video mode
 
-static Camera _2d_cam;
-// A 2D camera for the current mode
-
 static int _frames = 0;
 static uint32_t _last_time = 0;
 // Used by the FPS counter
+
+static Renderer *_renderer = NULL;
+// The renderer
+
 
 
 void init()
@@ -30,6 +31,7 @@ void init()
 	_window = NULL;
 	_gl = NULL;
 	_cur_mode.type = VideoModeType::None;
+	_renderer = NULL;
 }
 
 void done()
@@ -43,9 +45,12 @@ static void set_viewport(int w, int h)
 	// Set the OpenGL viewport
 	glViewport(0, 0, w, h);
 
-	// Recalculate the 2D camera's projection matrix
-	_2d_cam.mat = Matrix::ortho2d(w, h);
-
+	// Rebuild the projection matrix
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, h, 0, -1, 1);
+		
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void handle_resize(int width, int height)
@@ -74,6 +79,13 @@ void handle_move(int x, int y)
 void unset_mode()
 {
 	// Unset any currently set mode
+	if(_renderer)
+	{
+		_renderer->done();
+		delete _renderer;
+		_renderer = NULL;
+	}
+
 	if(_gl)
 	{
 		SDL_GL_DeleteContext(_gl);
@@ -170,9 +182,6 @@ void set_mode(const VideoMode& vm)
 		// Reset the OpenGL state
 		set_viewport(_cur_mode.width, _cur_mode.height);
 
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
@@ -181,6 +190,20 @@ void set_mode(const VideoMode& vm)
 
 		// Reset the input system
 		Input::reset();
+
+		// Create the renderer
+		switch(_cur_mode.renderer)
+		{
+			case RendererType::Direct:
+			case RendererType::VB:
+			case RendererType::Shader:
+				// Create a direct renderer
+				_renderer = new DirectRenderer();
+				_renderer->init();
+
+				_cur_mode.renderer = RendererType::Shader;
+				break;
+		}
 	}
 	catch(Error)
 	{
@@ -283,20 +306,6 @@ void swap()
 	}
 }
 
-void show_cursor(bool show)
-{
-	ASSERT(_window, "Display::show_cursor(): No mode currently set")
-
-	SDL_ShowCursor(show ? 1 : 0);
-}
-
-bool cursor_visible()
-{
-	ASSERT(_window, "Display::cursor_visible(): No mode currently set")
-
-	return SDL_ShowCursor(-1)==1 ? true : false;
-}
-
 int get_max_texture_size()
 {
 	ASSERT(_window, "Display::get_max_texture_size(): No mode currently set")
@@ -324,70 +333,19 @@ int get_texture_units()
 	return val;
 }
 
-const Camera& get_2d_camera()
+Renderer *renderer()
 {
-	return _2d_cam;
+	ASSERT(_window, "Display::renderer(): No mode currently set")
+
+	return _renderer;
 }
 
-const Matrix& get_2d_matrix()
+void render()
 {
-	return _2d_cam.mat;
+	ASSERT(_window, "Display::render(): No mode currently set")
+
+	_renderer->render();
 }
-
-void test_draw(int x, int y, int w, int h, Texture *tex, const Color& col)
-{
-	ASSERT(_window, "Display::test_draw(): No mode currently set")
-
-	// Bind/unbind the texture
-	if(tex)
-		tex->bind(0);
-	else
-		Texture::unbind(0);
-
-	// Setup the matrices
-	_2d_cam.set();
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glEnable(GL_TEXTURE_2D);
-
-	glBegin(GL_QUADS);
-		glColor4f(col.fr(), col.fg(), col.fb(), col.fa());
-
-		if(tex)
-			glTexCoord2f(0, 0);
-		glVertex3f(x, y, 0);
-
-		if(tex)
-			glTexCoord2f(1, 0);
-		glVertex3f(x+w, y, 0);
-
-		if(tex)
-			glTexCoord2f(1, 1);
-		glVertex3f(x+w, y+h, 0);
-
-		if(tex)
-			glTexCoord2f(0, 1);
-		glVertex3f(x, y+h, 0);
-	glEnd();
-}
-
-void test_draw(int x, int y, Texture *tex, const Color& col)
-{
-	ASSERT(tex, "Display::test_draw(): NULL texture provided with the no-size version of the function")
-
-	test_draw(x, y, tex->width(), tex->height(), tex, col);
-}
-
-void draw(int first, int count)
-{
-	ASSERT(_window, "Display::draw(): No mode currently set")
-
-	glDrawArrays(GL_QUADS, first, count);
-}
-
-
 
 }}
 

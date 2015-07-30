@@ -1,6 +1,6 @@
 #pragma once
 
-
+/*
 class ShaderUniformAttrib
 {
 public:
@@ -92,5 +92,5 @@ public:
 
 };
 
-
+*/
 

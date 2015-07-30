@@ -20,13 +20,9 @@ namespace Input			{ void init(); void done(); }
 namespace Action		{ void init(); void done(); }
 namespace Audio			{ void init(); void done(); }
 namespace Cache			{ void init(); void done(); }
-namespace GUI			{ void init(); void done(); }
-namespace IO			{ void init(); void done(); }
 
 
 void font_init();		void font_done();
-void sprite_init();		void sprite_done();
-void tr_init();			void tr_done();
 
 
 
@@ -64,16 +60,12 @@ void pix_init(const Str& app_name)
 		_has_parachute = true;
 	}
 
-	IO::init();
 	Input::init();
 	Action::init();
 	font_init();
 	Display::init();
-	tr_init();
-	sprite_init();
 	Audio::init();
 	Cache::init();
-	GUI::init();
 
 	Log::log("PIX successfully initialized");
 }
@@ -87,16 +79,12 @@ void pix_shutdown()
 	Log::log("Shutting down PIX...");
 
 	// Shutdown
-	GUI::done();
 	Audio::done();
-	sprite_done();
-	tr_done();
 	Display::done();
 	Action::done();
 	Input::done();
 	Cache::done();
 	font_done();
-	IO::done();
 
 	SDL_Quit();
 

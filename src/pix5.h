@@ -89,14 +89,6 @@ int64_t get_ms();
 #include "JobThread.h"
 #include "ThreadPool.h"
 
-#include "FilePath.h"
-#include "FileAccess.h"
-#include "File.h"
-#include "CFile.h"
-#include "FileSource.h"
-#include "LinuxFileSource.h"
-#include "IO.h"
-
 #include "Mouse.h"
 #include "keys.h"
 #include "Key.h"
@@ -109,53 +101,30 @@ int64_t get_ms();
 #include "Action.h"
 
 #include "VideoModeType.h"
+#include "RendererType.h"
 #include "VideoMode.h"
 
-#include "TextAlign.h"
 #include "Color.h"
 #include "Rect.h"
 #include "Glyph.h"
 #include "Font.h"
 #include "Texture.h"
+#include "TextAlign.h"
 #include "TextFormat.h"
-
-#include "Matrix.h"
-#include "Camera.h"
 
 #include "Shader.h"
 
-#include "VertexComp.h"
-#include "VertexDef.h"
 #include "VertexBuffer.h"
-#include "VertexArray.h"
 
-#include "Anim.h"
-#include "Sprite.h"
-#include "SpriteSet.h"
-
+#include "RenderElement.h"
+#include "Renderer.h"
+#include "DirectRenderer.h"
 #include "Display.h"
-
-#include "TexRenderer.h"
 
 #include "SoundClip.h"
 #include "Audio.h"
 
 #include "Cache.h"
-
-#include "GuiElement.h"
-#include "Label.h"
-#include "Button.h"
-
-#include "GuiTheme.h"
-#include "GUI.h"
-
-#include "MapSprite.h"
-#include "TMLayer.h"
-#include "TMBase.h"
-#include "TileMap.h"
-
-#include "Lua.h"
-#include "LuaData.h"
 
 #include "EventHandler.h"
 

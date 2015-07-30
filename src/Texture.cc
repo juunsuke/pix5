@@ -681,6 +681,21 @@ void Texture::blit(int dx, int dy, Texture *src, int sx, int sy, int w, int h, b
 	_dirty = true;
 }
 
+void Texture::draw(int dx, int dy, const Rect& src_rect, const Color& col1, const Color& col2, const Color& col3, const Color& col4)
+{
+	Display::renderer()->draw(this, dx, dy, src_rect, col1, col2, col3, col4);
+}
+
+void Texture::draw(const Rect& src_rect, const Color& col1, const Color& col2, const Color& col3, const Color& col4, float *mat)
+{
+	Display::renderer()->draw(this, src_rect, col1, col2, col3, col4, mat);
+}
+
+void Texture::draw(int dx, int dy, const Rect& src_rect, const Color& col1, const Color& col2, const Color& col3, const Color& col4, int ox, int oy, float angle, float hscale, float vscale)
+{
+	Display::renderer()->draw(this, dx, dy, src_rect, col1, col2, col3, col4, ox, oy, angle, hscale, vscale);
+}
+
 
 
 

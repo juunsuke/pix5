@@ -224,6 +224,79 @@ public:
 	void blit(int dx, int dy, Texture *src, int sx, int sy, int w, int h, bool alpha = true);
 	inline void blit(int dx, int dy, Texture *src, const Rect& sr, bool alpha = true) { blit(dx, dy, src, sr.x, sr.y, sr.w, sr.h, alpha); }
 	inline void blit(int dx, int dy, Texture *src, bool alpha = true) { blit(dx, dy, src, 0, 0, src->_w, src->_h, alpha); }
+
+
+	//
+	// Rendering functions
+	// These are just simple forwards for the display renderer
+	//
+
+	//
+	// No transformation besides position
+	//
+
+	void draw(int dx, int dy, const Rect& src_rect, const Color& col1, const Color& col2, const Color& col3, const Color& col4);
+
+	inline void draw(int dx, int dy, const Color& col1, const Color& col2, const Color& col3, const Color& col4)
+	{ draw(dx, dy, Rect(0, 0, _w, _h), col1, col2, col3, col4); }
+
+	inline void draw(int dx, int dy, const Rect& src_rect, const Color& col)
+	{ draw(dx, dy, src_rect, col, col, col, col); }
+
+	inline void draw(int dx, int dy, const Rect& src_rect)
+	{ draw(dx, dy, src_rect, Color(1, 1, 1, 1)); }
+
+	inline void draw(int dx, int dy, const Color& col)
+	{ draw(dx, dy, Rect(0, 0, _w, _h), col); }
+
+	inline void draw(int dx, int dy)
+	{ draw(dx, dy, Color(1, 1, 1, 1)); }
+
+
+
+	//
+	// Provided transformation matrix
+	//
+
+	void draw(const Rect& src_rect, const Color& col1, const Color& col2, const Color& col3, const Color& col4, float *mat);
+
+	inline void draw(const Color& col1, const Color& col2, const Color& col3, const Color& col4, float *mat)
+	{ draw(Rect(0, 0, _w, _h), col1, col2, col3, col4, mat); }
+
+	inline void draw(const Rect& src_rect, const Color& col, float *mat)
+	{ draw(src_rect, col, col, col, col, mat); }
+
+	inline void draw(const Rect& src_rect, float *mat)
+	{ draw(src_rect, Color(1, 1, 1, 1), mat); }
+
+	inline void draw(const Color& col, float *mat)
+	{ draw(Rect(0, 0, _w, _h), col, mat); }
+
+	inline void draw(float *mat)
+	{ draw(Color(1, 1, 1, 1), mat); }
+
+
+	
+	//
+	// Provided raw transformations
+	//
+
+	void draw(int dx, int dy, const Rect& src_rect, const Color& col1, const Color& col2, const Color& col3, const Color& col4, int ox, int oy, float angle, float hscale, float vscale);
+
+	inline void draw(int dx, int dy, const Color& col1, const Color& col2, const Color& col3, const Color& col4, int ox, int oy, float angle, float hscale, float vscale)
+	{ draw(dx, dy, Rect(0, 0, _w, _h), col1, col2, col3, col4, ox, oy, angle, hscale, vscale); }
+
+	inline void draw(int dx, int dy, const Rect& src_rect, const Color& col, int ox, int oy, float angle, float hscale, float vscale)
+	{ draw(dx, dy, src_rect, col, col, col, col, ox, oy, angle, hscale, vscale); }
+
+	inline void draw(int dx, int dy, const Rect& src_rect, int ox, int oy, float angle, float hscale, float vscale)
+	{ draw(dx, dy, src_rect, Color(1, 1, 1, 1), ox, oy, angle, hscale, vscale); }
+
+	inline void draw(int dx, int dy, const Color& col, int ox, int oy, float angle, float hscale, float vscale)
+	{ draw(dx, dy, Rect(0, 0, _w, _h), col, ox, oy, angle, hscale, vscale); }
+
+	inline void draw(int dx, int dy, int ox, int oy, float angle, float hscale, float vscale)
+	{ draw(dx, dy, Color(1, 1, 1, 1), ox, oy, angle, hscale, vscale); }
 };
 
 

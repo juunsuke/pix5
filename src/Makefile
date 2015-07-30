@@ -5,32 +5,24 @@ DBG = 1
 ########################################################################################################################
 
 CLSS  = Error EventHandler Log Cache
-CLSS += Display Texture Matrix Camera Shader VertexComp VertexDef VertexBuffer VertexArray Glyph Font TextFormat
-CLSS += SpriteSet Sprite TexRenderer Anim
-CLSS += TMLayer TMBase MapSprite
+CLSS += Display Texture Shader VertexBuffer Renderer DirectRenderer
+CLSS += Glyph Font TextFormat
 CLSS += Audio SoundClip
-CLSS += GUI GuiTheme GuiElement Label Button
 CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
-CLSS += IO FileSource LinuxFileSource File CFile
-CLSS += Lua LuaData
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
 HDRS += pix5.h Str.h List.h SortedList.h FIFO.h Error.h errors.h Math.h
-HDRS += VideoModeType.h VideoMode.h Color.h Rect.h TextAlign.h
-HDRS += TileMap.h
+HDRS += RendererType.h RenderElement.h VideoModeType.h VideoMode.h Color.h Rect.h
 HDRS += Mouse.h keys.h Key.h Keyboard.h Joystick.h JoyAxis.h JoyButton.h JoyHat.h
 HDRS += Mutex.h Condition.h Barrier.h RWLock.h
-HDRS += FilePath.h FileAccess.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc get_ms.cc
-SRCS += GuiTheme_Label.cc
-SRCS += lua_print.cc
 
 DATA = sprite.vs sprite.fs LiberationSans-Regular.ttf
 
-PKGS = sdl2 SDL2_image gl glew freetype2 vorbisfile luajit
+PKGS = sdl2 SDL2_image gl glew freetype2 vorbisfile
 
 ########################################################################################################################
 

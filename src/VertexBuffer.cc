@@ -3,23 +3,7 @@
 
 namespace PIX {
 
-
-static int get_usage(VertexBufferUsage::Type usage)
-{
-	// Convert a PIX usage constant to an OpenGL one
-	switch(usage)
-	{
-		case VertexBufferUsage::Static:
-			return GL_STATIC_DRAW;
-
-		case VertexBufferUsage::Stream:
-			return GL_STREAM_DRAW;
-
-		default:
-			return GL_DYNAMIC_DRAW;
-	}
-}
-
+/*
 
 VertexBuffer::VertexBuffer(const VertexDef& def, int stride, VertexBufferUsage::Type usage, bool double_buf)
 {
@@ -229,4 +213,5 @@ void VertexBuffer::disable_attribs()
 		glDisableVertexAttribArray(c);
 }
 
+*/
 }

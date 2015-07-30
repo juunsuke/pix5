@@ -1,17 +1,6 @@
 #pragma once
 
-
-namespace VertexBufferUsage
-{
-	enum Type
-	{
-		Static,
-		Dynamic,
-		Stream,
-	};
-}
-
-
+/*
 class VertexBuffer
 {
 	VertexDef _def;
@@ -116,5 +105,5 @@ public:
 	static void disable_attribs();
 	// Disable all vertex attribs
 };
-
+*/
 

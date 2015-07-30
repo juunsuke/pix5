@@ -35,12 +35,6 @@ void clear(const Color& col = 0);
 void swap();
 // Swap the buffers
 
-void show_cursor(bool show);
-// Show/hide the mouse cursor
-
-bool cursor_visible();
-// Returns true if the cursor if visible, false if hidden
-
 int get_max_texture_size();
 // Return the maximum texture size supported by the GPU
 // A mode must currently be set
@@ -54,30 +48,11 @@ int get_texture_units();
 // Returns the number of texture units supported by the GPU
 // A mode must currently be set
 
-const Camera& get_2d_camera();
-// Retrieve a 2D camera for the current mode
-// This returns a reference to an internal camera for pixel-perfect 1:1
-// 2D coordinates
-// The camera/matrix are not calculated when this function is called, but rather
-// whenever a mode change or window resize occurs
+Renderer *renderer();
+// Retrieve the renderer instance
 
-const Matrix& get_2d_matrix();
-// Retrieves the 2D camera's matrix
-
-void test_draw(int x, int y, int w, int h, Texture *tex = NULL, const Color& col = Color(1.0f, 1.0f, 1.0f));
-void test_draw(int x, int y, Texture *tex, const Color& col = Color(1.0f, 1.0f, 1.0f));
-// Draw a single test rectangle
-// This function uses the OpenGL direct draw functions, as such performances
-// are poor and not supported everywhere
-// As such, as its name implies, it should only be used as a test function
-// If a texture is provided, it will be bound, and not unbound
-// If no texture is provided, any curreny texture will be unbound, and not restored
-// The internal 2D camera will be used to set the projection matrix
-// The modelview matrix will be reset to identity
-// Both matrices will not be restored to their former state
-// The second version of the function takes the dimensions from the texture, which must not be NULL
-
-void draw(int first, int count);
+void render();
+// Shortcut for renderer()->render()
 
 
 }

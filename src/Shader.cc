@@ -3,6 +3,7 @@
 
 namespace PIX {
 
+/*
 
 Shader::Shader(const Str& name)
 {
@@ -335,6 +336,6 @@ void Shader::set_uniform(const Str& name, int index)
 {
 	glUniform1i(get_uniform(name, GL_SAMPLER_2D)->index, index);
 }
-
+*/
 
 }
