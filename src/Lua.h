@@ -14,7 +14,7 @@ public:
 
 
 
-	Lua(bool reg_api = true);
+	Lua();
 	~Lua();
 	
 
@@ -24,7 +24,11 @@ public:
 
 	void register_api(LuaAPI *api);
 	// Register an API definition
-	// 'api'  is an array of LuaAPI entries, the last one containing NULL entries
+	// 'api' is an array of LuaAPI entries, the last one containing NULL entries
+
+	void register_const(LuaConst *cnst);
+	// Register a constant list
+	// 'cnst' is an array of LuaConst entries, the last one containing NULL entries
 
 	void load_file(const Str& fname, bool run = true);
 	// Load the given Lua source file and place the function on top of the stack

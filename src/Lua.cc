@@ -9,17 +9,17 @@ void luaP_done(lua_State *lua);
 
 
 extern LuaAPI _core_api[];
-// The core API, from LuaAPI.cc
+extern LuaConst _core_const[];
+// The core API and constants, from LuaAPI.cc
 
 
-Lua::Lua(bool reg_api)
+Lua::Lua()
 {
 	// Create a new lua state
 	_lua = lua_open();
 	luaL_openlibs(_lua);
 
-	if(reg_api)
-		register_api();
+	register_api();
 
 	// Init luaP
 	luaP_init(_lua);
@@ -36,6 +36,7 @@ void Lua::register_api()
 {
 	// Register the core API
 	register_api(_core_api);
+	register_const(_core_const);
 }
 
 static void set_mod(lua_State *lua, const char *mod, const char* &last_mod, int& mod_i)
@@ -105,6 +106,28 @@ void Lua::register_api(LuaAPI *api)
 	set_mod(_lua, NULL, last_mod, mod_i);
 
 	ASSERT(lua_gettop(_lua)==0, "Lua::register_api(): Stack inconsistancy")
+}
+	
+void Lua::register_const(LuaConst *cnst)
+{
+	// Check all the entries
+	const char *last_mod = NULL;
+	int mod_i = LUA_GLOBALSINDEX;
+
+	for(; cnst->name; cnst++)
+	{
+		// Setup the proper module
+		set_mod(_lua, cnst->mod, last_mod, mod_i);
+
+		// Set the constant
+		lua_pushinteger(_lua, cnst->val);
+		lua_setfield(_lua, mod_i, cnst->name);
+	}
+
+	// Unset any set module
+	set_mod(_lua, NULL, last_mod, mod_i);
+
+	ASSERT(lua_gettop(_lua)==0, "Lua::register_const(): Stack inconsistancy")
 }
 
 void Lua::load_file(const Str& fname, bool run)

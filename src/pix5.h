@@ -24,11 +24,13 @@ struct FT_FaceRec_;
 	#include <cxxabi.h>
 #endif
 
-#ifdef OVERLOAD_NEW_DELETE
+#ifdef DBG
+#ifndef NO_OVERLOAD_NEW_DELETE
 	void *operator new(size_t size, const char *file, int line);
 	#define new new(__FILE__, __LINE__)
 
 	void new_delete(void *ptr);
+#endif
 #endif
 
 namespace PIX

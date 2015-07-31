@@ -97,14 +97,14 @@ Texture *Texture::load(const Str& fname)
 	return tex;
 }
 	
-Texture *Texture::sub(int x, int y, int w, int h)
+Texture *Texture::sub(const Rect& r)
 {
-	ASSERT(w>=1 && h>=1, "Texture::sub(): Invalid dimensions")
-	ASSERT(x>=0 && (x+w)<=_w && y>=0 && (y+h)<=_h, "Texture::sub(): The given region lies outside of the texture")
+	ASSERT(r.w>=1 && r.h>=1, "Texture::sub(): Invalid dimensions")
+	ASSERT(r.x>=0 && (r.x+r.w)<=_w && r.y>=0 && (r.y+r.h)<=_h, "Texture::sub(): The given region lies outside of the texture")
 
 	// Create a texture and blit a portion of us on it
-	Texture *tex = Texture::create(w, h, false);
-	tex->blit(0, 0, this, x, y, w, h, false);
+	Texture *tex = Texture::create(r.w, r.h, false);
+	tex->blit(0, 0, this, r.x, r.y, r.w, r.h, false);
 
 	return tex;
 }

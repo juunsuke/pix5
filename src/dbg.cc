@@ -1,7 +1,7 @@
 #include "pix5.h"
 
 #ifdef DBG
-#ifdef OVERLOAD_NEW_DELETE
+#ifndef NO_OVERLOAD_NEW_DELETE
 
 void dbg_init() __attribute__((constructor(101)));
 void dbg_done() __attribute__((destructor(101)));

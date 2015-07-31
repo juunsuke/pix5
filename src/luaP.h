@@ -17,6 +17,8 @@ void luaP_createudata(lua_State *lua, const char *name, void *p);
 Texture *luaP_checktexture(lua_State *lua, int narg);
 // Check for PIX object wrappers
 
+Rect luaP_checkrect(lua_State *lua, int narg);
+// Get a rectangle parameter
 
 
 

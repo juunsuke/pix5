@@ -7,24 +7,12 @@ namespace PIX {
 extern luaL_Reg _texture_api[];
 
 
-static void reg_meta_api(lua_State *lua, const char *name, luaL_Reg *api)
+static void reg_meta_api(lua_State *lua, const char *name, const char *index, luaL_Reg *api)
 {
 	// Create a new metatable
 	luaL_newmetatable(lua, "PIX::Texture");
 
-	// Create a table
-	lua_newtable(lua);
-
-	// The first entry of 'api' can be __tostring
-	if(api->name && strcmp(api->name, "__tostring")==0)
-	{
-		// Add it to the metatable itself
-		lua_pushcfunction(lua, api->func);
-		lua_setfield(lua, -3, "__tostring");
-		api++;
-	}
-
-	// Register the API functions
+	// Add the special API functions
 	for(; api->name && api->func; api++)
 	{
 		// Push the function
@@ -34,8 +22,14 @@ static void reg_meta_api(lua_State *lua, const char *name, luaL_Reg *api)
 		lua_setfield(lua, -2, api->name);
 	}
 
-	// Set the __index field of the metatable
-	lua_setfield(lua, -2, "__index");
+	// Get the index table, if any
+	if(index)
+	{
+		lua_getglobal(lua, index);
+
+		// Set the __index field of the metatable
+		lua_setfield(lua, -2, "__index");
+	}
 
 	// Pop the metatable
 	lua_pop(lua, 1);
@@ -45,7 +39,7 @@ static void reg_meta_api(lua_State *lua, const char *name, luaL_Reg *api)
 void luaP_init(lua_State *lua)
 {
 	// Register the metatables and their APIs
-	reg_meta_api(lua, "PIX::Texture", _texture_api);
+	reg_meta_api(lua, "PIX::Texture", "Texture", _texture_api);
 
 	ASSERT(lua_gettop(lua)==0, "Stack inconsistency")
 }
@@ -99,6 +93,24 @@ Texture *luaP_checktexture(lua_State *lua, int narg)
 	return *(Texture**)get_udata(lua, narg, "PIX::Texture");
 }
 
+Rect luaP_checkrect(lua_State *lua, int narg)
+{
+	luaL_argcheck(lua, lua_istable(lua, narg), narg, "Rect expected");
+
+	lua_getfield(lua, narg, "x");
+	int x = luaL_checkint(lua, -1);
+
+	lua_getfield(lua, narg, "y");
+	int y = luaL_checkint(lua, -1);
+
+	lua_getfield(lua, narg, "w");
+	int w = luaL_checkint(lua, -1);
+
+	lua_getfield(lua, narg, "h");
+	int h = luaL_checkint(lua, -1);
+
+	return Rect(x, y, w, h);
+}
 
 
 

@@ -15,4 +15,15 @@ struct LuaAPI
 	// Actual function
 };
 
+struct LuaConst
+{
+	const char *mod;
+	// Module name
+
+	const char *name;
+	// Constant name
+
+	int val;
+	// Constant value
+};
 

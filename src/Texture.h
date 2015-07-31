@@ -73,6 +73,9 @@ class Texture: public Obj
 	void create_gl();
 	// Create/bind/configure/upload the OpenGL texture
 
+	void delete_gl();
+	// Delete the OpenGL texture, if it exists
+
 	void hline(int x1, int x2, int y, const Color& col);
 	void vline(int y1, int y2, int x, const Color& col);
 
@@ -102,12 +105,10 @@ public:
 
 	~Texture();
 
-	Texture *sub(int x, int y, int w, int h);
+	Texture *sub(const Rect& r);
+	inline Texture *sub(int x, int y, int w, int h) { return sub(Rect(x, y, w, h)); }
 	// Create a sub-texture
 	
-	void delete_gl();
-	// Delete the OpenGL texture, if it exists
-
 
 	inline Str file() const { return _file; }
 	// Get the filed name, when the texture was loaded
@@ -118,10 +119,6 @@ public:
 
 	inline bool is_dirty() const { return _dirty; }
 	// Return the dirty flag
-
-	inline uint32_t get_gl_id() const { return _gl; }
-	// Return the OpenGL texture ID (GL_TEXTURE_2D)
-	// bind() should be called prior to this to make sure it has been created
 
 	inline TextureFilter::Type get_min_filter() const { return _min_filter; }
 	inline TextureFilter::Type get_mag_filter() const { return _mag_filter; }

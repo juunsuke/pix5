@@ -30,10 +30,17 @@ void LuaGame::on_init()
 		lua_pop(_lua, 1);
 		E::Lua("Runtime error: %s", s.ptr());
 	}
+
+	// Call lua's on_init
+	if(_lua.get_global_func("on_init") && lua_pcall(_lua, 0, 0, 0))
+		_lua.error();
 }
 
 void LuaGame::on_shutdown()
 {
+	// Call lua's on_shutdown
+	if(_lua.get_global_func("on_shutdown") && lua_pcall(_lua, 0, 0, 0))
+		_lua.error();
 }
 
 void LuaGame::on_frame()

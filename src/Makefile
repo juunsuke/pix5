@@ -1,7 +1,7 @@
 
 TARGET = pix5
 DBG = 1
-OVERLOAD_NEW_DELETE = 1
+NO_OVERLOAD_NEW_DELETE = 1
 
 ########################################################################################################################
 
@@ -22,7 +22,7 @@ HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc get_ms.cc dbg.cc
-SRCS += la_print.cc la_texture.cc
+SRCS += la_print.cc la_color.cc la_rect.cc la_texture.cc
 
 DATA = vs.glsl fs.glsl LiberationSans-Regular.ttf
 
@@ -70,8 +70,8 @@ ifdef DBG
 CFLAGS += -Og -g -DDBG
 LFLAGS += -Og -g
 
-ifdef OVERLOAD_NEW_DELETE
-CFLAGS += -DOVERLOAD_NEW_DELETE
+ifdef NO_OVERLOAD_NEW_DELETE
+CFLAGS += -DNO_OVERLOAD_NEW_DELETE
 endif
 
 else
