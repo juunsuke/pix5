@@ -1,8 +1,10 @@
 #pragma once
 
 
-class VideoMode
+class VideoMode: public Obj
 {
+	PIXOBJ("VideoMode")
+
 	void copy(const VideoMode& o)
 	{
 		type = o.type;

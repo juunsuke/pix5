@@ -26,6 +26,7 @@ PIXERR( 0x00000007, EmptyFIFO,			"FIFO list is empty" )
 PIXERR( 0x00000008, DoubleCache,		"Double cache entry" )
 PIXERR( 0x00000009, Lua,				"Lua error" )
 PIXERR( 0x0000000A, LuaAPI,				"Lua API error" )
+PIXERR( 0x0000000B, LuaRuntime,			"Lua runtime error" )
 
 
 // Graphics errors

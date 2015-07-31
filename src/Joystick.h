@@ -1,7 +1,9 @@
 #pragma once
 
-class Joystick
+class Joystick: public Obj
 {
+	PIXOBJ("Joystick")
+
 	void copy(const Joystick& o)
 	{
 		id = o.id;

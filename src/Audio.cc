@@ -5,8 +5,10 @@ namespace PIX {
 namespace Audio {
 
 
-class SoundCategory
+class SoundCategory: public Obj
 {
+	PIXOBJ("SoundCategory")
+
 public:
 
 	Str _name;

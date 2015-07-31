@@ -3,7 +3,7 @@
 namespace PIX {
 
 
-int la_print(lua_State *lua)
+LUAF(la_print)
 {
 	// Get the parameter count
 	int num = lua_gettop(lua);

@@ -1,8 +1,9 @@
 #pragma once
 
 
-class JoyAxis
+class JoyAxis: public Obj
 {
+	PIXOBJ("JoyAxis")
 public:
 
 	int index;

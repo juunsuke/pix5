@@ -1,7 +1,9 @@
 #pragma once
 
-class ThreadPool
+class ThreadPool: public Obj
 {
+	PIXOBJ("ThreadPool")
+
 	List<JobThread*> _threads;
 	// The threads in the pool
 

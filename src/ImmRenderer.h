@@ -3,6 +3,8 @@
 
 class ImmRenderer: public Renderer
 {
+	PIXOBJ("ImmRenderer")
+
 	void on_init();
 	void on_done();
 	void on_prepare();

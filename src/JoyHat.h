@@ -21,8 +21,9 @@ namespace HatDirection
 
 
 
-class JoyHat
+class JoyHat: public Obj
 {
+	PIXOBJ("JoyHat")
 public:
 
 	int index;

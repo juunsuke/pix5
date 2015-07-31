@@ -1,7 +1,9 @@
 #pragma once
 
-class Glyph
+class Glyph: public Obj
 {
+	PIXOBJ("Glyph")
+
 public:
 
 	int index;

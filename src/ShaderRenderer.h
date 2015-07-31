@@ -3,6 +3,8 @@
 
 class ShaderRenderer: public VBORenderer
 {
+	PIXOBJ("ShaderRenderer")
+
 	uint32_t _vs, _fs, _prg;
 	// The vertex and fragment shaders, and the program
 

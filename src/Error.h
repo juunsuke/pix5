@@ -1,8 +1,10 @@
 #pragma once
 
 
-class Error
+class Error: public Obj
 {
+	PIXOBJ("Error")
+
 public:
 
 	uint32_t code;

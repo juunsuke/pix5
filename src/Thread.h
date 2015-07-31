@@ -19,7 +19,7 @@ namespace ThreadState
 	};
 }
 
-class Thread
+class Thread: public Obj
 {
 	pthread_t _th;
 	// Thread handle

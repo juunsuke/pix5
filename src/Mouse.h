@@ -1,8 +1,10 @@
 #pragma once
 
 
-class Mouse
+class Mouse: public Obj
 {
+	PIXOBJ("Mouse")
+
 public:
 
 	int x, y;

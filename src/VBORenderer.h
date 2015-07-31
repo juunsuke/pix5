@@ -3,6 +3,8 @@
 
 class VBORenderer: public Renderer
 {
+	PIXOBJ("VBORenderer")
+
 	uint32_t _vbo[2];
 	// The two VBOs
 

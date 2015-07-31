@@ -1,7 +1,7 @@
 #pragma once
 
 
-class Renderer
+class Renderer: public Obj
 {
 protected:
 
@@ -26,7 +26,7 @@ protected:
 
 public:
 
-	virtual ~Renderer();
+	~Renderer();
 
 
 	void init();

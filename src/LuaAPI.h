@@ -1,6 +1,8 @@
 #pragma once
 
 
+#define LUAF(x) int x(lua_State *lua)
+
 struct LuaAPI
 {
 	const char *mod;

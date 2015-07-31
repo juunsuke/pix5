@@ -1,8 +1,10 @@
 #pragma once
 
 
-class RenderElement
+class RenderElement: public Obj
 {
+	PIXOBJ("RenderElement")
+
 public:
 
 	Texture *tex;

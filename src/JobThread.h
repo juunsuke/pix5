@@ -3,6 +3,8 @@
 
 class JobThread: public Thread
 {
+	PIXOBJ("JobThread")
+
 	class ThreadPool *_pool;
 	// The pool that owns this job thread
 

@@ -33,6 +33,10 @@ void Renderer::clear()
 
 void Renderer::render()
 {
+	// Skip if nothing to render
+	if(!_elements.size())
+		return;
+
 	// Perform preparations
 	on_prepare();
 

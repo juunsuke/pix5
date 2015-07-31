@@ -16,8 +16,10 @@ namespace ElementType
 }
 
 
-class TFAlignPoint
+class TFAlignPoint: public Obj
 {
+	PIXOBJ("TFAlignPoint")
+
 public:
 
 	int i;
@@ -27,8 +29,10 @@ public:
 	// X position of the align point
 };
 
-class TFWord
+class TFWord: public Obj
 {
+	PIXOBJ("TFWord")
+
 public:
 
 	Rect r;
@@ -56,8 +60,10 @@ public:
 	}
 };
 
-class TFLine
+class TFLine: public Obj
 {
+	PIXOBJ("TFLine")
+
 public:
 
 	List<TFWord*> words;
@@ -83,8 +89,10 @@ public:
 };
 
 
-class TFElement
+class TFElement: public Obj
 {
+	PIXOBJ("TFElement")
+
 public:
 
 	TFState state;

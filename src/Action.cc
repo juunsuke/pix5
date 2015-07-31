@@ -24,8 +24,10 @@ namespace ActionType
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Action
+class Action: public Obj
 {
+	PIXOBJ("Action")
+
 public:
 	
 	ActionType::Type type;
@@ -41,7 +43,7 @@ public:
 		this->name = name;
 	}
 
-	virtual ~Action()
+	~Action()
 	{
 	}
 
@@ -52,6 +54,8 @@ public:
 
 class KeyAction: public Action
 {
+	PIXOBJ("KeyAction")
+
 public:
 
 	KeyCode key;
@@ -71,6 +75,8 @@ public:
 
 class MouseAction: public Action
 {
+	PIXOBJ("MouseAction")
+
 public:
 
 	int but;
@@ -93,6 +99,8 @@ public:
 
 class JoyAction: public Action
 {
+	PIXOBJ("JoyAction")
+
 public:
 
 	Str joy_name;
@@ -107,6 +115,8 @@ public:
 
 class JoyButtonAction: public JoyAction
 {
+	PIXOBJ("JoyButtonAction")
+
 public:
 
 	int but;
@@ -127,6 +137,8 @@ public:
 
 class JoyHatAction: public JoyAction
 {
+	PIXOBJ("JoyHatAction")
+
 public:
 
 	int hat;
@@ -156,8 +168,10 @@ public:
 
 
 
-class Section
+class Section: public Obj
 {
+	PIXOBJ("Section")
+
 public:
 
 	Str name;

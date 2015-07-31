@@ -4,13 +4,14 @@ DBG = 1
 
 ########################################################################################################################
 
-CLSS  = Error EventHandler Log Cache
+CLSS  = Obj Error EventHandler Log Cache
 CLSS += Display Texture Renderer ImmRenderer VBORenderer ShaderRenderer
 CLSS += Glyph Font TextFormat
 CLSS += Audio SoundClip
 CLSS += Input Action
 CLSS += Thread JobThread ThreadPool Job
-CLSS += Lua LuaAPI
+CLSS += Game
+CLSS += Lua LuaAPI luaP LuaGame
 
 HDRS  = $(patsubst %,%.h,$(CLSS))
 HDRS += pix5.h Str.h List.h SortedList.h FIFO.h Error.h errors.h Math.h
@@ -20,7 +21,7 @@ HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
 SRCS += init.cc get_ms.cc
-SRCS += la_print.cc
+SRCS += la_print.cc la_texture.cc
 
 DATA = vs.glsl fs.glsl LiberationSans-Regular.ttf
 

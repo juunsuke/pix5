@@ -1,8 +1,10 @@
 #pragma once
 
 
-class Rect
+class Rect: public Obj
 {
+	PIXOBJ("Rect")
+
 public:
 
 	int x, y;

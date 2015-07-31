@@ -3,8 +3,10 @@
 
 #define STR_SHORT_BUF_SIZE		256
 
-class Str
+class Str: public Obj
 {
+	PIXOBJ("Str")
+
 
 	int _len;
 	// Current string length

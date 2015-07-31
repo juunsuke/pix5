@@ -4,8 +4,10 @@ class SoundClip;
 
 namespace Audio { void audio_cb(void*, uint8_t*, int); }
 
-class SoundClip
+class SoundClip: public Obj
 {
+	PIXOBJ("SoundClip")
+
 	int _freq;
 	// Frequency of the clip, in hertz
 

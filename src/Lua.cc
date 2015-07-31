@@ -4,6 +4,10 @@
 namespace PIX {
 
 
+void luaP_init(lua_State *lua);
+void luaP_done(lua_State *lua);
+
+
 extern LuaAPI _core_api[];
 // The core API, from LuaAPI.cc
 
@@ -16,11 +20,15 @@ Lua::Lua(bool reg_api)
 
 	if(reg_api)
 		register_api();
+
+	// Init luaP
+	luaP_init(_lua);
 }
 
 Lua::~Lua()
 {
 	// Close the state
+	luaP_done(_lua);
 	lua_close(_lua);
 }
 
@@ -111,17 +119,35 @@ void Lua::load_file(const Str& fname, bool run)
 	}
 
 	// Run it ?
-	if(run)
-	{
-		if(lua_pcall(_lua, 0, 0, 0))
-		{
-			Str err = lua_tostring(_lua, -1);
-			lua_pop(_lua, 1);
-
-			E::Lua("Runtime error: %s", err.ptr());
-		}
-	}
+	if(run && lua_pcall(_lua, 0, 0, 0))
+		error();
 }
+
+bool Lua::get_global_func(const char *name)
+{
+	// Find the global function
+	lua_getglobal(_lua, name);
+
+	if(!lua_isfunction(_lua, -1))
+	{
+		// Not found
+		lua_pop(_lua, 1);
+		return false;
+	}
+
+	// Found
+	return true;
+}
+
+void Lua::error()
+{
+	// Pop the error message
+	Str s = lua_tostring(_lua, -1);
+	lua_pop(_lua, 1);
+
+	E::LuaRuntime("%s", s.ptr());
+}
+
 
 
 }

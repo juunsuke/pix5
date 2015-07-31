@@ -27,6 +27,7 @@ struct FT_FaceRec_;
 namespace PIX
 {
 
+#include "Obj.h"
 
 #include "Str.h"
 #include "Error.h"
@@ -130,10 +131,14 @@ int load_file(const Str& fname, char **buf);
 
 #include "Cache.h"
 
-#include "LuaAPI.h"
-#include "Lua.h"
 
 #include "EventHandler.h"
+#include "Game.h"
+
+#include "luaP.h"
+#include "LuaAPI.h"
+#include "Lua.h"
+#include "LuaGame.h"
 
 
 }

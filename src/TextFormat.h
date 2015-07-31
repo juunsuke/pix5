@@ -1,8 +1,10 @@
 #pragma once
 
 
-class TFState
+class TFState: public Obj
 {
+	PIXOBJ("TFState")
+
 public:
 
 	Font *font;
@@ -56,8 +58,10 @@ public:
 };
 
 
-class TextFormat
+class TextFormat: public Obj
 {
+	PIXOBJ("TextFormat")
+
 	TFState _state;
 	// Current state
 

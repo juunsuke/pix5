@@ -1,12 +1,14 @@
 #pragma once
 
 
-class EventHandler
+class EventHandler: public Obj
 {
+	PIXOBJ("EventHandler")
+
 public:
 
 	EventHandler();
-	virtual ~EventHandler();
+	~EventHandler();
 
 
 	void process_events();

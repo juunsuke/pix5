@@ -8,8 +8,10 @@
 // Which returns -1, 0, or 1, depending of if it's lesser, equal, or greater than 'o', respectively
 //
 
-template<class T> class SortedList
+template<class T> class SortedList: public Obj
 {
+	PIXOBJ("SortedList")
+
 	List<T> _list;
 	// The actual list we're wrapping
 

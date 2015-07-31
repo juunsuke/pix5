@@ -4,8 +4,10 @@ namespace PIX {
 namespace Cache {
 
 
-class CachedTexture
+class CachedTexture: public Obj
 {
+	PIXOBJ("CachedTexture")
+
 public:
 
 	Str name;
@@ -28,8 +30,10 @@ public:
 	}
 };
 
-class CachedFont
+class CachedFont: public Obj
 {
+	PIXOBJ("CachedFont")
+
 public:
 
 	Str name;

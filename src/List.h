@@ -4,8 +4,10 @@
 #define DEFAULT_LIST_STRIDE			128
 
 
-template<class T> class List
+template<class T> class List: public Obj
 {
+	PIXOBJ("PIX::List")
+
 	T *_buf;
 	// Actual array buffer
 

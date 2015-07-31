@@ -1,8 +1,10 @@
 #pragma once
 
 
-class Font
+class Font: public Obj
 {
+	PIXOBJ("Font")
+
 	struct FT_FaceRec_* _face;
 	// The actual Freetype face
 

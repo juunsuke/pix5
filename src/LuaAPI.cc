@@ -3,7 +3,8 @@
 namespace PIX {
 
 
-int la_print(lua_State *lua);
+LUAF(la_print);
+LUAF(la_texture_load);
 
 
 //
@@ -13,10 +14,12 @@ int la_print(lua_State *lua);
 LuaAPI _core_api[] =
 {
 	{ NULL,					"print",					la_print						},
+	{ "texture",			"load",						la_texture_load					},
 
 
 	{ NULL, NULL, NULL },
 };
+
 
 
 

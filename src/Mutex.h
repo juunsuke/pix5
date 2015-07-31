@@ -22,7 +22,6 @@ public:
 	{
 		// Destroy the mutex
 		pthread_mutex_destroy(&_th);
-		printf("!\n");
 	}
 
 	inline void lock()

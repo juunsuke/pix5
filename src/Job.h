@@ -25,7 +25,7 @@ namespace JobState
 
 
 
-class Job
+class Job: public Obj
 {
 public:
 
@@ -38,7 +38,7 @@ public:
 
 
 	Job();
-	virtual ~Job();
+	~Job();
 
 
 	virtual void job_start() = 0;

@@ -37,10 +37,15 @@ namespace TextureWrap
 }
 
 
-class Texture
+class Texture: public Obj
 {
+	PIXOBJ("Texture")
+
 	int _w, _h;
 	// Texture size
+
+	Str _file;
+	// File name, when the texture was loaded
 
 	uint32_t *_data;
 	// Raw data, in ABGR format
@@ -64,10 +69,6 @@ class Texture
 	
 	Texture();
 	// Empty texture, used internally
-
-	Texture(const Texture& o) { }
-	Texture& operator=(const Texture& o) { return *this; }
-	// No copy constructor or affectation available
 
 	void create_gl();
 	// Create/bind/configure/upload the OpenGL texture
@@ -107,6 +108,9 @@ public:
 	void delete_gl();
 	// Delete the OpenGL texture, if it exists
 
+
+	inline Str file() const { return _file; }
+	// Get the filed name, when the texture was loaded
 
 	inline int width() const { return _w; }
 	inline int height() const { return _h; }

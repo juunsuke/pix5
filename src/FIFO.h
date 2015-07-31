@@ -3,8 +3,10 @@
 
 #define DEFAULT_FIFO_STRIDE			128
 
-template<class T> class FIFO
+template<class T> class FIFO: public Obj
 {
+	PIXOBJ("FIFO")
+
 	T *_buf;
 	// Array
 

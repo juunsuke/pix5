@@ -72,6 +72,7 @@ Texture *Texture::load(const Str& fname)
 
 	// Create a new, empty texture
 	Texture *tex = Texture::create(sur->w, sur->h, false);
+	tex->_file = fname;
 
 	// Copy the surface data
 	SDL_LockSurface(sur);

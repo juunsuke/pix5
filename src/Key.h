@@ -1,8 +1,9 @@
 #pragma once
 
 
-class Key
+class Key: public Obj
 {
+	PIXOBJ("Key")
 public:
 
 	KeyCode code;

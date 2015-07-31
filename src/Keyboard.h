@@ -10,8 +10,10 @@
 #define MOD_GUI				0x08
 
 
-class Keyboard
+class Keyboard: public Obj
 {
+	PIXOBJ("Keyboard")
+
 public:
 
 	Key keys[512];
