@@ -20,8 +20,8 @@ static Obj *_first = NULL;
 static Obj *_last = NULL;
 
 
-void obj_init() __attribute__((constructor(101)));
-void obj_done() __attribute__((destructor(101)));
+void obj_init() __attribute__((constructor(102)));
+void obj_done() __attribute__((destructor(102)));
 
 
 void obj_init()
@@ -41,7 +41,16 @@ void obj_done()
 {
 	// Look for memory leaks
 	for(Obj *run = _first->__obj_next; run!=_last; run = run->__obj_next)
-		fprintf(stderr, "Instance not freed: %s\n", run->__obj_get_name());
+		fprintf(stderr, "Instance not freed: class %s\n", run->__obj_get_name());
+
+	Obj *f = _first;
+	Obj *l = _last;
+
+	_first = NULL;
+	_last = NULL;
+
+	delete f;
+	delete l;
 }
 
 

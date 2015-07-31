@@ -2,8 +2,10 @@
 
 #ifdef DBG
 	#define PIXOBJ(name) const char *__obj_get_name() { return "PIX::" name; }
+	#define OBJ(name) const char *__obj_get_name() { return name; }
 #else
 	#define PIXOBJ(name)
+	#define OBJ(name)
 #endif
 
 

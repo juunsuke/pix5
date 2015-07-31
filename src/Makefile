@@ -1,6 +1,7 @@
 
 TARGET = pix5
 DBG = 1
+OVERLOAD_NEW_DELETE = 1
 
 ########################################################################################################################
 
@@ -20,7 +21,7 @@ HDRS += Mouse.h keys.h Key.h Keyboard.h Joystick.h JoyAxis.h JoyButton.h JoyHat.
 HDRS += Mutex.h Condition.h Barrier.h RWLock.h
 
 SRCS  = $(patsubst %,%.cc,$(CLSS))
-SRCS += init.cc get_ms.cc
+SRCS += init.cc get_ms.cc dbg.cc
 SRCS += la_print.cc la_texture.cc
 
 DATA = vs.glsl fs.glsl LiberationSans-Regular.ttf
@@ -68,6 +69,11 @@ LFLAGS = -pthread
 ifdef DBG
 CFLAGS += -Og -g -DDBG
 LFLAGS += -Og -g
+
+ifdef OVERLOAD_NEW_DELETE
+CFLAGS += -DOVERLOAD_NEW_DELETE
+endif
+
 else
 CFLAGS += -O2 -DRELEASE
 LFLAGS += -O2
