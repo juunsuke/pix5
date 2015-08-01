@@ -104,6 +104,8 @@ void pix_shutdown()
 
 	Log::log("Shutting down PIX...");
 
+	Cache::done();
+
 	// Shutdown the modules
 	for(int c = _num_modules-1; c>=0; c--)
 	{
@@ -111,8 +113,6 @@ void pix_shutdown()
 		_modules[c].shutdown();
 	}
 //	Audio::done();
-
-	Cache::done();
 
 	SDL_Quit();
 
