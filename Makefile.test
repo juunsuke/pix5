@@ -1,0 +1,16 @@
+
+OUT_BIN = test
+PIXDIR = .
+
+HDRS =
+
+SRCS = test.cc
+
+PIXLIBS = core input gfx
+
+
+
+
+include Rules.make
+
+

@@ -1,0 +1,221 @@
+#pragma once
+
+
+#define DEFAULT_LIST_STRIDE			128
+
+
+template<class T> class List
+{
+	T *_buf;
+	// Actual array buffer
+
+	int _size;
+	// Number of elements in the list
+
+	int _alloc;
+	// Number of allocated elements
+
+	int _stride;
+	// List stride, in elements
+
+
+	void copy(const List<T>& o)
+	{
+		// Copy another list
+		_size = o._size;
+		_alloc = _size;
+		_stride = o._stride;
+
+		if(_size)
+		{
+			_buf = (T*)malloc(_alloc*sizeof(T));
+			memcpy(_buf, o._buf, _size*sizeof(T));
+		}
+		else
+			_buf = NULL;
+	}
+
+	inline void check_index(int index, const char *func, bool allow_end = false) const
+	{
+		#ifdef DBG
+			// Validate an index
+			if(index<0 || (!allow_end && index>=_size) || (allow_end && index>_size))
+				E::OutOfBounds("List<%s>::%s(): Index out of bounds.  Index:%i  Size:%i", demangle(typeid(T).name()).ptr(), func, index, _size);
+		#endif
+	}
+
+public:
+
+	List(int stride = DEFAULT_LIST_STRIDE)
+	{
+		// Empty list
+		_buf = NULL;
+		_size = 0;
+		_alloc = 0;
+		_stride = stride;
+	}
+
+	List(const List<T>& o)
+	{
+		// Copy constructor
+		copy(o);
+	}
+
+	~List()
+	{
+		#ifdef DBG
+		if(_size)
+			Log::debug("List<%s>::~List(): The list still contains %i elements", demangle(typeid(T).name()).ptr(), _size);
+		#endif
+
+		if(_buf)
+			free(_buf);
+	}
+
+	List<T>& operator=(const List<T>& o)
+	{
+		// Affectation
+		#ifdef DBG
+		if(_size)
+			Log::debug("List<%s>::~operator=(): The list still contains %i elements", demangle(typeid(T).name()).ptr(), _size);
+		#endif
+
+		if(_buf)
+			free(_buf);
+
+		copy(o);
+		return *this;
+	}
+
+
+	void set_stride(int stride)
+	{
+		// Change the stride
+		ASSERT(stride>=1, "List<>::set_stride(): Invalid stride")
+
+		_stride = stride;
+	}
+
+	int stride() const { return _stride; }
+	// Retrieve the stride
+
+	inline int size() const { return _size; };
+	// Get the size of the list
+
+	inline T get(int index) const
+	{
+		// Get an element
+		check_index(index, "get");
+		return _buf[index];
+	}
+
+	inline void set(int index, T val)
+	{
+		// Set an element
+		check_index(index, "set");
+		_buf[index] = val;
+	}
+
+	inline T& operator[](int index)
+	{
+		// Return a reference to an element
+		// The returned reference can be considered valid until the next call to any List function
+		// As such, references should not be kept, but rather used immediatly and discarded
+		check_index(index, "operator[]");
+		return _buf[index];
+	}
+
+	void clear_nodel()
+	{
+		// Clear the list without deleting entries
+		if(_buf)
+		{
+			free(_buf);
+			_buf = NULL;
+		}
+
+		_size = 0;
+		_alloc = 0;
+	}
+
+	void clear_del()
+	{
+		// Delete every elements
+		for(int c = 0; c<_size; c++)
+			delete _buf[c];
+
+		// Clear the buffer
+		clear_nodel();
+	}
+
+	int insert(T val, int index)
+	{
+		// Insert a value in the list at the given index
+		// Returns 'index'
+
+		check_index(index, "insert", true);
+
+		// Enlarge the buffer ?
+		if(_size==_alloc)
+		{
+			// Yes
+			_alloc += _stride;
+			_buf = (T*)realloc(_buf, _alloc*sizeof(T));
+		}
+
+		// Move data to the right ?
+		if(index<_size)
+			memmove(_buf+index+1, _buf+index, (_size-index)*sizeof(T));
+
+		// Set the new element
+		_buf[index] = val;
+		_size++;
+
+		return index;
+	}
+
+	inline int add(T val)
+	{
+		// Add an element at the end of the list
+		return insert(val, _size);
+	}
+
+	void remove_nodel(int index, int count = 1)
+	{
+		// Remove an element from the list, without deleting it
+		check_index(index, "remove_nodel");
+		check_index(index+count, "remove_nodel", true);
+
+		// Move data to the left ?
+		if((index+count)<_size)
+			memmove(_buf+index, _buf+index+count, (_size-index-count)*sizeof(T));
+
+		_size -= count;
+	}
+
+	inline void remove_del(int index, int count = 1)
+	{
+		// Remove an element from the list, deleting it
+		check_index(index, "remove_del");
+		check_index(index+count, "remove_del", true);
+
+		for(int c = 0; c<count; c++)
+			delete _buf[index+c];
+
+		remove_nodel(index, count);
+	}
+
+	int find(const T& val, int start = 0) const
+	{
+		// Find the first instance of the given value within the list
+		for(int c = start; c<_size; c++)
+			if(_buf[c]==val)
+				return c;
+
+		// Not found
+		return -1;
+	}
+};
+
+
+
