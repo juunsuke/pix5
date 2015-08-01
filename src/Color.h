@@ -9,12 +9,7 @@ class Color
 	inline uint32_t f2i(float v)
 	{
 		// Clamp and convert a float component to an integer value in range 0..255
-		if(v<0)
-			v = 0;
-		else if(v>1.0f)
-			v = 1.0f;
-
-		return (uint32_t)(v*255.0f);
+		return (uint32_t)(Math::fclamp(v)*255.0f);
 	}
 
 public:
@@ -128,6 +123,7 @@ public:
 		float rr = (sr*sa + dr*da*inv_sa)/ra;
 		float rg = (sg*sa + dg*da*inv_sa)/ra;
 		float rb = (sb*sa + db*da*inv_sa)/ra;
+
 
 		return Color(rr, rg, rb, ra);
 	}
