@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+bi_data.cc
+bi_data.h
+test_d
+test_r
+

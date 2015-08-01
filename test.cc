@@ -1,4 +1,4 @@
-#include "gfx/pix5gfx.h"
+#include "pix5.h"
 
 
 class MyHandler: public GfxEventHandler

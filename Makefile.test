@@ -2,6 +2,10 @@
 OUT_BIN = test
 PIXDIR = .
 
+
+
+CLSS = 
+
 HDRS =
 
 SRCS = test.cc
@@ -11,6 +15,6 @@ PIXLIBS = core input gfx
 
 
 
-include Rules.make
+include $(PIXDIR)/Rules.make
 
 
