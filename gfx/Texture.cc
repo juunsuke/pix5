@@ -117,6 +117,12 @@ Texture *Texture::cache(const Str& name)
 	return tex;
 }
 	
+void Texture::add_cache(const Str& name)
+{
+	// Add this texture to the cache
+	Cache::add(name, this, kill_tex);
+}
+	
 Texture *Texture::sub(const Rect& r)
 {
 	ASSERT(r.w>=1 && r.h>=1, "Texture::sub(): Invalid dimensions")

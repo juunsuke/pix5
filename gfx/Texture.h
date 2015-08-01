@@ -108,6 +108,11 @@ public:
 
 	~Texture();
 
+
+	void add_cache(const Str& name);
+	// Add this texture to the cache with the given name
+
+
 	Texture *sub(const Rect& r);
 	inline Texture *sub(int x, int y, int w, int h) { return sub(Rect(x, y, w, h)); }
 	// Create a sub-texture
