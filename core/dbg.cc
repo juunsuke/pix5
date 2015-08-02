@@ -24,7 +24,7 @@ typedef struct MemBlock
 static MemBlock *_first = NULL;
 static MemBlock *_last = NULL;
 
-static Mutex _mtx;
+//static Mutex _mtx;
 
 
 void dbg_init()
@@ -57,14 +57,14 @@ void *operator new(size_t size, const char *file, int line)
 	*(MemBlock**)(((char*)mb)+sizeof(MemBlock)+size) = mb;
 
 	// Insert it in the doubly linked list
-	_mtx.lock();
+	//_mtx.lock();
 
 	mb->prev = _first;
 	mb->next = _first->next;
 	mb->prev->next = mb;
 	mb->next->prev = mb;
 
-	_mtx.unlock();
+	//_mtx.unlock();
 
 	return mb+1;
 }
@@ -85,12 +85,12 @@ void new_delete(void *ptr)
 		E::Assert("new_delete(): Overflow detected");
 
 	// Unlink it
-	_mtx.lock();
+	//_mtx.lock();
 
 	mb->prev->next = mb->next;
 	mb->next->prev = mb->prev;
 
-	_mtx.unlock();
+	//_mtx.unlock();
 
 	free(mb);
 }
@@ -111,12 +111,12 @@ void operator delete(void *ptr)
 		E::Assert("delete(): Overflow detected");
 
 	// Unlink it
-	_mtx.lock();
+	//_mtx.lock();
 
 	mb->prev->next = mb->next;
 	mb->next->prev = mb->prev;
 
-	_mtx.unlock();
+	//_mtx.unlock();
 
 
 	free(mb);

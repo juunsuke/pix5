@@ -18,6 +18,14 @@ int main(int argc, char **argv)
 
 	Texture *tex = Texture::cache("src/data/konata.png");
 
+	TcpSocket *s;
+	s = new TcpSocket();
+
+	SockAddr sa(Net::resolve("www.google.ca"), 80);
+
+	s->create();
+	s->connect(sa);
+
 	for(;;)
 	{
 		Display::clear(Color(0.9f, 0.3f, 0.4f));
