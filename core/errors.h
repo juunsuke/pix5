@@ -54,12 +54,7 @@ PIXERR( 0x30000002, BadJoyHat,			"Invalid joystick hat index" )
 
 
 // Network errors
-PIXERR( 0x40000001, SocketCreate,		"Error creating a socket" )
-PIXERR( 0x40000002, SocketBind,			"Error binding a socket" )
-PIXERR( 0x40000003, SocketConnect,		"Error connecting a TCP socket" )
-PIXERR( 0x40000004, NetResolve,			"Could not resolve host name" )
-PIXERR( 0x40000005, NetBufferFull,		"The network buffer is full" )
-
-
+PIXERR( 0x40000001, NetResolve,			"Could not resolve host name" )
+PIXERR( 0x40000002, Socket,				"Socket error" )
 
 

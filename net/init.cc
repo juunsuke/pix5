@@ -1,12 +1,22 @@
 #include "pix5net.h"
 
 
+namespace Net
+{
+	void init();
+	void done();
+}
+
+
+
 static void net_init()
 {
+	Net::init();
 }
 
 static void net_shutdown()
 {
+	Net::done();
 }
 
 

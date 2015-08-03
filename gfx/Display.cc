@@ -32,6 +32,8 @@ static SDL_Cursor *_cur_cur = NULL;
 
 void init()
 {
+	SDL_InitSubSystem(SDL_INIT_VIDEO);
+
 	_window = NULL;
 	_gl = NULL;
 	_cur_mode.type = VideoModeType::None;

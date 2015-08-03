@@ -36,6 +36,8 @@ void reset();
 
 void init()
 {
+	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
 	reset();
 
 	_repeat = false;
@@ -227,10 +229,7 @@ static void handle_joy_device_added(InputEventHandler *eh, const SDL_JoyDeviceEv
 	// Add the joystick to the list
 	_joys.add(joy);
 
-	char buf[1024];
-	SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(sj), buf, 1024);
-
-	Log::log("Joystick connected: [%i] {%s} %s", joy->id, buf, joy->name.ptr());
+	Log::log("Joystick connected: [%i] %s", joy->id, joy->name.ptr());
 	Log::log("   %i axes, %i buttons, %i hats", joy->axis.size(), joy->buts.size(), joy->hats.size());
 
 	// Report

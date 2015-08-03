@@ -48,28 +48,9 @@ int NetBuffer::make_room(int size, bool partial)
 	return Math::min(have, size);
 }
 
-void NetBuffer::add(void *ptr, int size)
+int NetBuffer::add(const void *ptr, int size, bool partial)
 {
-	//_mtx.lock();
-
-	// Make room for the data
-	if(!make_room(size, false))
-	{
-		// Failure
-		//_mtx.unlock();
-		E::NetBufferFull();
-	}
-
-	// Add the data
-	memcpy((void*)(_buf+_pos+_size), ptr, size);
-	_size += size;
-
-	//_mtx.unlock();
-}
-
-int NetBuffer::try_add(void *ptr, int size, bool partial)
-{
-	//_mtx.lock();
+	_mtx.lock();
 
 	// Try to make room
 	int room = make_room(size, partial);
@@ -81,8 +62,62 @@ int NetBuffer::try_add(void *ptr, int size, bool partial)
 		_size += room;
 	}
 
-	//_mtx.unlock();
+	_mtx.unlock();
 
 	return room;
+}
+
+int NetBuffer::peek_get(void *ptr, int pos, int size, bool partial, bool remove)
+{
+	_mtx.lock();
+
+	// First check for no-data cases
+	if(pos<0 || pos>=_size || size<=0)
+	{
+		_mtx.unlock();
+		return 0;
+	}
+
+	// Adjust the size
+	if((pos+size)>_size)
+	{
+		// If no partial is allowed, returned 0
+		if(!partial)
+		{
+			_mtx.unlock();
+			return 0;
+		}
+
+		size = _size-pos;
+	}
+
+	// Copy the data
+	memcpy(ptr, (void*)(_buf+_pos+pos), size);
+
+	if(remove)
+	{
+		_size -= size;
+
+		if(_size)
+			_pos += size;
+		else
+			_pos = 0;
+	}
+
+	_mtx.unlock();
+
+	return size;
+}
+
+int NetBuffer::peek(void *ptr, int pos, int size)
+{
+	// Peek some data
+	return peek_get(ptr, pos, size, true, false);
+}
+
+int NetBuffer::get(void *ptr, int size, bool partial)
+{
+	// Get some data
+	return peek_get(ptr, 0, size, partial, true);
 }
 

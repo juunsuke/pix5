@@ -3,7 +3,7 @@ OUT_LIB = pix5net
 
 
 
-CLSS = NetSocket TcpSocket Net NetBuffer
+CLSS = Net NetBuffer UdpSocket
 
 HDRS = pix5net.h SockAddr.h
 
