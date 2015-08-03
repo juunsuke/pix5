@@ -33,11 +33,11 @@ int main(int argc, char **argv)
 {
 	pix_init("Test");
 
-	Display::set_mode(VideoMode::resizable());
+	Display::set_mode(VideoMode::resizable(1366, 768, false));
 
 	MyHandler mh;
 
-	Texture *tex = Texture::cache("src/data/konata.png");
+	Texture *tex = Texture::cache("src/data/konata.png")->sub(0, 0, 32, 32);
 
 	SockAddr sa(Net::resolve("localhost"), 9999);
 
@@ -62,7 +62,8 @@ int main(int argc, char **argv)
 
 		Display::clear(Color(0.9f, 0.3f, 0.4f));
 
-		tex->draw(100, 10);
+		for(int c = 0; c<10000; c++)
+			tex->draw(rand()%1000, rand()%1000);
 
 		Display::render();
 
