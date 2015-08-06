@@ -56,5 +56,8 @@ PIXERR( 0x30000002, BadJoyHat,			"Invalid joystick hat index" )
 // Network errors
 PIXERR( 0x40000001, NetResolve,			"Could not resolve host name" )
 PIXERR( 0x40000002, Socket,				"Socket error" )
+PIXERR( 0x40000003, EndPoint,			"EndPoint error" )
+PIXERR( 0x40000004, NetMessage,			"NetMessage error" )
+
 
 

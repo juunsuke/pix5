@@ -4,7 +4,7 @@
 static bool _run = true;
 
 
-UdpSocket *sok;
+UdpEndPoint *cli, *srv;
 
 
 class MyHandler: public GfxEventHandler
@@ -20,9 +20,16 @@ public:
 	{
 		if(key==KEY_SPACE)
 		{
-			static int counter = 0;
-			Str s = Str::build("Oink oink %i\n", counter++);
-			sok->send(SockAddr(Net::resolve("localhost"), 9999), s.ptr(), s.len());
+			NetMessage *msg = new NetMessage();
+			msg->add_i32(748);
+			msg->add_str("Proutentakendok");
+
+			for(int c = 0; c<12000; c++)
+				msg->add_i64(c*c);
+
+			msg->add_str("Shtre");
+
+			cli->send_message(msg);
 		}
 	}
 
@@ -33,37 +40,59 @@ int main(int argc, char **argv)
 {
 	pix_init("Test");
 
-	Display::set_mode(VideoMode::resizable(1366, 768, false));
+	Display::set_mode(VideoMode::resizable(
+		//1366, 768, false
+	));
 
 	MyHandler mh;
 
-	Texture *tex = Texture::cache("src/data/konata.png")->sub(0, 0, 32, 32);
-
-	SockAddr sa(Net::resolve("localhost"), 9999);
+	Texture *tex = Texture::cache("src/data/konata.png");
 
 
-	Str str = "Proute\r\n";
 
-	sok = new UdpSocket();
-	if(sok->send(sa, str.ptr(), str.len()))
-		printf("Success\n");
-	else
-		printf("Failure\n");
+
+	cli = new UdpEndPoint();
+	cli->connect(SockAddr(Net::resolve("localhost"), 6464));
+
+
+
+	srv = new UdpEndPoint();
+	srv->listen(SockAddr(0, 6464));
 
 	while(_run)
 	{
-		char buf[512];
-		int r = sok->recv(sa, buf);
-		if(r)
+		cli->handle();
+		srv->handle();
+
+		if(cli->state()==EndPointState::Error)
+			printf("Client is error: %s\n", cli->error().ptr());
+
+		if(srv->state()==EndPointState::Error)
+			printf("Server is error: %s\n", srv->error().ptr());
+
+		if(srv->state()==EndPointState::Connected)
 		{
-			buf[r] = 0;
-			printf("Received %i bytes from %s: %s\n", r, sa.format_ip_port().ptr(), buf);
+			NetMessage *msg = srv->recv_message();
+			if(msg)
+			{
+				printf("Received %i bytes message\n", msg->size());
+
+				printf("i32: %i\n", msg->get_i32());
+				printf("str: '%s'\n", msg->get_str().ptr());
+
+				for(int c = 0; c<12000; c++)
+					//printf("%4i: %li\n", c, msg->get_i64());
+					msg->get_i64();
+				
+				printf("str: '%s'\n", msg->get_str().ptr());
+
+				delete msg;
+			}
 		}
 
 		Display::clear(Color(0.9f, 0.3f, 0.4f));
 
-		for(int c = 0; c<10000; c++)
-			tex->draw(rand()%1000, rand()%1000);
+		tex->draw(100, 100);
 
 		Display::render();
 
@@ -72,7 +101,8 @@ int main(int argc, char **argv)
 		mh.process_events();
 	}
 
-	delete sok;
+	delete cli;
+	delete srv;
 
 	pix_shutdown();
 

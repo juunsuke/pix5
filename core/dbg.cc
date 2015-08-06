@@ -108,7 +108,7 @@ void operator delete(void *ptr)
 		E::Assert("delete(): Invalid pointer");
 
 	if(*(MemBlock**)(((char*)mb)+sizeof(MemBlock)+mb->size) != mb)
-		E::Assert("delete(): Overflow detected");
+		E::Assert("delete(): %s: %i: Overflow detected", mb->file, mb->line);
 
 	// Unlink it
 	pthread_mutex_lock(&_mtx);

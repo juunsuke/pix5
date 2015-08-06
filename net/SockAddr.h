@@ -13,6 +13,7 @@ public:
 	{
 		// Clear
 		memset(&sin, 0, sizeof(sin));
+		sin.sin_family = AF_INET;
 	}
 
 	SockAddr(const SockAddr& o)

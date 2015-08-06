@@ -25,6 +25,9 @@ OUT_BIN_REL = $(OUT_BIN)_r
 PIXLIBS_DBG = $(patsubst %,-lpix5%_d,$(PIXLIBS))
 PIXLIBS_REL = $(patsubst %,-lpix5%,$(PIXLIBS))
 
+PIXDEP_DBG = $(patsubst %,$(PIXDIR)/libpix5%_d.so,$(PIXLIBS))
+PIXDEP_REL = $(patsubst %,$(PIXDIR)/libpix5%.so,$(PIXLIBS))
+
 BIN_SRCS = $(SRCS)
 endif
 
@@ -133,18 +136,18 @@ endif
 
 ########################################################################################################################
 
-$(OUT_BIN_DBG): $(BIN_OBJS_DBG) $(DEPS)
+$(OUT_BIN_DBG): $(BIN_OBJS_DBG) $(DEPS) $(PIXDEP_DBG)
 	$(LD) $(LD_OUT) $(OUT_BIN_DBG) $(BIN_OBJS_DBG) $(BIN_LOPTS_DBG)
 
-$(BIN_OBJS_DBG): dbg_%.o: %.cc $(DEPS)
+$(BIN_OBJS_DBG): dbg_%.o: %.cc $(DEPS) $(PIXDEP_DBG)
 	$(CC) $(CC_OUT) $@ $(BIN_COPTS_DBG) $<
 
 ########################################################################################################################
 
-$(OUT_BIN_REL): $(BIN_OBJS_REL) $(DEPS)
+$(OUT_BIN_REL): $(BIN_OBJS_REL) $(DEPS) $(PIXDEP_REL)
 	$(LD) $(LD_OUT) $(OUT_BIN_REL) $(BIN_OBJS_REL) $(BIN_LOPTS_REL)
 
-$(BIN_OBJS_REL): rel_%.o: %.cc $(DEPS)
+$(BIN_OBJS_REL): rel_%.o: %.cc $(DEPS) $(PIXDEP_REL)
 	$(CC) $(CC_OUT) $@ $(BIN_COPTS_REL) $<
 
 ########################################################################################################################
