@@ -39,11 +39,11 @@ PIXERR( 0x10000005, FreeType,			"FreeType error" )
 PIXERR( 0x10000005, Renderer,			"Renderer error" )
 
 
-// Audio errors
-PIXERR( 0x20000001, AudioStarted,		"Audio sub-system already started" )
-PIXERR( 0x20000002, AudioStart,			"Error starting audio" )
-PIXERR( 0x20000003, LoadVorbis,			"Error loading Ogg Vorbis file" )
-PIXERR( 0x20000004, BadTrack,			"Invalid track index" )
+// IO errors
+PIXERR( 0x20000001, BadMountPoint,		"Invalid mount point" )
+PIXERR( 0x20000002, OpenFile,			"Error opening a file" )
+PIXERR( 0x20000003, FileIO,				"File I/O error" )
+PIXERR( 0x20000004, DirIO,				"Directory error" )
 
 
 // Input errors

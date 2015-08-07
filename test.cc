@@ -59,6 +59,27 @@ int main(int argc, char **argv)
 	srv = new UdpEndPoint();
 	srv->listen(SockAddr(0, 6464));
 
+
+	List<MountEntry*> m;
+	IO::get_mounts(m);
+
+	for(int c = 0; c<m.size(); c++)
+		printf("[%i] '%s:' -> %s\n", c, m[c]->mount_point.ptr(), m[c]->desc.ptr());
+
+	m.clear_del();
+
+
+
+	List<FileEntry*> fe;
+
+	IO::get_files("home:/", fe);
+
+	for(int c = 0; c<fe.size(); c++)
+		printf("[%3i]  %c  %10li  %s\n", c, fe[c]->dir ? '*':' ', fe[c]->size, fe[c]->path.full().ptr());
+
+	fe.clear_del();
+
+
 	while(_run)
 	{
 		cli->handle();

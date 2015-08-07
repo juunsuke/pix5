@@ -12,12 +12,8 @@ static bool _has_parachute = false;
 // Wether the parachute has been installed
 
 
-// namespace Audio			{ void init(); void done(); }
- namespace Cache
-{
-	void init();
-	void done();
-}
+namespace Cache		{ void init(); void done(); }
+namespace IO		{ void init(); void done(); }
 
 
 
@@ -82,6 +78,7 @@ void pix_init(const Str& app_name)
 		_has_parachute = true;
 	}
 
+	IO::init();
 	Cache::init();
 
 	// Initialize the modules
@@ -90,8 +87,6 @@ void pix_init(const Str& app_name)
 		Log::log("Initializing module: %s", _modules[c].name);
 		_modules[c].init();
 	}
-
-//	Audio::init();
 
 	Log::log("PIX successfully initialized");
 }
@@ -112,7 +107,8 @@ void pix_shutdown()
 		Log::log("Shutting down module: %s", _modules[c].name);
 		_modules[c].shutdown();
 	}
-//	Audio::done();
+
+	IO::done();
 
 	SDL_Quit();
 

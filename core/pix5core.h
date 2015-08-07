@@ -58,13 +58,6 @@ int64_t get_ms();
 // Get an ever-increasing time value in milliseconds
 // Usually the time since the OS booted, but not guaranteed to be so
 
-int load_file(const Str& fname, char **buf);
-// Loads a file, allocates a buffer and sets its address into buf
-// A terminal zero is added at the end
-// Returns the number of bytes read, exclusing the terminal zero
-// Returns -1 on error
-
-
 #ifdef DBG
 	#define ASSERT(x, m) if(!(x)) E::Assert("%s: %i: %s", __FILE__, __LINE__, m);
 	#define ASSERT_INIT(m) if(!PIX::was_init()) E::Assert("%s: %i: PIX was not initialized: %s", __FILE__, __LINE__, m);
@@ -100,6 +93,16 @@ int load_file(const Str& fname, char **buf);
 #include "Job.h"
 #include "JobThread.h"
 #include "ThreadPool.h"
+
+#include "FilePath.h"
+#include "FileAccess.h"
+#include "File.h"
+#include "FileUnix.h"
+#include "FileEntry.h"
+#include "MountEntry.h"
+#include "IOSource.h"
+#include "IOSourceUnix.h"
+#include "IO.h"
 
 // #include "SoundClip.h"
 // #include "Audio.h"
