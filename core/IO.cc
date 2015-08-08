@@ -145,33 +145,31 @@ File *open(const FilePath& path, FileAccess::Type access)
 	return _mounts[i]->src->on_open(path, access);
 }
 
-void *read_file(const FilePath& path, int *size)
+Buffer<char> *read_file(const FilePath& path, bool add_zero)
 {
 	// Try to open the file
 	File *f = open(path);
 
 	// Get its size and allocate the buffer
 	int sz = f->size();
-	char *buf = (char*)malloc(sz+1);
+	Buffer<char> *buf = new Buffer<char>(sz + (add_zero?1:0));
 
 	// Read the file
 	try
 	{
-		sz = f->read(buf, sz);
+		sz = f->read(buf->ptr(), sz);
 		delete f;
 	}
 	catch(Error)
 	{
 		// Some failure
-		free(buf);
+		delete buf;
 		delete f;
 		throw;
 	}
 
-	buf[sz] = 0;
-
-	if(size)
-		*size = sz;
+	if(add_zero)
+		(*buf)[sz] = 0;
 
 	return buf;
 }

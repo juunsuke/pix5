@@ -11,7 +11,6 @@ Texture::Texture()
 	// Empty texture
 	_w = 0;
 	_h = 0;
-	_data = NULL;
 	_gl = 0;
 	_dirty = true;
 	_min_filter = TextureFilter::Nearest;
@@ -23,9 +22,6 @@ Texture::Texture()
 Texture::~Texture()
 {
 	// Free a texture
-	if(_data)
-		free(_data);
-
 	delete_gl();
 }
 
@@ -38,13 +34,9 @@ Texture *Texture::create(int width, int height, bool clear)
 	Texture *tex = new Texture();
 	tex->_w = width;
 	tex->_h = height;
-	tex->_data = (uint32_t*)malloc(width*height*4);
+	tex->_data.resize(width*height, clear);
 	tex->_dirty = true;
 	tex->_clip = Rect(0, 0, width, height);
-
-	// Clear ?
-	if(clear)
-		memset(tex->_data, 0, width*height*4);
 
 	return tex;
 }
@@ -313,7 +305,7 @@ void Texture::clear(const Color& col)
 	// Copy over the other rows
 	for(int y = 1; y<_h; y++)
 	{
-		memcpy(ptr, _data, _w*4);
+		memcpy(ptr, _data.ptr(), _w*4);
 		ptr += _w;
 	}
 
@@ -355,7 +347,7 @@ void Texture::hline(int x1, int x2, int y, const Color& col)
 	if(x2>=(_clip.x+_clip.w))
 		x2 = _clip.x+_clip.w-1;
 
-	uint32_t *ptr = _data + y*_w + x1;
+	uint32_t *ptr = _data.ptr() + y*_w + x1;
 	for(int w = x2-x1+1; w>0; w--)
 		*(ptr++) = col;
 
@@ -380,7 +372,7 @@ void Texture::vline(int y1, int y2, int x, const Color& col)
 	if(y2>=(_clip.y+_clip.h))
 		y2 = _clip.y+_clip.h-1;
 
-	uint32_t *ptr = _data + y1*_w + x;
+	uint32_t *ptr = _data.ptr() + y1*_w + x;
 	for(int h = y2-y1+1; h>0; h--)
 	{
 		*ptr = col;
@@ -706,9 +698,9 @@ void Texture::blit(int dx, int dy, Texture *src, int sx, int sy, int w, int h, b
 
 	// Perform the proper blit
 	if(alpha)
-		blit_alpha(_data+dy*_w+dx, src->_data+sy*src->_w+sx, w, h, src->_w);
+		blit_alpha(_data.ptr()+dy*_w+dx, src->_data.ptr()+sy*src->_w+sx, w, h, src->_w);
 	else
-		blit_raw(_data+dy*_w+dx, src->_data+sy*src->_w+sx, w, h, src->_w);
+		blit_raw(_data.ptr()+dy*_w+dx, src->_data.ptr()+sy*src->_w+sx, w, h, src->_w);
 
 	_dirty = true;
 }

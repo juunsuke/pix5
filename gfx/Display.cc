@@ -470,8 +470,8 @@ static void create_mono_cursor(Texture *tex, int hx, int hy)
 	int cw = (tex->width()+7)/8;
 	int ch = tex->height();
 
-	uint8_t *data = (uint8_t*)calloc(1, cw*ch);
-	uint8_t *mask = (uint8_t*)calloc(1, cw*ch);
+	Buffer<uint8_t> data(cw*ch, true);
+	Buffer<uint8_t> mask(cw*ch, true);
 
 	for(int y = 0; y<tex->height(); y++)
 	{
@@ -500,8 +500,6 @@ static void create_mono_cursor(Texture *tex, int hx, int hy)
 	}
 
 	_cur_cur = SDL_CreateCursor(data, mask, cw*8, ch, hx, hy);
-	free(data);
-	free(mask);
 
 	if(!_cur_cur)
 		E::SDL("Error creating mono cursor: %s", SDL_GetError());

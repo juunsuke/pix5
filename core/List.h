@@ -6,14 +6,11 @@
 
 template<class T> class List
 {
-	T *_buf;
+	Buffer<T> _buf;
 	// Actual array buffer
 
 	int _size;
 	// Number of elements in the list
-
-	int _alloc;
-	// Number of allocated elements
 
 	int _stride;
 	// List stride, in elements
@@ -23,16 +20,8 @@ template<class T> class List
 	{
 		// Copy another list
 		_size = o._size;
-		_alloc = _size;
 		_stride = o._stride;
-
-		if(_size)
-		{
-			_buf = (T*)malloc(_alloc*sizeof(T));
-			memcpy(_buf, o._buf, _size*sizeof(T));
-		}
-		else
-			_buf = NULL;
+		_buf = o._buf;
 	}
 
 	inline void check_index(int index, const char *func, bool allow_end = false) const
@@ -49,9 +38,7 @@ public:
 	List(int stride = DEFAULT_LIST_STRIDE)
 	{
 		// Empty list
-		_buf = NULL;
 		_size = 0;
-		_alloc = 0;
 		_stride = stride;
 	}
 
@@ -67,9 +54,6 @@ public:
 		if(_size)
 			Log::debug("List<%s>::~List(): The list still contains %i elements", demangle(typeid(T).name()).ptr(), _size);
 		#endif
-
-		if(_buf)
-			free(_buf);
 	}
 
 	List<T>& operator=(const List<T>& o)
@@ -79,9 +63,6 @@ public:
 		if(_size)
 			Log::debug("List<%s>::~operator=(): The list still contains %i elements", demangle(typeid(T).name()).ptr(), _size);
 		#endif
-
-		if(_buf)
-			free(_buf);
 
 		copy(o);
 		return *this;
@@ -128,14 +109,8 @@ public:
 	void clear_nodel()
 	{
 		// Clear the list without deleting entries
-		if(_buf)
-		{
-			free(_buf);
-			_buf = NULL;
-		}
-
+		_buf.free();
 		_size = 0;
-		_alloc = 0;
 	}
 
 	void clear_del()
@@ -156,16 +131,11 @@ public:
 		check_index(index, "insert", true);
 
 		// Enlarge the buffer ?
-		if(_size==_alloc)
-		{
-			// Yes
-			_alloc += _stride;
-			_buf = (T*)realloc(_buf, _alloc*sizeof(T));
-		}
+		if(_size==_buf.size())
+			_buf.resize(_buf.size()+_stride);
 
-		// Move data to the right ?
-		if(index<_size)
-			memmove(_buf+index+1, _buf+index, (_size-index)*sizeof(T));
+		// Move data to the right
+		_buf.insert(index, 1);
 
 		// Set the new element
 		_buf[index] = val;
@@ -186,9 +156,8 @@ public:
 		check_index(index, "remove_nodel");
 		check_index(index+count, "remove_nodel", true);
 
-		// Move data to the left ?
-		if((index+count)<_size)
-			memmove(_buf+index, _buf+index+count, (_size-index-count)*sizeof(T));
+		// Move data to the left
+		_buf.cut(index, 1);
 
 		_size -= count;
 	}

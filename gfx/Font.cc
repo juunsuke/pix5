@@ -28,8 +28,6 @@ void font_done()
 Font::Font()
 {
 	_face = NULL;
-	_glyphs = NULL;
-	_num_glyphs = 0;
 }
 	
 Font *Font::load(const Str& fname, int ptsize)
@@ -65,14 +63,9 @@ Font *Font::load(const void *buf, int size, int ptsize)
 Font::~Font()
 {
 	// Free the glyphs
-	if(_glyphs)
-	{
-		for(int c = 0; c<_num_glyphs; c++)
-			if(_glyphs[c])
-				delete _glyphs[c];
-
-		free(_glyphs);
-	}
+	for(int c = 0; c<_glyphs.size(); c++)
+		if(_glyphs[c])
+			delete _glyphs[c];
 
 	// Free the face
 	if(_face)
@@ -114,15 +107,15 @@ void Font::setup(struct FT_FaceRec_* face, int ptsize)
 		E::FreeType("Error setting the font size to %i points", ptsize);
 
 	// Allocate the glyphs buffers
-	_num_glyphs = _face->num_glyphs;
-	_glyphs = (Glyph**)calloc(_num_glyphs, sizeof(Glyph*));
+	int num = _face->num_glyphs;
+	_glyphs.resize(num, true);
 
 	// Get the height and spacing
 	_height = (_face->size->metrics.ascender - _face->size->metrics.descender)/64;
 	_spacing = _face->size->metrics.height/64;
 	
 	#ifdef DBG
-	Log::debug("Success. %i glyphs, %i sizes, %i fixed sizes", _num_glyphs, _face->available_sizes, _face->num_fixed_sizes);
+	Log::debug("Success. %i glyphs, %i sizes, %i fixed sizes", num, _face->available_sizes, _face->num_fixed_sizes);
 	#endif
 
 }
@@ -132,7 +125,7 @@ Glyph *Font::get_glyph(int ch)
 	// Get the glyph index for the given character
 	int i = FT_Get_Char_Index(_face, ch);
 
-	ASSERT(i>=0 && i<_num_glyphs, "FT_Get_Char_Index() returned an out-of-range index, this shouldn't happen")
+	ASSERT(i>=0 && i<_glyphs.size(), "FT_Get_Char_Index() returned an out-of-range index, this shouldn't happen")
 
 	// Return the glyph if it's already loaded
 	if(_glyphs[i])
@@ -153,7 +146,7 @@ Glyph *Font::get_glyph(int ch)
 	// Copy the raw bitmap data
 	g->width = bmp->width;
 	g->height = bmp->rows;
-	g->data = (float*)malloc(g->width*g->height*sizeof(float));
+	g->data.resize(g->width*g->height);
 
 	// Build the glyph data
 	float *dp = g->data;

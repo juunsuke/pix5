@@ -3,14 +3,11 @@
 
 class NetMessage
 {
-	uint8_t *_buf;
+	Buffer<uint8_t> _buf;
 	// Raw data buffer
 
 	int _size;
-	// Raw data buffer size
-
-	int _alloc;
-	// Allocated size
+	// Actual message size
 
 	int _pos;
 	// Current read/write position

@@ -33,17 +33,13 @@ uint32_t ShaderRenderer::compile(int type, char *src, int len)
 		int len;
 		glGetShaderiv(sh, GL_INFO_LOG_LENGTH, &len);
 
-		char *buf = (char*)malloc(len);
-		glGetShaderInfoLog(sh, len, &len, buf);
-
-		// Copy into a string object
-		Str s(buf);
-		free(buf);
+		Buffer<char> buf(len);
+		glGetShaderInfoLog(sh, len, &len, buf.ptr());
 
 		// Destroy the shader and throw an error
 		glDeleteShader(sh);
 
-		E::Renderer("Error compiling shader: %s", s.ptr());
+		E::Renderer("Error compiling shader: %s", buf.ptr());
 	}
 
 	// Compilation was successful
@@ -71,15 +67,11 @@ void ShaderRenderer::create_prog()
 		int len;
 		glGetProgramiv(_prg, GL_INFO_LOG_LENGTH, &len);
 
-		char *buf = (char*)malloc(len);
-		glGetProgramInfoLog(_prg, len, &len, buf);
-
-		// Copy into a string object
-		Str s(buf);
-		free(buf);
+		Buffer<char> buf(len);
+		glGetProgramInfoLog(_prg, len, &len, buf.ptr());
 
 		// Throw an error
-		E::Renderer("Error linking shaders: %s", s.ptr());
+		E::Renderer("Error linking shaders: %s", buf.ptr());
 	}
 }
 

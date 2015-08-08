@@ -10,7 +10,7 @@ public:
 	int width, height;
 	// Glyph raw size, in pixels
 
-	float *data;
+	Buffer<float> data;
 	// Raw glyph data
 
 

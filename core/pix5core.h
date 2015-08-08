@@ -80,10 +80,12 @@ int64_t get_ms();
 #endif
 
 #include "Log.h"
+#include "Buffer.h"
 #include "List.h"
 #include "SortedList.h"
 #include "FIFO.h"
 #include "Math.h"
+#include "RNG.h"
 
 #include "Mutex.h"
 #include "Condition.h"

@@ -3,42 +3,26 @@
 
 NetMessage::NetMessage()
 {
-	_buf = NULL;
-	_size = 0;
-	_alloc = 0;
 	_pos = 0;
+	_size = 0;
 }
 
 NetMessage::~NetMessage()
 {
-	if(_buf)
-		free(_buf);
 }
 
 void NetMessage::copy(const NetMessage& o)
 {
+	_buf = o._buf;
 	_size = o._size;
-	_alloc = _size;
 	_pos = o._pos;
-
-	if(_size)
-	{
-		_buf = (uint8_t*)malloc(_size);
-		memcpy(_buf, o._buf, _size);
-	}
-	else
-		_buf = NULL;
 }
 	
 void NetMessage::add_size(int sz)
 {
 	// Resize the buffer ?
-	if((_size+sz)>_alloc)
-	{
-		// Yes
-		_alloc = _size+sz+1024;
-		_buf = (uint8_t*)realloc(_buf, _alloc);
-	}
+	if((_size+sz)>_buf.size())
+		_buf.resize(_size+sz+1024);
 
 	// Increase the size
 	_size += sz;
@@ -101,7 +85,7 @@ Str NetMessage::get_str()
 	has_size(len);
 	_pos += len;
 
-	return Str((char*)_buf+_pos-len, len);
+	return Str((char*)_buf.ptr()+_pos-len, len);
 }
 
 void NetMessage::get_raw(void *ptr, int size)

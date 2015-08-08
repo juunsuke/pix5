@@ -21,15 +21,13 @@ File *open(const FilePath& path, FileAccess::Type access = FileAccess::Read);
 // Open a file
 // Throws an error on failure
 
-void *read_file(const FilePath& path, int *size = NULL);
-// Read a whole file into an allocated buffer
+Buffer<char> *read_file(const FilePath& path, bool add_zero = false);
+// Read a whole file
 // If 'path' is successfully open for reading, a new buffer will be allocated
 // and the contents of the file will be read into it
-// The buffer address will be returned
-// If 'size' is not NULL, the number of read bytes will be stored there
-// The returned buffer is caller-owned and should be freed using free()
-// A terminal 0 is always appended at the end of the buffer, and is not
-// included in the size
+// If 'add_zero' is set to true, a terminal 0 character will be added at the
+// end of the buffer, which will be included in the buffer size
+// The returned buffer is caller-owned, and should be deleted when processed
 
 void get_files(const FilePath& path, List<FileEntry*> &files);
 // Retrieve the list of files in the directory pointed to by 'path'

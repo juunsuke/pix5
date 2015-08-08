@@ -6,11 +6,8 @@ class Font
 	struct FT_FaceRec_* _face;
 	// The actual Freetype face
 
-	Glyph **_glyphs;
+	Buffer<Glyph*> _glyphs;
 	// All the glyphs
-
-	int _num_glyphs;
-	// Number of glyphs
 
 	int _height, _spacing;
 	// Font height and vertical spacing

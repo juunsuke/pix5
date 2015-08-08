@@ -45,7 +45,7 @@ class Texture: public VideoData
 	Str _file;
 	// File name, when the texture was loaded
 
-	uint32_t *_data;
+	Buffer<uint32_t> _data;
 	// Raw data, in ABGR format
 
 	uint32_t _gl;
