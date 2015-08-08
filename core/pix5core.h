@@ -86,6 +86,7 @@ int64_t get_ms();
 #include "FIFO.h"
 #include "Math.h"
 #include "RNG.h"
+#include "GZip.h"
 
 #include "Mutex.h"
 #include "Condition.h"

@@ -28,6 +28,7 @@ PIXERR( 0x00000009, Lua,				"Lua error" )
 PIXERR( 0x0000000A, LuaAPI,				"Lua API error" )
 PIXERR( 0x0000000B, LuaRuntime,			"Lua runtime error" )
 PIXERR( 0x0000000C, Cache,				"Cache error" )
+PIXERR(	0x0000000D, ZLib,				"zlib error" )
 
 
 // Graphics errors

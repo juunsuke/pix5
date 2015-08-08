@@ -37,6 +37,7 @@ int main(int argc, char **argv)
 
 	Texture *tex = Texture::cache("src/data/konata.png");
 
+
 	while(_run)
 	{
 		Display::clear(Color(0.9f, 0.3f, 0.4f));

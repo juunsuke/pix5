@@ -1,6 +1,5 @@
 *** Core module
 
-	- GZip compression/decompression
 	- IOSource for ZIP and/or resource files
 
 
@@ -24,6 +23,5 @@
 	- Hex map engine
 	- Iso map engine
 	- Pathfinding
-
 
 
