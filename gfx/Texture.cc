@@ -145,6 +145,11 @@ void Texture::delete_gl()
 		_gl = 0;
 	}
 }
+	
+void Texture::release_video_data()
+{
+	delete_gl();
+}
 
 void Texture::set_filter(TextureFilter::Type min, TextureFilter::Type mag)
 {

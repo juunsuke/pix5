@@ -12,7 +12,6 @@ class VBORenderer: public Renderer
 	int _cur_vbo;
 	// VBO index currently in use
 
-
 protected:
 	void on_init();
 	void on_done();

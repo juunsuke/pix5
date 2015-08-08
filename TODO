@@ -1,0 +1,29 @@
+*** Core module
+
+	- GZip compression/decompression
+	- IOSource for ZIP and/or resource files
+
+
+*** Graphics module
+
+	- Render-to-texture
+	- Box2D integration
+	- Video playback
+
+
+*** Audio module
+
+	- Redo audio using OpenAL
+	- Mic input
+	- Voice compression
+
+
+*** Map module
+
+	- Tile map engine
+	- Hex map engine
+	- Iso map engine
+	- Pathfinding
+
+
+

@@ -37,7 +37,7 @@ namespace TextureWrap
 }
 
 
-class Texture
+class Texture: public VideoData
 {
 	int _w, _h;
 	// Texture size
@@ -79,6 +79,8 @@ class Texture
 
 	void blit_raw(uint32_t *dptr, uint32_t *sptr, int w, int h, int spitch);
 	void blit_alpha(uint32_t *dptr, uint32_t *sptr, int w, int h, int spitch);
+	
+	void release_video_data();
 
 public:
 

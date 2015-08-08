@@ -102,6 +102,9 @@ static void free_cur()
 
 void unset_mode()
 {
+	// Release all the video data
+	VideoData::release_all();
+
 	free_cur();
 
 	// Unset any currently set mode

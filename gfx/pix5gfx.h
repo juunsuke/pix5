@@ -16,6 +16,7 @@ struct FT_FaceRec_;
 #include "Rect.h"
 #include "Glyph.h"
 #include "Font.h"
+#include "VideoData.h"
 #include "Texture.h"
 #include "TextAlign.h"
 #include "TextFormat.h"

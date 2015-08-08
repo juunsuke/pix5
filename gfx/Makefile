@@ -3,7 +3,7 @@ OUT_LIB = pix5gfx
 
 
 
-CLSS = Display Font Glyph Renderer ImmRenderer VBORenderer ShaderRenderer TextFormat Texture GfxEventHandler
+CLSS = Display Font Glyph Renderer ImmRenderer VBORenderer ShaderRenderer TextFormat Texture GfxEventHandler VideoData
 
 HDRS = pix5gfx.h Color.h Rect.h RenderElement.h TextAlign.h VideoMode.h VideoModeType.h
 
