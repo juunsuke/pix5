@@ -19,7 +19,7 @@ uint32_t ShaderRenderer::compile(int type, char *src, int len)
 	uint32_t sh = glCreateShader(type);
 
 	// Provide the source
-	glShaderSource(sh, 1, &src, &len);
+	glShaderSource(sh, 1, (const char*)&src, &len);
 
 	// Compile it
 	glCompileShader(sh);
