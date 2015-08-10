@@ -197,7 +197,7 @@ int play(SoundClip *sc, int track, bool repeat, float vol, float pan, float pitc
 	trk->_sc = sc;
 	trk->_repeat = repeat;
 	trk->_vol = vol;
-	trk->_pan = Math::fclamp(pan);
+	trk->_pan = Math::fclamp(pan, -1, 1);
 	trk->_pitch = pitch;
 	trk->_pos = (double)Math::fclamp(pos);
 	trk->_adv = (1.0 / (double)sc->_samples) * ((double)sc->_freq / (double)_driver->get_freq());
@@ -258,16 +258,27 @@ void mix(int16_t *dest, int num, bool stereo)
 
 			// Get the sample
 			float smp1 = (float)trk->_sc->_buf[pos];
-			v1 += vol*smp1;
 
 			if(stereo)
 			{
 				float smp2 = trk->_sc->_chan==2 ? (float)trk->_sc->_buf[pos+1] : smp1;
+
+				// Adjust panning
+				if(trk->_pan!=0)
+				{
+					if(trk->_pan>0)
+						smp1 *= 1.0f-trk->_pan;
+					else
+						smp2 *= 1.0f+trk->_pan;
+				}
+
 				v2 += vol*smp2;
 			}
+			
+			v1 += vol*smp1;
 
 			// Advance the track
-			trk->_pos += trk->_adv;
+			trk->_pos += trk->_adv*trk->_pitch;
 		}
 
 		// Set the value

@@ -21,7 +21,15 @@ public:
 	{
 		if(key==KEY_SPACE)
 		{
-			Audio::play(sc);
+			Audio::play(sc, -1, false, 1, 0, 0.5f);
+		}
+		if(key==KEY_LEFT)
+		{
+			Audio::play(sc, -1, false, 1.0f, -1.0f);
+		}
+		if(key==KEY_RIGHT)
+		{
+			Audio::play(sc, -1, false, 1.0f, 1.0f);
 		}
 	}
 
@@ -45,7 +53,7 @@ int main(int argc, char **argv)
 
 	SoundClip *sc2 = SoundClip::load("FindYou.ogg");
 
-	Audio::play(sc2, -1, true);
+	Audio::play(sc2, -1, true, 1, 0, 2);
 
 
 	while(_run)
