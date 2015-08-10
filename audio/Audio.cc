@@ -54,6 +54,8 @@ static List<Track*> _tracks;
 static Track *_first, *_last;
 // Doubly linked list of active tracks
 
+static float _vol = 1.0f;
+// Master volume
 
 
 
@@ -72,6 +74,8 @@ void init()
 
 	_last->_next = NULL;
 	_last->_prev = _first;
+
+	_vol = 1.0f;
 
 	// Select a driver
 	_driver = new SDLAudio();
@@ -180,8 +184,7 @@ int play(SoundClip *sc, int track, bool repeat, float vol, float pan, float pitc
 	}
 	else
 	{
-		if(track<0 || track>=_tracks.size())
-			E::Assert("Audio::play(): Invalid track index");
+		ASSERT(track>=0 && track<_tracks.size(), "Audio::play(): Invalid track index");
 
 		// Unlink it if it's active
 		_driver->lock();
@@ -236,7 +239,7 @@ void mix(int16_t *dest, int num, bool stereo)
 		for(Track *trk = _first->_next; trk!=_last; trk = trk->_next)
 		{
 			// Get the final volume for this track
-			float vol = trk->_vol * trk->_sc->_vol;
+			float vol = _vol * trk->_vol * trk->_sc->_vol;
 
 			// Get a sample
 			int pos = (int)(trk->_pos*(double)trk->_sc->_samples);
@@ -307,7 +310,64 @@ void stop_clip(SoundClip *sc)
 	_driver->unlock();
 }
 
+float get_volume()
+{
+	return _vol;
+}
 
+void set_volume(float vol)
+{
+	_vol = vol;
+}
+
+bool is_track_active(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::is_track_playing(): Invalid track index");
+
+	return _tracks[track]->_active;
+}
+
+float get_volume(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::get_volume(): Invalid track index");
+
+	return _tracks[track]->_vol;
+}
+
+void set_volume(int track, float vol)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::set_volume(): Invalid track index");
+
+	_tracks[track]->_vol = vol;
+}
+
+float get_pan(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::get_pan(): Invalid track index");
+
+	return _tracks[track]->_pan;
+}
+
+void set_pan(int track, float pan)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::set_pan(): Invalid track index");
+
+	_tracks[track]->_pan = Math::fclamp(pan, -1, 1);
+}
+
+float get_pitch(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::get_pitch(): Invalid track index");
+
+	return _tracks[track]->_pitch;
+}
+
+void set_pitch(int track, float pitch)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::set_pitch(): Invalid track index");
+
+	_tracks[track]->_pitch = Math::fmax(0, pitch);
+}
 
 
 

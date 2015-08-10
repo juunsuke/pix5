@@ -53,11 +53,23 @@ int main(int argc, char **argv)
 
 	SoundClip *sc2 = SoundClip::load("FindYou.ogg");
 
-	Audio::play(sc2, -1, true, 1, 0, 2);
+	Audio::play(sc2, -1, true);
 
+
+	float p = 1;
+	float a = 0.01;
 
 	while(_run)
 	{
+		printf("%f\n", p);
+		Audio::set_pitch(0, p);
+		p += a;
+
+		if(p>3)
+			a = -a;
+		if(p<=0)
+			a = -a;
+
 		Display::clear(Color(0.9f, 0.3f, 0.4f));
 
 		tex->draw(100, 100);

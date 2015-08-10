@@ -28,6 +28,32 @@ void stop_clip(SoundClip *sc);
 // Stop any track playing this clip
 // Called during SoundClip's destructor to avoir segfaults
 
+float get_volume();
+void set_volume(float vol);
+// Get/set the master volume
+
+bool is_track_active(int track);
+// Returns true if the given track index is currently active
+
+
+//
+// The following functions act on tracks, referenced by their index
+// The functions do not check wether a track is active or not, and do
+// the change either way
+//
+
+float get_volume(int track);
+void set_volume(int track, float vol);
+// Get/set a track volume
+
+float get_pan(int track);
+void set_pan(int track, float pan);
+// Get/set a track's pan value, clamped between -1 and 1
+
+float get_pitch(int track);
+void set_pitch(int track, float pitch);
+// Get/set a track's pitch value
+// A pitch of 0 essentially pauses playback
 
 
 }
