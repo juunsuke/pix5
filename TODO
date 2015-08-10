@@ -1,6 +1,7 @@
 *** Core module
 
 	- IOSource for ZIP and/or resource files
+	- Timers
 
 
 *** Graphics module

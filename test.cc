@@ -4,6 +4,9 @@
 static bool _run = true;
 
 
+SoundClip *sc;
+
+
 
 class MyHandler: public GfxEventHandler
 {
@@ -18,7 +21,7 @@ public:
 	{
 		if(key==KEY_SPACE)
 		{
-			Display::set_mode(VideoMode::resizable());
+			Audio::play(sc);
 		}
 	}
 
@@ -38,6 +41,13 @@ int main(int argc, char **argv)
 	Texture *tex = Texture::cache("src/data/konata.png");
 
 
+	sc = SoundClip::load("Heal8-Bit.ogg");
+
+	SoundClip *sc2 = SoundClip::load("FindYou.ogg");
+
+	Audio::play(sc2, -1, true);
+
+
 	while(_run)
 	{
 		Display::clear(Color(0.9f, 0.3f, 0.4f));
@@ -50,6 +60,9 @@ int main(int argc, char **argv)
 
 		mh.process_events();
 	}
+
+	delete sc;
+	delete sc2;
 
 	pix_shutdown();
 

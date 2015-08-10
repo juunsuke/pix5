@@ -10,7 +10,7 @@ HDRS =
 
 SRCS = test.cc
 
-PIXLIBS = core input gfx net
+PIXLIBS = core input gfx net audio
 
 
 
