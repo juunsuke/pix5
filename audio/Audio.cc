@@ -5,6 +5,17 @@ namespace Audio
 {
 
 
+class Category
+{
+public:
+
+	Str _name;
+	// Category name
+
+	float _vol;
+	// Category volume
+};
+
 class Track
 {
 public:
@@ -17,6 +28,9 @@ public:
 	float _pitch;
 	// Track parameters
 
+	Category *_cat;
+	// Category
+
 	double _pos;
 	// Current position, between 0 and 1
 
@@ -28,6 +42,16 @@ public:
 
 	bool _active;
 	// Wether the track is active
+
+	bool _playing;
+	// Wether the track is currently playing
+
+	bool _stopping;
+	// Wether the track is fading out to be stopped
+
+	float _fade;
+	// Fade factor
+
 
 	Track *_next, *_prev;
 	// Links for the doubled linked list of active tracks
@@ -56,6 +80,9 @@ static Track *_first, *_last;
 
 static float _vol = 1.0f;
 // Master volume
+
+static List<Category*> _cats;
+// List of all known categories
 
 
 
@@ -93,6 +120,8 @@ void done()
 		delete _driver;
 		_driver = NULL;
 	}
+
+	_cats.clear_del();
 
 	_tracks.clear_del();
 
@@ -147,6 +176,11 @@ void set_tracks(int num)
 	_driver->unlock();
 }
 
+int get_tracks()
+{
+	return _tracks.size();
+}
+
 static Track *find_free_track(int& i)
 {
 	// Look for a free track
@@ -163,6 +197,22 @@ static Track *find_free_track(int& i)
 
 	// No free track
 	return NULL;
+}
+
+static Category *get_cat(const Str& name)
+{
+	// Look for the category
+	for(int c = 0; c<_cats.size(); c++)
+		if(_cats[c]->_name==name)
+			return _cats[c];
+
+	// Not found, create a new one
+	Category *cat = new Category();
+	cat->_name = name;
+	cat->_vol = 1.0f;
+	_cats.add(cat);
+
+	return cat;
 }
 
 int play(SoundClip *sc, int track, bool repeat, float vol, float pan, float pitch, float pos)
@@ -198,6 +248,7 @@ int play(SoundClip *sc, int track, bool repeat, float vol, float pan, float pitc
 
 	// Setup the track
 	trk->_sc = sc;
+	trk->_cat = get_cat(sc->_cat);
 	trk->_repeat = repeat;
 	trk->_vol = vol;
 	trk->_pan = Math::fclamp(pan, -1, 1);
@@ -205,6 +256,8 @@ int play(SoundClip *sc, int track, bool repeat, float vol, float pan, float pitc
 	trk->_pos = (double)Math::fclamp(pos);
 	trk->_adv = (1.0 / (double)sc->_samples) * ((double)sc->_freq / (double)_driver->get_freq());
 	trk->_active = true;
+	trk->_playing = true;
+	trk->_stopping = false;
 
 	// Link the track in the active list
 	_driver->lock();
@@ -218,6 +271,47 @@ int play(SoundClip *sc, int track, bool repeat, float vol, float pan, float pitc
 	_driver->unlock();
 
 	return track;
+}
+
+void stop(int track, float fade)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::stop(): Invalid track index");
+
+	if(fade>0)
+	{
+		// Fade out a track and then stop it
+		Track *trk = _tracks[track];
+		trk->_fade = (1.0f/(float)_driver->get_freq())/fade;
+		trk->_stopping = true;
+
+		return;
+	}
+
+	// Stop a track
+	_driver->lock();
+
+	Track *trk = _tracks[track];
+	
+	if(trk->_active)
+		unlink_track(trk);
+
+	_driver->unlock();
+}
+
+void pause(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::pause(): Invalid track index");
+
+	// Pause playback
+	_tracks[track]->_playing = false;
+}
+
+void resume(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::pause(): Invalid track index");
+
+	// Resume playback
+	_tracks[track]->_playing = true;
 }
 
 void mix(int16_t *dest, int num, bool stereo)
@@ -238,8 +332,12 @@ void mix(int16_t *dest, int num, bool stereo)
 		// Go through each track
 		for(Track *trk = _first->_next; trk!=_last; trk = trk->_next)
 		{
+			// Skip paused tracks
+			if(!trk->_playing)
+				continue;
+
 			// Get the final volume for this track
-			float vol = _vol * trk->_vol * trk->_sc->_vol;
+			float vol = _vol * trk->_vol * trk->_sc->_vol * trk->_cat->_vol;
 
 			// Get a sample
 			int pos = (int)(trk->_pos*(double)trk->_sc->_samples);
@@ -250,7 +348,10 @@ void mix(int16_t *dest, int num, bool stereo)
 				if(trk->_repeat)
 					trk->_pos = 0;
 				else
-					unlink_track(trk);
+				{
+					trk = trk->_prev;
+					unlink_track(trk->_next);
+				}
 
 				// Either way don't process it at this time
 				continue;
@@ -282,6 +383,17 @@ void mix(int16_t *dest, int num, bool stereo)
 
 			// Advance the track
 			trk->_pos += trk->_adv*trk->_pitch;
+
+			// Handle fade-stopping
+			if(trk->_stopping)
+			{
+				trk->_vol -= trk->_fade;
+				if(trk->_vol<=0)
+				{
+					trk = trk->_prev;
+					unlink_track(trk->_next);
+				}
+			}
 		}
 
 		// Set the value
@@ -320,12 +432,20 @@ void set_volume(float vol)
 	_vol = vol;
 }
 
-bool is_track_active(int track)
+bool is_active(int track)
 {
-	ASSERT(track>=0 && track<_tracks.size(), "Audio::is_track_playing(): Invalid track index");
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::is_active(): Invalid track index");
 
 	return _tracks[track]->_active;
 }
+
+bool is_playing(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::is_playing(): Invalid track index");
+
+	return _tracks[track]->_active && _tracks[track]->_playing;
+}
+
 
 float get_volume(int track)
 {
@@ -369,6 +489,45 @@ void set_pitch(int track, float pitch)
 	_tracks[track]->_pitch = Math::fmax(0, pitch);
 }
 
+bool get_repeat(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::get_repeat(): Invalid track index");
+
+	return _tracks[track]->_repeat;
+}
+
+void set_repeat(int track, bool repeat)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::set_repeat(): Invalid track index");
+
+	_tracks[track]->_repeat = repeat;
+}
+
+float get_pos(int track)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::get_pos(): Invalid track index");
+
+	return _tracks[track]->_pos;
+}
+
+void set_pos(int track, float pos)
+{
+	ASSERT(track>=0 && track<_tracks.size(), "Audio::set_pos(): Invalid track index");
+
+	_tracks[track]->_pos = Math::fclamp(pos);
+}
+
+float get_volume(const Str& cat)
+{
+	// Get a category's volume
+	return get_cat(cat)->_vol;
+}
+
+void set_volume(const Str& cat, float vol)
+{
+	// Set a category's volume
+	get_cat(cat)->_vol = vol;
+}
 
 
 }
