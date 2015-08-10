@@ -12,6 +12,8 @@ SRCS = init.cc
 
 PKGS = sdl2 vorbisfile
 
+PIXLIBS = core
+
 
 include ../Rules.make
 

@@ -12,6 +12,8 @@ SRCS = init.cc
 
 PKGS = 
 
+PIXLIBS = core
+
 
 include ../Rules.make
 

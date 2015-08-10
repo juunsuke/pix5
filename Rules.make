@@ -22,14 +22,14 @@ ifdef OUT_BIN
 OUT_BIN_DBG = $(OUT_BIN)_d
 OUT_BIN_REL = $(OUT_BIN)_r
 
+BIN_SRCS = $(SRCS)
+endif
+
 PIXLIBS_DBG = $(patsubst %,-lpix5%_d,$(PIXLIBS))
 PIXLIBS_REL = $(patsubst %,-lpix5%,$(PIXLIBS))
 
 PIXDEP_DBG = $(patsubst %,$(PIXDIR)/libpix5%_d.so,$(PIXLIBS))
 PIXDEP_REL = $(patsubst %,$(PIXDIR)/libpix5%.so,$(PIXLIBS))
-
-BIN_SRCS = $(SRCS)
-endif
 
 ########################################################################################################################
 
@@ -96,9 +96,9 @@ endif
 LOPTS_DBG = $(LOPTS) -Og -g
 LOPTS_REL = $(LOPTS) -O2
 
-LIB_LOPTS = -shared
-LIB_LOPTS_DBG = $(LIB_LOPTS) $(LOPTS_DBG)
-LIB_LOPTS_REL = $(LIB_LOPTS) $(LOPTS_REL)
+LIB_LOPTS = -shared -L.. -Wl,-rpath=.
+LIB_LOPTS_DBG = $(LIB_LOPTS) $(LOPTS_DBG) $(PIXLIBS_DBG)
+LIB_LOPTS_REL = $(LIB_LOPTS) $(LOPTS_REL) $(PIXLIBS_REL)
 
 BIN_LOPTS = -L$(PIXDIR) -Wl,-rpath=$(PIXDIR)
 BIN_LOPTS_DBG = $(BIN_LOPTS) $(LOPTS_DBG) $(PIXLIBS_DBG)

@@ -14,6 +14,8 @@ DATA = data/vs.glsl data/fs.glsl data/LiberationSans-Regular.ttf
 
 PKGS  = sdl2 SDL2_image gl glew freetype2
 
+PIXLIBS = core input
+
 
 include ../Rules.make
 
