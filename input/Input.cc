@@ -42,6 +42,23 @@ void init()
 
 	_repeat = false;
 
+	_last_joy_id = 0;
+}
+
+void done()
+{
+	// Clear the joysticks
+	_joys.clear_del();
+}
+
+
+void reset()
+{
+	// Reset the internal state
+	// Happens after a mode change or window resize
+	_mouse.reset();
+	_kbd.reset();
+	
 	// Setup the key data
 	for(int c = 0; c<512; c++)
 	{
@@ -65,23 +82,6 @@ void init()
 		_kbd.keys[c].code_name = SDL_GetScancodeName(sc);
 		_kbd.keys[c].key_name = SDL_GetKeyName(key);
 	}
-
-	_last_joy_id = 0;
-}
-
-void done()
-{
-	// Clear the joysticks
-	_joys.clear_del();
-}
-
-
-void reset()
-{
-	// Reset the internal state
-	// Happens after a mode change or window resize
-	_mouse.reset();
-	_kbd.reset();
 }
 
 Mouse& get_mouse()
