@@ -13,7 +13,6 @@
 
 *** Audio module
 
-	- Redo audio using OpenAL
 	- Mic input
 	- Voice compression
 

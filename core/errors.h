@@ -65,4 +65,13 @@ PIXERR( 0x40000004, NetMessage,			"NetMessage error" )
 PIXERR( 0x50000001, LoadVorbis,			"Error loading an Ogg Vorbis file" )
 
 
+// Map errors
+PIXERR( 0x60000001, TileMap,			"TileMap error" )
+
+
+
+
+
+
+
 
