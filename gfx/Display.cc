@@ -230,8 +230,11 @@ void set_mode(const VideoMode& vm)
 			// Windowed fullscreen
 			mode_desc = "Windowed fullscreen";
 			flags |= SDL_WINDOW_BORDERLESS;
-			width = 0;
-			height = 0;
+
+			SDL_DisplayMode dm;
+			SDL_GetDesktopDisplayMode(0, &dm);
+			width = dm.w;
+			height = dm.h;
 			break;
 
 		case VideoModeType::Fullscreen:

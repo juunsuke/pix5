@@ -6,6 +6,7 @@
 #include "net/pix5net.h"
 #include "audio/pix5audio.h"
 #include "map/pix5map.h"
+#include "game/pix5game.h"
 
 
 

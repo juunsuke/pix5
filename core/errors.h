@@ -69,6 +69,9 @@ PIXERR( 0x50000001, LoadVorbis,			"Error loading an Ogg Vorbis file" )
 PIXERR( 0x60000001, TileMap,			"TileMap error" )
 
 
+// Game errors
+PIXERR( 0x70000001, Scene,				"Scene error" )
+
 
 
 

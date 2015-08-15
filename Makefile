@@ -6,6 +6,8 @@ debug:
 	@(cd net && make -j debug)
 	@(cd audio && make -j debug)
 	@(cd map && make -j debug)
+	@(cd gui && make -j debug)
+	@(cd game && make -j debug)
 
 release:
 	@(cd core && make -j release)
@@ -14,6 +16,8 @@ release:
 	@(cd net && make -j release)
 	@(cd audio && make -j release)
 	@(cd map && make -j release)
+	@(cd gui && make -j release)
+	@(cd game && make -j release)
 
 clean:
 	@(cd core && make -j clean)
@@ -22,6 +26,8 @@ clean:
 	@(cd net && make -j clean)
 	@(cd audio && make -j clean)
 	@(cd map && make -j clean)
+	@(cd gui && make -j clean)
+	@(cd game && make -j clean)
 	@(make -f Makefile.test clean)
 
 test: debug
